@@ -25,11 +25,11 @@ window.SITE_CONFIG = {
    * Để trống thì web chỉ đọc dữ liệu tĩnh trong data/giai-dau.json.
    */
   firebase: {
-    apiKey: '',
-    authDomain: '',
-    projectId: '',
-    storageBucket: '',
-    messagingSenderId: '',
-    appId: ''
+    apiKey: 'AIzaSyBRTt_mJPk3Gvoj7qOltxzmHv7I64HIz6c',
+    authDomain: 'dao97-open.firebaseapp.com',
+    projectId: 'dao97-open',
+    storageBucket: 'dao97-open.firebasestorage.app',
+    messagingSenderId: '223298716515',
+    appId: '1:223298716515:web:0aba4931b80d3fa0394956'
   }
 };
