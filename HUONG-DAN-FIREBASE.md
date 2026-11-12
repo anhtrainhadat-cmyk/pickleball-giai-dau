@@ -7,25 +7,30 @@ Dùng gói **Spark (miễn phí)**, không cần thẻ ngân hàng. Làm 1 lần
 1. Vào https://console.firebase.google.com bằng Gmail → **Create a project** (Tạo dự án).
 2. Đặt tên `dao97-open` → tắt Google Analytics → **Create project**.
 
-## 2. Bật đăng nhập bằng email
-1. Menu trái **Build › Authentication** → **Get started**.
-2. Tab **Sign-in method** → **Email/Password** → bật **Enable** → **Save**.
-3. Tab **Settings › User actions** → **bỏ tích** “Enable create (sign-up)” → **Save** (không cho người lạ tự tạo tài khoản).
-4. Tab **Users** → **Add user** → nhập email + mật khẩu cho từng thành viên BTC (VD trưởng BTC Dương CT).
+## 2. Bật đăng nhập (BTC dùng số điện thoại + mật khẩu)
+1. Menu trái **Security › Authentication** → **Get started**.
+2. Tab **Sign-in method** → **Email/Password** → bật **Enable** (công tắc đầu) → **Save**.
+3. Tab **Settings › User actions** → **bỏ tích** “Enable create (sign-up)” → **Save**.
+4. Tab **Users** → **Add user**:
+   - **Email**: số điện thoại + `@dao97open.vn`, VD `0912345678@dao97open.vn`
+   - **Password**: mật khẩu ≥ 6 ký tự
+   - Lặp lại cho từng thành viên BTC.
+
+> Trên trang BTC chỉ cần gõ **số điện thoại** (VD `0912345678`) và mật khẩu — web tự thêm phần `@dao97open.vn`.
+> Quên mật khẩu: Trưởng BTC xoá user đó trong tab Users rồi Add user lại với mật khẩu mới.
 
 ## 3. Tạo cơ sở dữ liệu
-1. **Build › Firestore Database** → **Create database**.
-2. Vị trí: **asia-southeast1 (Singapore)** → chọn **Start in production mode** → **Create**.
-3. Tab **Rules** → xoá hết → dán toàn bộ nội dung file [`firestore.rules`](firestore.rules) → **Publish**.
+1. Menu trái **Databases & Storage › Firestore** → **Create database**.
+2. Phiên bản **Standard**, vị trí **asia-southeast1 (Singapore)**, **Start in production mode** → **Create**.
+3. Tab **Rules** → xoá hết → dán toàn bộ nội dung file [`firestore.rules`](firestore.rules)
+   (bản thô: https://raw.githubusercontent.com/anhtrainhadat-cmyk/pickleball-giai-dau/main/firestore.rules) → **Publish**.
 
 ## 4. Cấp quyền BTC
 Trong Firestore tab **Data**:
 1. **Start collection** → Collection ID: `admins` → **Next**.
-2. **Document ID**: email của BTC, **viết thường** (VD `duongct@gmail.com`).
-3. Thêm 1 trường: Field `role`, Type `string`, Value `btc` → **Save**.
-4. Thêm người khác: trong collection `admins` bấm **Add document**, làm tương tự.
-
-> Chỉ email có trong `admins` mới nhập được kết quả và xem/chấm trình VĐV. Người khác đăng nhập cũng bị chặn.
+2. **Document ID**: đúng chuỗi đã tạo ở bước 2, VD `0912345678@dao97open.vn`.
+3. Thêm trường: Field `role`, Type `string`, Value `btc` → **Save**.
+4. Người tiếp theo: trong `admins` bấm **Add document**, làm tương tự.
 
 ## 5. Lấy cấu hình web
 1. Bấm ⚙️ cạnh **Project Overview** → **Project settings**.

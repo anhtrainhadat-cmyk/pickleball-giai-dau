@@ -124,7 +124,17 @@
       cb(u, ok);
     });
   };
-  Store.signIn = (email, pw) => auth.signInWithEmailAndPassword(email.trim(), pw);
+  // Đăng nhập bằng số điện thoại: 0912 345 678 / +84912345678 → 0912345678@dao97open.vn
+  Store.PHONE_DOMAIN = 'dao97open.vn';
+  Store.phoneToLogin = function (v) {
+    v = String(v || '').trim();
+    if (v.includes('@')) return v.toLowerCase();
+    let d = v.replace(/\D/g, '');
+    if (d.startsWith('84') && d.length >= 11) d = '0' + d.slice(2);
+    return d + '@' + Store.PHONE_DOMAIN;
+  };
+  Store.loginToPhone = (email) => String(email || '').replace('@' + Store.PHONE_DOMAIN, '');
+  Store.signIn = (phone, pw) => auth.signInWithEmailAndPassword(Store.phoneToLogin(phone), pw);
   Store.signOut = () => auth.signOut();
   Store.resetPassword = (email) => auth.sendPasswordResetEmail(email.trim());
 

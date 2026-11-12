@@ -22,33 +22,28 @@
       <h2>Đăng nhập BTC</h2>
       <p class="muted" style="margin-top:0">Dành cho thành viên Ban tổ chức nhập kết quả và chấm trình VĐV.</p>
       <div class="form-grid" style="grid-template-columns:1fr">
-        <label class="f">Email<input type="email" name="email" required autocomplete="username"></label>
+        <label class="f">Số điện thoại<input type="tel" name="phone" required autocomplete="username" inputmode="tel" placeholder="VD: 0912345678"></label>
         <label class="f">Mật khẩu<input type="password" name="pw" required autocomplete="current-password"></label>
       </div>
       <p class="hint" id="login-msg" style="color:var(--danger)">${esc(err || '')}</p>
-      <div class="toolbar" style="margin-top:12px"><button class="btn primary" type="submit">Đăng nhập</button><button class="btn ghost sm" type="button" id="forgot">Quên mật khẩu?</button></div>
+      <div class="toolbar" style="margin-top:12px"><button class="btn primary" type="submit">Đăng nhập</button></div>
+      <p class="hint">Quên mật khẩu? Liên hệ Trưởng BTC <b>${esc((window.SITE_CONFIG || {}).head || '')}</b> để cấp lại.</p>
     </form>`;
     $('#login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       $('#login-msg').textContent = 'Đang đăng nhập…';
-      try { await Store.signIn(fd.get('email'), fd.get('pw')); }
-      catch (er) { $('#login-msg').textContent = 'Sai email hoặc mật khẩu.'; }
-    });
-    $('#forgot').addEventListener('click', async () => {
-      const email = $('#login [name=email]').value;
-      if (!email) { $('#login-msg').textContent = 'Nhập email trước rồi bấm "Quên mật khẩu?".'; return; }
-      try { await Store.resetPassword(email); $('#login-msg').textContent = 'Đã gửi email đặt lại mật khẩu (nếu email có trong hệ thống).'; }
-      catch (er) { $('#login-msg').textContent = 'Không gửi được email đặt lại mật khẩu.'; }
+      try { await Store.signIn(fd.get('phone'), fd.get('pw')); }
+      catch (er) { $('#login-msg').textContent = 'Sai số điện thoại hoặc mật khẩu.'; }
     });
   }
 
   Store.onAuth((user, ok) => {
     if (!user) return loginView();
-    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">${esc(user.email)}</span><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
+    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">📱 ${esc(Store.loginToPhone(user.email))}</span><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
     $('#logout').addEventListener('click', () => Store.signOut());
     if (!ok) {
-      app.innerHTML = `<div class="card login"><h2>Chưa có quyền BTC</h2><p class="muted">Tài khoản <b>${esc(user.email)}</b> đã đăng nhập nhưng chưa được thêm vào danh sách BTC. Trưởng BTC thêm email này trong Firebase Console › Firestore › <code>admins</code>.</p></div>`;
+      app.innerHTML = `<div class="card login"><h2>Chưa có quyền BTC</h2><p class="muted">Tài khoản <b>${esc(Store.loginToPhone(user.email))}</b> đã đăng nhập nhưng chưa được thêm vào danh sách BTC. Trưởng BTC thêm <code>${esc(user.email)}</code> vào Firebase Console › Firestore › <code>admins</code>.</p></div>`;
       return;
     }
     if (!watching) {
@@ -171,8 +166,9 @@
       <p class="muted">Tải toàn bộ dữ liệu (đội, kết quả, trình VĐV, dự đoán) về máy để lưu trữ.</p>
       <button class="btn" data-act="backup">⤓ Tải bản sao lưu</button>
       <h3 style="margin-top:22px">Thêm thành viên BTC</h3>
-      <ol class="guide muted"><li>Firebase Console › Authentication › Users › <b>Add user</b> (email + mật khẩu).</li>
-      <li>Firestore Database › collection <code>admins</code> › <b>Add document</b>: Document ID = email đó (chữ thường), thêm 1 trường bất kỳ (VD <code>role</code> = <code>btc</code>).</li></ol></div>`;
+      <ol class="guide muted"><li>Firebase Console › Security › Authentication › Users › <b>Add user</b>: Email = <code>SỐĐIỆNTHOẠI@dao97open.vn</code> (VD <code>0912345678@dao97open.vn</code>), mật khẩu ≥ 6 ký tự.</li>
+      <li>Firestore › collection <code>admins</code> › <b>Add document</b>: Document ID = đúng chuỗi trên, thêm trường <code>role</code> = <code>btc</code>.</li>
+      <li>Người đó đăng nhập trang BTC bằng <b>số điện thoại + mật khẩu</b>.</li></ol></div>`;
   }
 
   /* ---------- Sự kiện ---------- */
