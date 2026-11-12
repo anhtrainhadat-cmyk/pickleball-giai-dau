@@ -403,6 +403,7 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 .sponsor { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 18px 12px; border-radius: 16px; background: linear-gradient(180deg, rgba(31, 33, 99, .7), rgba(17, 18, 58, .7)); border: 1px solid var(--border); min-height: 150px; }
 .sponsor img { height: 64px; width: auto; max-width: 100%; object-fit: contain; }
 .sponsor img.wide { height: 44px; }
+.sponsor img.tall { height: 84px; }
 .sponsor span { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-align: center; }
 
 /* Danh sách đội */
