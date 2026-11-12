@@ -1,15 +1,25 @@
 /*
- * CẤU HÌNH WEBSITE — sửa các thông tin dưới đây cho đúng với đơn vị tổ chức của anh.
+ * CẤU HÌNH WEBSITE — sửa các thông tin dưới đây cho đúng.
  * Để trống ("") mục nào thì mục đó sẽ tự ẩn trên website.
  */
 window.SITE_CONFIG = {
-  name: 'Pickleball Cup',                       // Tên thương hiệu / ban tổ chức
-  slogan: 'Tổ chức giải pickleball chuyên nghiệp — minh bạch, đúng giờ, vui hết mình',
-  phone: '0900 000 000',                        // Số điện thoại / hotline
-  zalo: '0900000000',                           // Số Zalo (chỉ số, không dấu cách)
-  facebook: 'https://facebook.com/',            // Link fanpage Facebook
-  email: 'lienhe@example.com',
-  address: 'TP. Hồ Chí Minh',
-  // Link Google Form đăng ký chung (dùng khi giải không có link riêng)
+  name: 'ĐÀO97 OPEN',
+  club: 'CLB Pickleball Đào 97 Hà Nội',
+  slogan: 'Giải pickleball đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 (Đào Duy Từ 1997–2000).',
+  since: '2024',
+  president: 'Hoàng Đức Dương',
+
+  // Giải chính hiển thị trên trang chủ (id trong data/giai-dau.json)
+  mainTournament: 'dao97-open-2026',
+  // Giờ bắt đầu để đếm ngược (giờ Việt Nam)
+  eventStart: '2026-11-21T12:30:00+07:00',
+  eventEnd: '2026-11-21T22:00:00+07:00',
+
+  // Liên hệ — điền vào để hiện mục Liên hệ trên trang chủ
+  phone: '',
+  zalo: '',
+  facebook: '',
+  email: '',
+  address: 'Hà Nội',
   registerUrl: ''
 };

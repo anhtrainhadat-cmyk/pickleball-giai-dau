@@ -1,4 +1,6 @@
-# Website tổ chức giải Pickleball
+# ĐÀO97 OPEN — Website giải Pickleball CLB Đào 97 Hà Nội
+
+Giải đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 · 21/11/2026 · Sân Pick Ba Dứa – Nguyễn Xiển.
 
 Website tĩnh (HTML/CSS/JS thuần), chạy **miễn phí** trên GitHub Pages — không cần hosting, không cần domain, không cần database.
 
@@ -6,7 +8,7 @@ Website tĩnh (HTML/CSS/JS thuần), chạy **miễn phí** trên GitHub Pages �
 - **Trang chủ**: danh sách giải (lọc theo trạng thái), dịch vụ, quy trình, luật cơ bản, liên hệ.
 - **Trang chi tiết giải**: thông tin, danh sách đội, bảng xếp hạng vòng bảng, nhánh loại trực tiếp, lịch & kết quả. Tự cập nhật mỗi 60 giây khi giải đang diễn ra.
 - **Trang ban tổ chức** (`quan-ly.html`):
-  - Tạo giải: vòng tròn / loại trực tiếp / vòng bảng + loại trực tiếp
+  - Tạo giải: **đồng đội vòng tròn** (mỗi vòng 4 nội dung, chạm 15, xếp hạng theo Điều 9 điều lệ), vòng tròn, loại trực tiếp, vòng bảng + loại trực tiếp
   - Nhập đội hàng loạt (dán từ Google Sheets), xếp hạt giống, bốc thăm ngẫu nhiên
   - Tự chia bảng, xếp lịch vòng tròn, dựng nhánh đấu (có miễn đấu, tránh đội cùng bảng gặp sớm)
   - Nhập tỉ số → bảng xếp hạng & nhánh đấu tự cập nhật; in lịch thi đấu
@@ -17,8 +19,18 @@ Website tĩnh (HTML/CSS/JS thuần), chạy **miễn phí** trên GitHub Pages �
 2. Mục *Build and deployment*: Source = **Deploy from a branch**, Branch = **main**, thư mục **/ (root)** → **Save**.
 3. Sau 1–2 phút, website có địa chỉ: `https://<tên-tài-khoản>.github.io/<tên-repo>/`
 
-## Sửa thông tin liên hệ
-Mở file `js/config.js` trên GitHub (bấm biểu tượng ✏️), sửa tên, số điện thoại, Zalo, Facebook, email → **Commit changes**.
+## Sửa thông tin CLB / liên hệ
+Mở file `js/config.js` trên GitHub (bấm biểu tượng ✏️), sửa tên, giờ đếm ngược, số điện thoại, Zalo, Facebook, email → **Commit changes**.
+Mục Liên hệ trên trang chủ chỉ hiện khi có ít nhất 1 trong: điện thoại, Zalo, Facebook, email.
+
+## Hình ảnh
+Ảnh nằm trong thư mục `img/` (logo, backdrop, giải thưởng, điều lệ, timeline, nhà tài trợ). Muốn thay ảnh: upload file mới **cùng tên** vào `img/`.
+
+## Nhập tên đội & tỉ số ngày thi đấu
+1. Vào `quan-ly.html` → **⤓ Lấy từ web** → chọn giải ĐÀO97 OPEN.
+2. Bước **2. Đội / VĐV**: sửa tên "Đội 1…8", đội trưởng, danh sách VĐV (đổi tên không làm mất lịch).
+3. Bước **3. Thi đấu & tỉ số**: nhập tỉ số từng nội dung (VD `15-12`; xử thua `0-15`), tên cặp VĐV, sân, giờ.
+4. Bước **4. Đăng lên web** → tải `giai-dau.json` → upload đè vào thư mục `data` trên GitHub.
 
 ## Quy trình cập nhật giải đấu
 1. Mở `https://<tên-tài-khoản>.github.io/<tên-repo>/quan-ly.html`

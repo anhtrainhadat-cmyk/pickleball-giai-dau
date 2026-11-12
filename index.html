@@ -3,100 +3,263 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Giải Pickleball — Lịch thi đấu, đăng ký & kết quả</title>
-  <meta name="description" content="Tổ chức giải pickleball: đăng ký thi đấu, lịch thi đấu, bảng xếp hạng, nhánh đấu và kết quả trực tiếp.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23d6f43a'/><g fill='%231b2a07' opacity='.45'><circle cx='35' cy='35' r='6'/><circle cx='65' cy='35' r='6'/><circle cx='50' cy='55' r='6'/><circle cx='30' cy='65' r='6'/><circle cx='70' cy='65' r='6'/></g></svg>">
+  <title>ĐÀO97 OPEN — Giải Pickleball mừng sinh nhật 2 tuổi CLB Đào 97</title>
+  <meta name="description" content="ĐÀO97 OPEN — giải pickleball đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 Hà Nội. Ngày 21/11/2026 tại sân Pick Ba Dứa – Nguyễn Xiển. Lịch thi đấu, bảng xếp hạng, điều lệ.">
+  <meta property="og:title" content="ĐÀO97 OPEN — Mừng sinh nhật 2 tuổi CLB Pickleball Đào 97">
+  <meta property="og:description" content="21/11/2026 · Sân Pick Ba Dứa – Nguyễn Xiển · Gala tại Trống Đồng Linh Đàm">
+  <meta property="og:image" content="img/og.jpg">
+  <meta name="theme-color" content="#12082b">
+  <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a class="logo" href="index.html"><span class="dot" aria-hidden="true"></span><span data-site-name>Pickleball</span></a>
+      <a class="logo" href="index.html"><img src="img/logo.webp" alt="Logo CLB Pickleball Đào Duy Từ" width="52" height="40"><span><b>ĐÀO97 OPEN</b><small>CLB PICKLEBALL ĐÀO 97</small></span></a>
       <button class="btn sm ghost menu-btn" aria-label="Mở menu">☰ Menu</button>
       <nav class="nav-links">
-        <a href="#giai-dau">Giải đấu</a>
-        <a href="#dich-vu">Dịch vụ</a>
-        <a href="#luat">Luật cơ bản</a>
-        <a href="#lien-he">Liên hệ</a>
-        <a href="quan-ly.html">Ban tổ chức</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#bxh">Bảng xếp hạng</a>
+        <a href="#dieu-le">Điều lệ</a>
+        <a href="#giai-thuong">Giải thưởng</a>
+        <a href="#tai-tro">Nhà tài trợ</a>
+        <a href="quan-ly.html">BTC</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div>
+        <img class="hero-logo" src="img/logo.webp" alt="Logo CLB Pickleball Đào Duy Từ 1997–2000" width="430" height="326">
+        <h1 class="display grad-text">Đào97 Open</h1>
+        <div class="hero-sub">Mừng sinh nhật 2 tuổi · CLB Pickleball Đào 97 Hà Nội</div>
+        <p class="lead">Giải pickleball đồng đội: 8 đội, 7 vòng đấu, 4 nội dung mỗi vòng. Thi đấu xong là Gala sinh nhật.</p>
+        <div class="pills">
+          <div class="pill"><span class="t">12h30 · 21.11.2026</span><a href="https://www.google.com/maps/search/?api=1&query=S%C3%A2n%20pickleball%20Ba%20D%E1%BB%A9a%20Nguy%E1%BB%85n%20Xi%E1%BB%83n%20H%C3%A0%20N%E1%BB%99i" target="_blank" rel="noopener">📍 Sân Pick Ba Dứa – Nguyễn Xiển ↗</a></div>
+          <div class="pill pink"><span class="t">18h00 · 21.11.2026</span><a href="https://www.google.com/maps/search/?api=1&query=Nh%C3%A0%20h%C3%A0ng%20Tr%E1%BB%91ng%20%C4%90%E1%BB%93ng%20Linh%20%C4%90%C3%A0m" target="_blank" rel="noopener">🎉 Gala · Nhà hàng Trống Đồng Linh Đàm ↗</a></div>
+        </div>
+        <div class="actions">
+          <a class="btn primary" id="cta-live" href="giai-dau.html?id=dao97-open-2026">Lịch thi đấu & kết quả</a>
+          <a class="btn ghost" href="#dieu-le">Xem điều lệ</a>
+        </div>
+      </div>
+      <div class="countdown-card">
+        <h3 id="cd-title">Đếm ngược đến giờ khai mạc</h3>
+        <div id="countdown" class="countdown" aria-live="polite">
+          <div><b id="cd-d">--</b><span>Ngày</span></div>
+          <div><b id="cd-h">--</b><span>Giờ</span></div>
+          <div><b id="cd-m">--</b><span>Phút</span></div>
+          <div><b id="cd-s">--</b><span>Giây</span></div>
+        </div>
+        <div class="stats">
+          <div><b id="s-doi">8</b><span>đội</span></div>
+          <div><b id="s-tran">0/28</b><span>lượt đấu</span></div>
+          <div><b id="s-nd">0</b><span>nội dung đã đấu</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="timeline">
     <div class="container">
-      <div class="eyebrow" style="color:var(--ball)">Giải đấu pickleball</div>
-      <h1>Thi đấu hết mình — kết quả cập nhật từng trận</h1>
-      <p id="slogan"></p>
-      <div class="actions">
-        <a class="btn ball" href="#giai-dau">Xem giải đấu</a>
-        <a class="btn" href="#lien-he">Liên hệ tổ chức giải</a>
+      <div class="section-head"><div><div class="eyebrow">Thứ Bảy · 21.11.2026</div><h2 class="display grad-text">Timeline chương trình</h2></div></div>
+      <div class="timeline">
+        <div class="card tl-group">
+          <h3>I. Đón tiếp & <span>Khai mạc</span></h3>
+          <ul class="tl">
+            <li><time>12h15 – 12h30</time>Đón tiếp khách mời và các vận động viên tại sân Ba Dứa.</li>
+            <li><time>12h30 – 12h45</time>Chụp ảnh lưu niệm và BTC trao tặng quà.</li>
+            <li><time>12h45 – 13h00</time>Khai mạc giải<small>BTC phát biểu, cảm ơn nhà tài trợ, tuyên thệ</small></li>
+          </ul>
+        </div>
+        <div class="card tl-group">
+          <h3>II. Thi đấu & <span>Bế mạc</span></h3>
+          <ul class="tl">
+            <li><time>13h00 – 17h30</time>Thi đấu đồng đội vòng tròn<small>Theo điều lệ giải</small></li>
+            <li><time>17h30 – 18h00</time>Trao giải và Bế mạc<small>VĐV nghỉ ngơi và thay trang phục</small></li>
+          </ul>
+        </div>
+        <div class="card tl-group">
+          <h3>III. Gala <span>sinh nhật</span></h3>
+          <ul class="tl">
+            <li><time>18h00 – 22h00</time>Gala chúc mừng sinh nhật CLB Pickleball Đào97 tròn 2 tuổi
+              <small>Tiệc mặn và những ly bia đậm đà · DJ và vũ đoàn Spartar · Thổi nến mừng sinh nhật · Bốc thăm trúng thưởng Lucky Draw với nhiều phần quà hấp dẫn</small></li>
+          </ul>
+        </div>
       </div>
-      <div class="stats">
-        <div><b id="s-giai">0</b><span>giải đấu</span></div>
-        <div><b id="s-doi">0</b><span>đội / VĐV tham gia</span></div>
-        <div><b id="s-tran">0</b><span>trận đã đấu</span></div>
+    </div>
+  </section>
+
+  <section class="block alt" id="bxh">
+    <div class="container">
+      <div class="section-head">
+        <div><div class="eyebrow">Cập nhật trực tiếp</div><h2 class="display">Bảng xếp hạng</h2></div>
+        <a class="btn primary sm" href="giai-dau.html?id=dao97-open-2026#lich">Xem tất cả lượt đấu →</a>
       </div>
+      <div id="bxh-body"><p class="empty">Đang tải dữ liệu…</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="dieu-le">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Kỷ niệm 2 năm thành lập · Tháng 11/2026</div><h2 class="display grad-text">Điều lệ giải</h2></div></div>
+
+      <div class="big-facts">
+        <div class="fact"><b class="grad-text">08</b><span>đội tham gia</span></div>
+        <div class="fact"><b class="grad-text">08</b><span>VĐV/đội · 6 nam, 2 nữ</span></div>
+        <div class="fact"><b class="grad-text">07</b><span>vòng đấu vòng tròn</span></div>
+        <div class="fact"><b class="grad-text">04</b><span>nội dung mỗi vòng</span></div>
+        <div class="fact"><b style="color:var(--gold)">15</b><span>điểm · chạm 15</span></div>
+        <div class="fact"><b style="color:var(--gold)">8</b><span>điểm thì đổi sân</span></div>
+      </div>
+
+      <div class="rules-grid">
+        <div class="card rule">
+          <h3><span class="k">A</span>Quy định chung & cơ cấu</h3>
+          <ul>
+            <li>Giải có <b>08 đội</b>, mỗi đội <b>08 VĐV</b> gồm <b>06 nam và 02 nữ</b>.</li>
+            <li>Mỗi đội cử 01 <b>đội trưởng</b> làm đầu mối liên hệ, phối hợp với BTC.</li>
+            <li>Danh sách VĐV phải được BTC xác nhận trước giải. Mọi thay đổi, bổ sung phải được BTC chấp thuận.</li>
+            <li>Thi đấu <b>vòng tròn một lượt</b>: mỗi đội gặp 07 đội còn lại. Mỗi vòng đối đầu có 4 nội dung theo thứ tự:</li>
+          </ul>
+          <div class="subs-order"><span>1 · Đôi nam 1</span><span>2 · Đôi nam nữ 1</span><span>3 · Đôi nam 2</span><span>4 · Đôi nam nữ 2</span></div>
+          <ul><li>Mỗi VĐV chỉ thi đấu <b>tối đa 01 nội dung</b> trong cùng một vòng đối đầu.</li></ul>
+        </div>
+
+        <div class="card rule">
+          <h3><span class="k">B</span>Bốc thăm & báo cặp</h3>
+          <ul>
+            <li>Trước mỗi vòng, hai đội bốc thăm (có trọng tài giám sát) để xác định đội báo cặp trước ở nội dung đầu tiên.</li>
+            <li>Báo cặp luân phiên kiểu zic-zac:
+              <br><b>B1 · Đôi nam 1:</b> đội thua bốc thăm báo trước.
+              <br><b>B2 · Đôi nam nữ 1:</b> đội báo sau ở nội dung 1 thì báo trước.
+              <br><b>B3 · Đôi nam 2:</b> đội báo trước ở nội dung 1 thì báo trước.
+              <br><b>B4 · Đôi nam nữ 2:</b> đội báo trước ở nội dung 2 thì báo trước.</li>
+            <li>Mỗi đội được báo cặp trước ở 02 nội dung. Báo xong, hai đội xác nhận danh sách với trọng tài.</li>
+          </ul>
+        </div>
+
+        <div class="card rule">
+          <h3><span class="k">⏱</span>Trước & trong trận</h3>
+          <ul>
+            <li>Có mặt tại sân ít nhất <b>10 phút</b> trước giờ trận đấu.</li>
+            <li>Khởi động trên sân tối đa <b>2 phút</b>.</li>
+            <li>Mỗi cặp được hội ý <b>01 lần/trận</b>, tối đa 60 giây.</li>
+            <li>Chấn thương: chăm sóc y tế tối đa <b>10 phút</b>.</li>
+            <li>Bóng thi đấu <b>Facolos 48 lỗ</b> do BTC cung cấp.</li>
+            <li>Đổi sân 01 lần tại điểm <b>8</b>, giữ nguyên vị trí ô số 1 và ô số 2.</li>
+          </ul>
+        </div>
+
+        <div class="card rule">
+          <h3><span class="k">🎾</span>Vị trí & giao bóng</h3>
+          <ul>
+            <li>Đăng ký vị trí trước trận: <b>ô số 1</b> bên phải, <b>ô số 2</b> bên trái (nhìn về lưới). Giữ cố định vị trí suốt trận, kể cả khi đổi sân.</li>
+            <li>Người giao bóng theo điểm của đội đang giao: điểm <b>chẵn</b> (kể cả 0) thì <b>ô số 1</b> giao, điểm <b>lẻ</b> thì <b>ô số 2</b> giao.</li>
+            <li>Bên giao thắng điểm thì giữ quyền giao, luân phiên ô 1 → ô 2 → ô 1…</li>
+            <li>Bên nhận thắng pha bóng thì giành quyền giao. Người giao đầu tiên xác định theo điểm số hiện tại.</li>
+          </ul>
+        </div>
+
+        <div class="card rule">
+          <h3><span class="k">C</span>Tính điểm & xếp hạng</h3>
+          <ul>
+            <li>Thắng 01 nội dung được <b>1 điểm</b>, thua được 0 điểm. Tối đa 4 điểm/vòng. Kết quả vòng: <b>4–0, 3–1 hoặc hoà 2–2</b>.</li>
+            <li>Xếp hạng chung cuộc lần lượt theo:
+              <br><b>①</b> Hiệu số nội dung thắng/thua toàn giải.
+              <br><b>②</b> Nếu 2 đội bằng nhau: xét kết quả đối đầu trực tiếp; hoà 2–2 thì xét hiệu số điểm trận đối đầu; nếu vẫn bằng thì xét hiệu số điểm toàn giải.
+              <br><b>③</b> Từ 3 đội trở lên bằng nhau: lập bảng phụ giữa các đội đó (hiệu số nội dung → hiệu số điểm), rồi đến tổng hiệu số điểm toàn giải.
+              <br>Vẫn bằng nhau thì đấu phụ hoặc bốc thăm.</li>
+            <li><b>Hiệu số điểm</b> = tổng điểm ghi được − tổng điểm bị ghi.</li>
+          </ul>
+        </div>
+
+        <div class="card rule">
+          <h3><span class="k">D</span>Kỷ luật & vi phạm</h3>
+          <ul>
+            <li>Các đội và VĐV có mặt đúng giờ. VĐV phải có tên trong danh sách đăng ký.</li>
+            <li>Vi phạm quy định số nội dung thi đấu: đội vi phạm bị <b>xử thua nội dung 0–15</b>, đội đối phương được công nhận thắng 15–0.</li>
+            <li>Bỏ cuộc hoặc không đủ điều kiện: các nội dung chưa đấu bị xử thua 0–15. Các nội dung đã đấu hợp lệ được giữ nguyên kết quả.</li>
+            <li>Khiếu nại, tranh chấp do BTC xem xét và quyết định cuối cùng.</li>
+          </ul>
+        </div>
+      </div>
+
+      <details class="full-doc">
+        <summary>📄 Xem bản điều lệ đầy đủ (ảnh gốc)</summary>
+        <img class="zoomable" src="img/dieu-le.webp" alt="Điều lệ giải pickleball kỷ niệm 2 năm thành lập CLB Pickleball Đào 97 Hà Nội" loading="lazy" width="854" height="1280">
+        <p class="hint" style="text-align:center">CLB Pickleball Đào 97 Hà Nội · Chủ tịch: <span data-president></span></p>
+      </details>
+    </div>
+  </section>
+
+  <section class="block alt" id="giai-thuong">
+    <div class="container prize-wrap">
+      <img class="prize-img zoomable" src="img/giai-thuong.webp" alt="Cúp và quà tặng giải ĐÀO97 OPEN" loading="lazy" width="1671" height="941">
+      <div>
+        <div class="eyebrow">Cơ cấu giải thưởng</div>
+        <h2 class="display grad-text" style="font-size:clamp(1.7rem,4.5vw,2.6rem)">Giải thưởng</h2>
+        <div class="prizes">
+          <div class="prize p1"><span class="ic">🏆</span><div><b>Giải Nhất · Đội vô địch</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
+          <div class="prize"><span class="ic">🥈</span><div><b>Giải Nhì · Đội Á quân</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
+          <div class="prize"><span class="ic">🥉</span><div><b>Giải Ba · Đội hạng Ba</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
+          <div class="prize"><span class="ic">⭐</span><div><b>Best Player · VĐV xuất sắc nhất</b><span>Dựa trên số trận thắng, điểm số ghi được và tiêu chí của BTC</span></div></div>
+          <div class="prize"><span class="ic">🎁</span><div><b>Lucky Draw tại Gala</b><span>Bốc thăm trúng thưởng với nhiều phần quà hấp dẫn</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="hinh-anh">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Hình ảnh</div><h2 class="display">Không khí giải đấu</h2></div></div>
+      <div class="gallery">
+        <img class="zoomable" src="img/backdrop.webp" alt="Sân thi đấu và backdrop ĐÀO97 OPEN" loading="lazy" width="1671" height="941">
+        <img class="zoomable" src="img/giai-thuong.webp" alt="Cúp và quà tặng sinh nhật" loading="lazy" width="1671" height="941">
+        <img class="zoomable" src="img/timeline.webp" alt="Poster timeline chương trình" loading="lazy" width="828" height="1330" style="object-position:top">
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt sponsors" id="tai-tro">
+    <div class="container">
+      <div class="eyebrow">Đồng hành cùng giải</div>
+      <h2 class="display" style="font-size:clamp(1.6rem,4vw,2.3rem)">Nhà tài trợ chính</h2>
+      <img src="img/nha-tai-tro.webp" alt="Logo các nhà tài trợ: Sơn Cường, Medistar, STEC, CLB Đào Duy Từ, BN, Picksun" loading="lazy" width="800" height="160">
+      <p class="sponsor-names">Sơn Cường · Medistar · STEC · BN · Picksun</p>
+      <p class="muted" style="margin-top:18px">Chân thành cảm ơn các nhà tài trợ đã đồng hành cùng CLB!</p>
     </div>
   </section>
 
   <section class="block" id="giai-dau">
     <div class="container">
       <div class="section-head">
-        <div><div class="eyebrow">Lịch giải</div><h2>Các giải đấu</h2></div>
+        <div><div class="eyebrow">Lịch giải</div><h2 class="display">Giải đấu của CLB</h2></div>
         <div class="chips" id="filters" role="tablist"></div>
       </div>
       <div class="grid" id="list"><p class="empty">Đang tải dữ liệu…</p></div>
     </div>
   </section>
 
-  <section class="block" id="dich-vu" style="background:var(--surface)">
+  <section class="block alt" id="lien-he" hidden>
     <div class="container">
-      <div class="section-head"><div><div class="eyebrow">Vì sao chọn chúng tôi</div><h2>Tổ chức giải trọn gói</h2></div></div>
-      <div class="features">
-        <div class="card feature"><div class="ico">🗓️</div><h3>Lịch thi đấu tự động</h3><p>Chia bảng, xếp cặp đấu vòng tròn và nhánh loại trực tiếp công bằng theo hạt giống.</p></div>
-        <div class="card feature"><div class="ico">📊</div><h3>Kết quả trực tiếp</h3><p>Tỉ số, bảng xếp hạng và nhánh đấu được cập nhật ngay trên website, xem bằng điện thoại.</p></div>
-        <div class="card feature"><div class="ico">📝</div><h3>Đăng ký online</h3><p>VĐV đăng ký qua form trực tuyến, ban tổ chức duyệt và công bố danh sách nhanh chóng.</p></div>
-        <div class="card feature"><div class="ico">🏆</div><h3>Trọng tài & giải thưởng</h3><p>Trọng tài theo luật hiện hành, cúp – huy chương – quà tặng cho các đội xuất sắc.</p></div>
-      </div>
-      <h3 style="margin-top:40px">Quy trình tham gia</h3>
-      <div class="steps">
-        <div class="card step"><b>BƯỚC 1</b><h3>Chọn giải</h3><p class="muted">Xem nội dung, trình độ, lệ phí và thời gian của giải.</p></div>
-        <div class="card step"><b>BƯỚC 2</b><h3>Đăng ký</h3><p class="muted">Điền form đăng ký, chuyển lệ phí theo hướng dẫn.</p></div>
-        <div class="card step"><b>BƯỚC 3</b><h3>Nhận lịch đấu</h3><p class="muted">Xem bảng đấu, giờ và sân thi đấu ngay trên website.</p></div>
-        <div class="card step"><b>BƯỚC 4</b><h3>Thi đấu</h3><p class="muted">Có mặt trước giờ đấu 15 phút. Kết quả cập nhật liên tục.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="luat">
-    <div class="container">
-      <div class="section-head"><div><div class="eyebrow">Dành cho người mới</div><h2>Luật pickleball cơ bản</h2></div></div>
-      <ol class="rules">
-        <li><b>Giao bóng thấp tay</b><span>Giao chéo sân, tay vợt chạm bóng dưới thắt lưng, đứng sau vạch cuối sân.</span></li>
-        <li><b>Luật hai lần nảy</b><span>Bóng giao phải nảy một lần bên nhận, cú trả giao phải nảy một lần bên giao, sau đó mới được đánh vô-lê.</span></li>
-        <li><b>Vùng cấm vô-lê (Kitchen)</b><span>Khu vực 2,13 m (7 feet) sát lưới — không được đánh bóng khi bóng chưa nảy nếu đang đứng trong vùng này.</span></li>
-        <li><b>Tính điểm</b><span>Thường chơi đến 11 điểm, thắng cách biệt 2 điểm. Một số giải dùng cách tính điểm mỗi pha bóng (rally scoring).</span></li>
-        <li><b>Lỗi thường gặp</b><span>Bóng ra ngoài, không qua lưới, vô-lê trong Kitchen, để bóng nảy hai lần bên mình.</span></li>
-        <li><b>Đánh đôi</b><span>Hô điểm 3 số: điểm đội giao – điểm đội nhận – người giao thứ 1 hoặc 2.</span></li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="block" id="lien-he" style="background:var(--surface)">
-    <div class="container">
-      <div class="section-head"><div><div class="eyebrow">Liên hệ</div><h2>Cần tổ chức giải cho CLB, công ty?</h2></div></div>
-      <p class="muted" style="max-width:640px">Chúng tôi nhận tổ chức giải phong trào, giải nội bộ doanh nghiệp, giải CLB với đầy đủ lịch thi đấu online, trọng tài và giải thưởng.</p>
+      <div class="section-head"><div><div class="eyebrow">Liên hệ</div><h2 class="display">Liên hệ Ban tổ chức</h2></div></div>
       <div class="contact" id="contact"></div>
     </div>
   </section>
 
   <footer>
-    <div class="container"><span>© <span data-year></span> <span data-site-name></span></span><a href="quan-ly.html">Trang ban tổ chức</a></div>
+    <div class="container">
+      <div class="f-brand"><img src="img/logo.webp" alt="" width="56" height="42"><div><b data-club></b><br>Since <span data-since></span> · Chủ tịch: <span data-president></span></div></div>
+      <span>© <span data-year></span> ĐÀO97 OPEN · <a href="quan-ly.html">Trang BTC</a></span>
+    </div>
   </footer>
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Xem ảnh"><img alt=""></div>
 
   <script src="js/config.js"></script>
   <script src="js/core.js"></script>

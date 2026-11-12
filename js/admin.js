@@ -17,11 +17,11 @@
   function newTournament() {
     const today = new Date().toISOString().slice(0, 10);
     return {
-      id: 'giai-' + PB.uid(), name: 'Giải pickleball mới', status: 'mo-dang-ky', public: true,
-      date: today, endDate: '', time: '07:30', location: '', category: 'Đôi nam', level: '',
-      format: 'groups-knockout', groupCount: 2, advance: 2,
-      scoring: 'Vòng bảng: 1 game 11 điểm (thắng cách 2). Bán kết, chung kết: 2/3 game 11 điểm.',
-      maxTeams: 16, fee: '', prize: '', registerUrl: '', contact: '', description: '',
+      id: 'giai-' + PB.uid(), name: 'Giải pickleball mới', status: 'sap-dien-ra', public: true,
+      date: today, endDate: '', time: '13:00', location: '', category: 'Đồng đội', level: '',
+      format: 'team-rr', groupCount: 2, advance: 2, subEvents: PB.DEFAULT_SUBS.slice(),
+      scoring: 'Mỗi nội dung 1 game chạm 15 (không cần cách biệt), đổi sân tại điểm 8.',
+      maxTeams: 8, fee: '', prize: '', registerUrl: '', contact: '', description: '',
       teams: [], groups: [], matches: [], koRounds: 0, createdAt: Date.now(), updatedAt: Date.now()
     };
   }
@@ -101,6 +101,7 @@
       <label class="f">Thể thức<select data-k="format">${opt(PB.FORMATS, t.format)}</select></label>
       ${t.format === 'groups-knockout' ? `${inp('groupCount', 'Số bảng', 'number', 'min="1" max="16"')}
       <label class="f">Số đội đi tiếp mỗi bảng<select data-k="advance">${[1, 2, 3, 4].map((n) => `<option ${+t.advance === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label>` : ''}
+      ${PB.isTeam(t) ? `<label class="f full">Các nội dung mỗi vòng đối đầu <small>(cách nhau dấu phẩy, theo thứ tự thi đấu)</small><input data-k="subEvents" value="${esc((t.subEvents || PB.DEFAULT_SUBS).join(', '))}"></label>` : ''}
       <label class="f full">Cách tính điểm<input data-k="scoring" value="${esc(t.scoring)}"></label>
       ${inp('fee', 'Lệ phí', 'text', 'placeholder="VD: 300.000đ/đội"')}
       ${inp('prize', 'Giải thưởng', 'text', 'placeholder="VD: Tổng giải 10 triệu + cúp"')}
@@ -118,20 +119,21 @@
     const rows = t.teams.map((x, i) => `<tr>
       <td class="n">${i + 1}</td>
       <td class="c1"><input data-tid="${x.id}" data-tk="name" value="${esc(x.name)}" placeholder="Tên đội / VĐV" aria-label="Tên đội"></td>
-      <td class="c2"><input data-tid="${x.id}" data-tk="players" value="${esc(x.players || '')}" placeholder="Thành viên" aria-label="Thành viên"></td>
-      <td class="c2"><input data-tid="${x.id}" data-tk="club" value="${esc(x.club || '')}" placeholder="CLB" aria-label="CLB"></td>
+      ${PB.isTeam(t) ? `<td class="c2"><input data-tid="${x.id}" data-tk="captain" value="${esc(x.captain || '')}" placeholder="Đội trưởng" aria-label="Đội trưởng"></td>` : ''}
+      <td class="c2"><input data-tid="${x.id}" data-tk="players" value="${esc(x.players || '')}" placeholder="${PB.isTeam(t) ? 'VĐV: A, B, C… (6 nam, 2 nữ)' : 'Thành viên'}" aria-label="Thành viên"></td>
+      ${PB.isTeam(t) ? '' : `<td class="c2"><input data-tid="${x.id}" data-tk="club" value="${esc(x.club || '')}" placeholder="CLB" aria-label="CLB"></td>`}
       <td class="act"><button class="icon-btn" data-tmove="-1" data-tid="${x.id}" title="Lên">↑</button><button class="icon-btn" data-tmove="1" data-tid="${x.id}" title="Xuống">↓</button><button class="icon-btn" data-tdel="${x.id}" title="Xoá">✕</button></td>
     </tr>`).join('');
     return `<div class="card">
       <div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Danh sách (${t.teams.length}${t.maxTeams ? '/' + t.maxTeams : ''})</h3>
         <div class="toolbar"><button class="btn sm" data-act="shuffle">🎲 Bốc thăm ngẫu nhiên</button>${t.teams.length ? '<button class="btn sm danger" data-act="clear-teams">Xoá hết</button>' : ''}</div></div>
       <p class="hint">Thứ tự trong danh sách = thứ tự hạt giống (đội số 1, 2… sẽ được xếp tránh nhau). Dùng ↑ ↓ để xếp hạt giống, hoặc bốc thăm ngẫu nhiên.</p>
-      ${t.teams.length ? `<table class="team-table"><thead><tr><th>#</th><th>Tên đội / VĐV</th><th>Thành viên</th><th>CLB</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="empty">Chưa có đội nào.</p>'}
+      ${t.teams.length ? `<table class="team-table"><thead><tr><th>#</th><th>Tên đội / VĐV</th>${PB.isTeam(t) ? '<th>Đội trưởng</th><th>Danh sách VĐV</th>' : '<th>Thành viên</th><th>CLB</th>'}<th></th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="empty">Chưa có đội nào.</p>'}
       </div>
       <div class="card" style="margin-top:16px">
         <h3>Thêm nhanh nhiều đội</h3>
-        <p class="hint">Mỗi dòng một đội theo dạng: <code>Tên đội | Thành viên | CLB</code>. Có thể chỉ ghi tên. Có thể dán trực tiếp từ Google Sheets (kết quả Google Form).</p>
-        <textarea id="bulk" rows="6" placeholder="Đội Sấm Sét | Nguyễn Văn A - Trần Văn B | CLB Quận 7&#10;Đội Gió Lốc | Lê Văn C - Phạm Văn D"></textarea>
+        <p class="hint">Mỗi dòng một đội theo dạng: <code>${PB.isTeam(t) ? 'Tên đội | Đội trưởng | VĐV 1, VĐV 2, …' : 'Tên đội | Thành viên | CLB'}</code>. Có thể chỉ ghi tên. Có thể dán trực tiếp từ Google Sheets.</p>
+        <textarea id="bulk" rows="6" placeholder="${PB.isTeam(t) ? 'Đội Đỏ | Nguyễn Văn A | Nguyễn Văn A, Trần Văn B, Lê Thị C, …' : 'Đội Sấm Sét | Nguyễn Văn A - Trần Văn B | CLB Quận 7'}"></textarea>
         <div class="toolbar" style="margin-top:10px"><button class="btn primary" data-act="bulk-add">Thêm vào danh sách</button></div>
       </div>
       ${t.matches && t.matches.length ? '<p class="notice warn" style="margin-top:16px">Đã có lịch thi đấu. Nếu thêm/bớt đội, hãy vào bước 3 bấm <b>Tạo lại lịch</b>. Sửa tên đội thì không cần.</p>' : ''}`;
@@ -141,22 +143,28 @@
   function matchesView(t) {
     if (!t.matches || !t.matches.length) {
       return `<div class="card"><h3>Tạo lịch thi đấu</h3>
-        <p>Thể thức: <b>${esc(PB.FORMATS[t.format])}</b>${t.format === 'groups-knockout' ? ` — ${t.groupCount} bảng, top ${t.advance} đi tiếp` : ''}. Số đội: <b>${t.teams.length}</b>.</p>
+        <p>Thể thức: <b>${esc(PB.FORMATS[t.format])}</b>${t.format === 'groups-knockout' ? ` — ${t.groupCount} bảng, top ${t.advance} đi tiếp` : ''}${PB.isTeam(t) ? ` — mỗi vòng ${(t.subEvents || PB.DEFAULT_SUBS).length} nội dung (${esc((t.subEvents || PB.DEFAULT_SUBS).join(', '))})` : ''}. Số đội: <b>${t.teams.length}</b>${PB.isTeam(t) && t.teams.length > 1 ? ` → <b>${t.teams.length % 2 ? t.teams.length : t.teams.length - 1} vòng</b>, <b>${t.teams.length * (t.teams.length - 1) / 2} lượt đấu</b>` : ''}.</p>
         <p class="hint">Hệ thống sẽ tự chia bảng theo hạt giống, xếp cặp vòng tròn và dựng nhánh loại trực tiếp (có miễn đấu nếu số đội lẻ).</p>
         <button class="btn primary" data-act="generate" ${t.teams.length < 2 ? 'disabled' : ''}>⚙️ Tạo lịch thi đấu</button>
         ${t.teams.length < 2 ? '<p class="hint">Cần ít nhất 2 đội — thêm ở bước 2.</p>' : ''}</div>`;
     }
     const played = t.matches.filter((m) => PB.result(m)).length;
     let html = `<div class="card no-print"><div class="toolbar" style="justify-content:space-between">
-      <div><b>${played}/${t.matches.length}</b> trận có kết quả</div>
+      <div><b>${played}/${t.matches.length}</b> ${PB.isTeam(t) ? 'lượt đấu' : 'trận'} đã xong</div>
       <div class="toolbar"><button class="btn sm" onclick="print()">🖨 In lịch</button><button class="btn sm danger" data-act="generate">↻ Tạo lại lịch</button></div></div>
-      <p class="hint">Nhập tỉ số từng game, cách nhau bằng dấu phẩy, theo thứ tự <b>đội trên – đội dưới</b>. VD: <code>11-7</code> hoặc <code>11-9, 8-11, 11-6</code>. Tỉ số lưu tự động.</p></div>`;
+      ${PB.isTeam(t)
+        ? '<p class="hint">Mỗi nội dung nhập tỉ số theo thứ tự <b>đội trái – đội phải</b>, VD: <code>15-12</code>. Xử thua do vi phạm: <code>0-15</code> hoặc <code>15-0</code>. Ô hai bên để ghi tên cặp VĐV (không bắt buộc). Tỉ số lưu tự động.</p>'
+        : '<p class="hint">Nhập tỉ số từng game, cách nhau bằng dấu phẩy, theo thứ tự <b>đội trên – đội dưới</b>. VD: <code>11-7</code> hoặc <code>11-9, 8-11, 11-6</code>. Tỉ số lưu tự động.</p>'}</div>`;
     const gm = t.matches.filter((m) => m.stage === 'group');
     t.groups.forEach((g) => {
       const ms = gm.filter((m) => m.group === g.name);
-      html += `<h2 class="stage-title">${t.format === 'round-robin' ? 'Vòng tròn' : 'Bảng ' + esc(g.name)}</h2>
-        <div class="card" style="margin-bottom:14px">${PB.renderStandings(t, g.name)}</div>
-        <div class="match-list">${ms.map((m) => PB.renderMatch(t, m, { editable: true })).join('')}</div>`;
+      html += `<h2 class="stage-title">${PB.singleTable(t) ? 'Bảng xếp hạng' : 'Bảng ' + esc(g.name)}</h2>
+        <div class="card" style="margin-bottom:14px">${PB.renderStandings(t, g.name)}</div>`;
+      if (PB.isTeam(t)) {
+        [...new Set(ms.map((m) => m.round))].forEach((r) => {
+          html += `<div class="round-title">Vòng ${r}</div><div class="match-list ties">${ms.filter((m) => m.round === r).map((m) => PB.renderMatch(t, m, { editable: true })).join('')}</div>`;
+        });
+      } else html += `<div class="match-list">${ms.map((m) => PB.renderMatch(t, m, { editable: true })).join('')}</div>`;
     });
     if (t.koRounds) html += `<h2 class="stage-title">Vòng loại trực tiếp</h2>${PB.renderBracket(t, { editable: true })}`;
     return html;
@@ -211,6 +219,7 @@
     if (el.dataset.k) {
       const k = el.dataset.k;
       t[k] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? '' : +el.value) : el.value;
+      if (k === 'subEvents') t.subEvents = el.value.split(',').map((x) => x.trim()).filter(Boolean);
       save(); renderList();
       if (k === 'name') $('#editor h2').textContent = t.name;
       if (k === 'format') renderEditor();
@@ -224,23 +233,25 @@
     if (el.id === 'importFile') return importFile(el.files[0]);
     if (!el.dataset.mid) return;
     const m = t.matches.find((x) => x.id === el.dataset.mid); if (!m) return;
+    const target = el.dataset.sub !== undefined ? m.subs[+el.dataset.sub] : m;
+    if (!target) return;
     const f = el.dataset.f;
     if (f === 'games') {
       const g = PB.parseGames(el.value);
-      if (g === null) { el.classList.add('invalid'); toast('Tỉ số chưa đúng dạng, VD: 11-7, 11-9'); return; }
-      if (g.length && !PB.result({ games: g })) { el.classList.add('invalid'); toast('Hai đội đang hoà số game — kiểm tra lại'); return; }
+      if (g === null) { el.classList.add('invalid'); toast(PB.isTeam(t) ? 'Tỉ số chưa đúng dạng, VD: 15-12' : 'Tỉ số chưa đúng dạng, VD: 11-7, 11-9'); return; }
+      if (g.length && !PB.gameResult(g)) { el.classList.add('invalid'); toast('Hai bên đang hoà số game — kiểm tra lại'); return; }
       el.classList.remove('invalid');
-      m.games = g;
-    } else m[f] = el.value.trim();
+      target.games = g;
+    } else target[f] = el.value.trim();
     save(true);
     // Vẽ lại nhưng giữ vị trí con trỏ
     setTimeout(() => {
       const a = document.activeElement;
-      const key = a && a.dataset && a.dataset.mid ? [a.dataset.mid, a.dataset.f] : null;
+      const key = a && a.dataset && a.dataset.mid ? [a.dataset.mid, a.dataset.f, a.dataset.sub] : null;
       const y = scrollY;
       $('#pane').innerHTML = matchesView(t);
       scrollTo(0, y);
-      if (key) { const n = $(`[data-mid="${key[0]}"][data-f="${key[1]}"]`); if (n) n.focus(); }
+      if (key) { const n = $(`[data-mid="${key[0]}"][data-f="${key[1]}"]${key[2] !== undefined ? `[data-sub="${key[2]}"]` : ''}`); if (n) n.focus(); }
     }, 0);
   });
 
@@ -266,7 +277,9 @@
         const lines = $('#bulk').value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
         lines.forEach((line) => {
           const p = line.split(/\s*[|\t]\s*/);
-          t.teams.push({ id: 't' + PB.uid(), name: p[0], players: p[1] || '', club: p[2] || '' });
+          t.teams.push(PB.isTeam(t)
+            ? { id: 't' + PB.uid(), name: p[0], captain: p[1] || '', players: p.slice(2).join(', ') }
+            : { id: 't' + PB.uid(), name: p[0], players: p[1] || '', club: p[2] || '' });
         });
         save(); renderEditor(); toast(`Đã thêm ${lines.length} đội`); break;
       }

@@ -8,8 +8,12 @@
   PB.FORMATS = {
     'round-robin': 'Vòng tròn tính điểm',
     'knockout': 'Loại trực tiếp',
-    'groups-knockout': 'Vòng bảng + Loại trực tiếp'
+    'groups-knockout': 'Vòng bảng + Loại trực tiếp',
+    'team-rr': 'Đồng đội vòng tròn'
   };
+  PB.DEFAULT_SUBS = ['Đôi nam 1', 'Đôi nam nữ 1', 'Đôi nam 2', 'Đôi nam nữ 2'];
+  PB.isTeam = (t) => t && t.format === 'team-rr';
+  PB.singleTable = (t) => t && (t.format === 'round-robin' || t.format === 'team-rr');
   PB.STATUS = {
     'mo-dang-ky': 'Đang mở đăng ký',
     'sap-dien-ra': 'Sắp diễn ra',
@@ -47,15 +51,36 @@
   };
   PB.formatGames = (g) => (g || []).map((x) => `${x[0]}-${x[1]}`).join(', ');
 
-  PB.result = function (m) {
-    if (!m || !m.games || !m.games.length) return null;
+  // Kết quả 1 trận đấu (gồm 1 hoặc nhiều game)
+  PB.gameResult = function (games) {
+    if (!games || !games.length) return null;
     let wa = 0, wb = 0, pa = 0, pb = 0;
-    for (const [x, y] of m.games) {
+    for (const [x, y] of games) {
       pa += x; pb += y;
       if (x > y) wa++; else if (y > x) wb++;
     }
     if (wa === wb) return null;
     return { wa, wb, pa, pb, winner: wa > wb ? 'a' : 'b' };
+  };
+
+  // Tỉ số một lượt đấu đồng đội (nhiều nội dung) — tính cả khi chưa đấu xong
+  PB.tieScore = function (m) {
+    let wa = 0, wb = 0, pa = 0, pb = 0, done = 0;
+    for (const s of m.subs || []) {
+      const r = PB.gameResult(s.games);
+      if (!r) continue;
+      done++; pa += r.pa; pb += r.pb;
+      if (r.winner === 'a') wa++; else wb++;
+    }
+    const total = (m.subs || []).length;
+    return { wa, wb, pa, pb, done, total, complete: total > 0 && done === total, winner: wa > wb ? 'a' : wb > wa ? 'b' : 'draw' };
+  };
+
+  // Kết quả trận (thường) hoặc lượt đấu đồng đội (khi đã đấu đủ nội dung)
+  PB.result = function (m) {
+    if (!m) return null;
+    if (m.subs) { const s = PB.tieScore(m); return s.complete ? s : null; }
+    return PB.gameResult(m.games);
   };
 
   /* ---------- Lịch thi đấu ---------- */
@@ -131,6 +156,17 @@
       });
     }
 
+    if (fmt === 'team-rr') {
+      const subs = (t.subEvents && t.subEvents.length ? t.subEvents : PB.DEFAULT_SUBS);
+      t.groups = [{ name: 'A', teamIds: ids.slice() }];
+      PB.roundRobin(ids).forEach((pairs, r) =>
+        pairs.forEach(([a, b]) => t.matches.push({
+          id: PB.uid(), stage: 'group', group: 'A', round: r + 1, a, b,
+          subs: subs.map((label) => ({ label, games: [], pa: '', pb: '' }))
+        }))
+      );
+    }
+
     if (fmt === 'knockout') buildKO(t, ids.map((id) => ({ team: id })));
 
     if (fmt === 'groups-knockout') {
@@ -156,7 +192,66 @@
     return ms.length > 0 && ms.every((m) => PB.result(m));
   };
 
+  // Xếp hạng đồng đội theo Điều 9 điều lệ:
+  // 1) Hiệu số nội dung thắng/thua toàn giải
+  // 2) 2 đội bằng nhau: kết quả đối đầu → (nếu hoà 2-2) hiệu số điểm trận đối đầu → hiệu số điểm toàn giải
+  // 3) Từ 3 đội: bảng phụ giữa các đội (hiệu số nội dung → hiệu số điểm) → hiệu số điểm toàn giải
+  PB.teamStandings = function (t, name) {
+    const g = (t.groups || []).find((x) => x.name === name);
+    if (!g) return [];
+    const ms = PB.groupMatches(t, name);
+    const tally = (ids, matches) => {
+      const rows = new Map(ids.map((id) => [id, { id, played: 0, w: 0, d: 0, l: 0, nw: 0, nl: 0, pf: 0, pa: 0 }]));
+      for (const m of matches) {
+        const A = rows.get(m.a), B = rows.get(m.b);
+        if (!A || !B) continue;
+        const s = PB.tieScore(m);
+        if (!s.done) continue;
+        A.nw += s.wa; A.nl += s.wb; B.nw += s.wb; B.nl += s.wa;
+        A.pf += s.pa; A.pa += s.pb; B.pf += s.pb; B.pa += s.pa;
+        if (s.complete) {
+          A.played++; B.played++;
+          if (s.winner === 'a') { A.w++; B.l++; } else if (s.winner === 'b') { B.w++; A.l++; } else { A.d++; B.d++; }
+        }
+      }
+      return rows;
+    };
+    const diff = (r) => r.nw - r.nl, pd = (r) => r.pf - r.pa;
+    const breakTie = (cl) => {
+      if (cl.length === 1) return cl;
+      if (cl.length === 2) {
+        const [x, y] = cl;
+        const m = ms.find((k) => (k.a === x.id && k.b === y.id) || (k.a === y.id && k.b === x.id));
+        let c = 0;
+        const s = m ? PB.tieScore(m) : null;
+        if (s && s.complete) {
+          const xa = m.a === x.id;
+          c = (xa ? s.wb : s.wa) - (xa ? s.wa : s.wb);
+          if (!c) c = -(xa ? s.pa - s.pb : s.pb - s.pa);
+        }
+        if (!c) c = pd(y) - pd(x);
+        return c > 0 ? [y, x] : [x, y];
+      }
+      const ids = cl.map((r) => r.id);
+      const mini = tally(ids, ms.filter((k) => ids.includes(k.a) && ids.includes(k.b)));
+      return cl.slice().sort((x, y) => {
+        const X = mini.get(x.id), Y = mini.get(y.id);
+        return diff(Y) - diff(X) || pd(Y) - pd(X) || pd(y) - pd(x);
+      });
+    };
+    const rows = [...tally(g.teamIds, ms).values()].sort((x, y) => diff(y) - diff(x));
+    const out = [];
+    for (let i = 0; i < rows.length;) {
+      let j = i;
+      while (j < rows.length && diff(rows[j]) === diff(rows[i])) j++;
+      out.push(...breakTie(rows.slice(i, j)));
+      i = j;
+    }
+    return out;
+  };
+
   PB.standings = function (t, name) {
+    if (PB.isTeam(t)) return PB.teamStandings(t, name);
     const g = (t.groups || []).find((x) => x.name === name);
     if (!g) return [];
     const rows = new Map(g.teamIds.map((id) => [id, { id, played: 0, w: 0, l: 0, gw: 0, gl: 0, pf: 0, pa: 0 }]));
@@ -252,7 +347,7 @@
       const inf = fin && PB.resolveKO(t)[fin.id];
       return inf && inf.winner ? inf.winner : null;
     }
-    if (t.format === 'round-robin' && t.groups && t.groups[0] && PB.groupComplete(t, t.groups[0].name)) {
+    if (PB.singleTable(t) && t.groups && t.groups[0] && PB.groupComplete(t, t.groups[0].name)) {
       return PB.standings(t, t.groups[0].name)[0].id;
     }
     return null;
@@ -278,20 +373,26 @@
 
   PB.statusBadge = (s) => `<span class="badge st-${PB.esc(s)}">${PB.esc(PB.STATUS[s] || s || '')}</span>`;
 
-  PB.teamCell = function (t, id, label) {
+  PB.teamCell = function (t, id, label, compact) {
     if (!id) return `<span class="tbd">${PB.esc(label || 'Chưa xác định')}</span>`;
     const tm = PB.team(t, id) || {};
     return `<span class="tn">${PB.esc(tm.name || '—')}</span>` +
-      (tm.players ? `<span class="tp">${PB.esc(tm.players)}</span>` : '');
+      (tm.players && !compact && !PB.isTeam(t) ? `<span class="tp">${PB.esc(tm.players)}</span>` : '');
+  };
+
+  PB.podium = function (t) {
+    if (!PB.singleTable(t) || !t.groups || !t.groups[0] || !PB.groupComplete(t, t.groups[0].name)) return [];
+    return PB.standings(t, t.groups[0].name).slice(0, 3).map((r) => r.id);
   };
 
   PB.renderStandings = function (t, name, opts = {}) {
+    if (PB.isTeam(t)) return renderTeamStandings(t, name);
     const rows = PB.standings(t, name);
     const adv = t.format === 'groups-knockout' ? +t.advance || 2 : (t.format === 'round-robin' ? 1 : 0);
     const done = PB.groupComplete(t, name);
     const sign = (n) => (n > 0 ? '+' + n : String(n));
     return `<div class="table-wrap"><table class="standings">
-      <thead><tr><th>#</th><th class="l">${t.format === 'round-robin' ? 'Đội' : 'Bảng ' + PB.esc(name)}</th>
+      <thead><tr><th>#</th><th class="l">${PB.singleTable(t) ? 'Đội' : 'Bảng ' + PB.esc(name)}</th>
       <th title="Số trận">Tr</th><th title="Thắng">T</th><th title="Thua">B</th><th title="Hiệu số game">HS game</th><th title="Hiệu số điểm">HS điểm</th></tr></thead>
       <tbody>${rows.map((r, i) => `<tr class="${i < adv ? 'adv' : ''}">
         <td>${i + 1}</td><td class="l">${PB.teamCell(t, r.id)}</td>
@@ -299,6 +400,52 @@
       </tbody></table></div>
       ${opts.legend !== false && adv ? `<p class="hint">${done ? '✔ Bảng đã hoàn tất.' : 'Bảng đang thi đấu.'} ${t.format === 'groups-knockout' ? `Top ${adv} vào vòng loại trực tiếp (tô màu).` : ''}</p>` : ''}`;
   };
+
+  function renderTeamStandings(t, name) {
+    const rows = PB.standings(t, name);
+    const done = PB.groupComplete(t, name);
+    const sign = (n) => (n > 0 ? '+' + n : String(n));
+    const medal = ['🥇', '🥈', '🥉'];
+    return `<div class="table-wrap"><table class="standings">
+      <thead><tr><th>#</th><th class="l">Đội</th><th title="Số lượt đã đấu">Tr</th><th title="Thắng">T</th><th title="Hoà">H</th><th title="Thua">B</th>
+      <th title="Nội dung thắng – thua">ND</th><th title="Hiệu số nội dung">HS ND</th><th title="Hiệu số điểm">HS điểm</th></tr></thead>
+      <tbody>${rows.map((r, i) => `<tr class="${done && i < 3 ? 'adv' : ''}">
+        <td>${done && i < 3 ? medal[i] : i + 1}</td><td class="l">${PB.teamCell(t, r.id, null, true)}</td>
+        <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.nw}–${r.nl}</td><td><b>${sign(r.nw - r.nl)}</b></td><td>${sign(r.pf - r.pa)}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="hint">${done ? '✔ Đã hoàn tất vòng tròn.' : 'Cập nhật theo từng nội dung đã có kết quả.'} Xếp hạng: hiệu số nội dung → đối đầu → hiệu số điểm (Điều 9).</p>`;
+  }
+
+  function renderTie(t, m, opts) {
+    const s = PB.tieScore(m);
+    const meta = [m.time, m.court ? 'Sân ' + m.court : ''].filter(Boolean).join(' · ');
+    const cls = (side) => (s.complete && s.winner === side ? 'win' : '');
+    const subs = m.subs.map((sub, i) => {
+      const r = PB.gameResult(sub.games);
+      const sc = r ? PB.formatGames(sub.games) : '–';
+      return `<div class="sub ${r ? 'done' : ''}">
+        <span class="sl">${PB.esc(sub.label)}</span>
+        <span class="sp a ${r && r.winner === 'a' ? 'w' : ''}">${PB.esc(sub.pa || '')}</span>
+        <span class="ss">${PB.esc(sc)}</span>
+        <span class="sp b ${r && r.winner === 'b' ? 'w' : ''}">${PB.esc(sub.pb || '')}</span>
+        ${opts.editable ? `<div class="sub-edit">
+          <input data-mid="${m.id}" data-sub="${i}" data-f="pa" value="${PB.esc(sub.pa || '')}" placeholder="VĐV đội trái" aria-label="VĐV đội trái">
+          <input class="in-score" data-mid="${m.id}" data-sub="${i}" data-f="games" value="${PB.esc(PB.formatGames(sub.games))}" placeholder="15-12" aria-label="Tỉ số ${PB.esc(sub.label)}">
+          <input data-mid="${m.id}" data-sub="${i}" data-f="pb" value="${PB.esc(sub.pb || '')}" placeholder="VĐV đội phải" aria-label="VĐV đội phải">
+        </div>` : ''}
+      </div>`;
+    }).join('');
+    return `<div class="match tie ${s.complete ? 'done' : ''}" data-mid="${m.id}">
+      <div class="m-head"><span>Vòng ${m.round}</span><span>${PB.esc(meta)}</span></div>
+      <div class="tie-top">
+        <div class="tt a ${cls('a')}">${PB.teamCell(t, m.a)}</div>
+        <div class="tie-score">${s.done ? `${s.wa}<i>–</i>${s.wb}` : 'vs'}</div>
+        <div class="tt b ${cls('b')}">${PB.teamCell(t, m.b)}</div>
+      </div>
+      <div class="subs">${subs}</div>
+      ${opts.editable ? `<div class="m-edit"><input class="in-sm" data-mid="${m.id}" data-f="court" value="${PB.esc(m.court || '')}" placeholder="Sân" aria-label="Sân"><input class="in-sm" data-mid="${m.id}" data-f="time" value="${PB.esc(m.time || '')}" placeholder="Giờ" aria-label="Giờ"></div>` : ''}
+    </div>`;
+  }
 
   function scoreCells(m, res, side) {
     if (!m.games || !m.games.length) return '';
@@ -309,6 +456,7 @@
   }
 
   PB.renderMatch = function (t, m, opts = {}) {
+    if (m.subs) return renderTie(t, m, opts);
     let A, B, isBye = false, title = '';
     if (m.stage === 'ko') {
       const inf = (opts.koInfo || PB.resolveKO(t))[m.id] || {};
