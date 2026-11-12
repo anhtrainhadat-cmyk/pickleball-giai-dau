@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giải Pickleball — Lịch thi đấu, đăng ký & kết quả</title>
+  <meta name="description" content="Tổ chức giải pickleball: đăng ký thi đấu, lịch thi đấu, bảng xếp hạng, nhánh đấu và kết quả trực tiếp.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23d6f43a'/><g fill='%231b2a07' opacity='.45'><circle cx='35' cy='35' r='6'/><circle cx='65' cy='35' r='6'/><circle cx='50' cy='55' r='6'/><circle cx='30' cy='65' r='6'/><circle cx='70' cy='65' r='6'/></g></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="index.html"><span class="dot" aria-hidden="true"></span><span data-site-name>Pickleball</span></a>
+      <button class="btn sm ghost menu-btn" aria-label="Mở menu">☰ Menu</button>
+      <nav class="nav-links">
+        <a href="#giai-dau">Giải đấu</a>
+        <a href="#dich-vu">Dịch vụ</a>
+        <a href="#luat">Luật cơ bản</a>
+        <a href="#lien-he">Liên hệ</a>
+        <a href="quan-ly.html">Ban tổ chức</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow" style="color:var(--ball)">Giải đấu pickleball</div>
+      <h1>Thi đấu hết mình — kết quả cập nhật từng trận</h1>
+      <p id="slogan"></p>
+      <div class="actions">
+        <a class="btn ball" href="#giai-dau">Xem giải đấu</a>
+        <a class="btn" href="#lien-he">Liên hệ tổ chức giải</a>
+      </div>
+      <div class="stats">
+        <div><b id="s-giai">0</b><span>giải đấu</span></div>
+        <div><b id="s-doi">0</b><span>đội / VĐV tham gia</span></div>
+        <div><b id="s-tran">0</b><span>trận đã đấu</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="giai-dau">
+    <div class="container">
+      <div class="section-head">
+        <div><div class="eyebrow">Lịch giải</div><h2>Các giải đấu</h2></div>
+        <div class="chips" id="filters" role="tablist"></div>
+      </div>
+      <div class="grid" id="list"><p class="empty">Đang tải dữ liệu…</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="dich-vu" style="background:var(--surface)">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Vì sao chọn chúng tôi</div><h2>Tổ chức giải trọn gói</h2></div></div>
+      <div class="features">
+        <div class="card feature"><div class="ico">🗓️</div><h3>Lịch thi đấu tự động</h3><p>Chia bảng, xếp cặp đấu vòng tròn và nhánh loại trực tiếp công bằng theo hạt giống.</p></div>
+        <div class="card feature"><div class="ico">📊</div><h3>Kết quả trực tiếp</h3><p>Tỉ số, bảng xếp hạng và nhánh đấu được cập nhật ngay trên website, xem bằng điện thoại.</p></div>
+        <div class="card feature"><div class="ico">📝</div><h3>Đăng ký online</h3><p>VĐV đăng ký qua form trực tuyến, ban tổ chức duyệt và công bố danh sách nhanh chóng.</p></div>
+        <div class="card feature"><div class="ico">🏆</div><h3>Trọng tài & giải thưởng</h3><p>Trọng tài theo luật hiện hành, cúp – huy chương – quà tặng cho các đội xuất sắc.</p></div>
+      </div>
+      <h3 style="margin-top:40px">Quy trình tham gia</h3>
+      <div class="steps">
+        <div class="card step"><b>BƯỚC 1</b><h3>Chọn giải</h3><p class="muted">Xem nội dung, trình độ, lệ phí và thời gian của giải.</p></div>
+        <div class="card step"><b>BƯỚC 2</b><h3>Đăng ký</h3><p class="muted">Điền form đăng ký, chuyển lệ phí theo hướng dẫn.</p></div>
+        <div class="card step"><b>BƯỚC 3</b><h3>Nhận lịch đấu</h3><p class="muted">Xem bảng đấu, giờ và sân thi đấu ngay trên website.</p></div>
+        <div class="card step"><b>BƯỚC 4</b><h3>Thi đấu</h3><p class="muted">Có mặt trước giờ đấu 15 phút. Kết quả cập nhật liên tục.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="luat">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Dành cho người mới</div><h2>Luật pickleball cơ bản</h2></div></div>
+      <ol class="rules">
+        <li><b>Giao bóng thấp tay</b><span>Giao chéo sân, tay vợt chạm bóng dưới thắt lưng, đứng sau vạch cuối sân.</span></li>
+        <li><b>Luật hai lần nảy</b><span>Bóng giao phải nảy một lần bên nhận, cú trả giao phải nảy một lần bên giao, sau đó mới được đánh vô-lê.</span></li>
+        <li><b>Vùng cấm vô-lê (Kitchen)</b><span>Khu vực 2,13 m (7 feet) sát lưới — không được đánh bóng khi bóng chưa nảy nếu đang đứng trong vùng này.</span></li>
+        <li><b>Tính điểm</b><span>Thường chơi đến 11 điểm, thắng cách biệt 2 điểm. Một số giải dùng cách tính điểm mỗi pha bóng (rally scoring).</span></li>
+        <li><b>Lỗi thường gặp</b><span>Bóng ra ngoài, không qua lưới, vô-lê trong Kitchen, để bóng nảy hai lần bên mình.</span></li>
+        <li><b>Đánh đôi</b><span>Hô điểm 3 số: điểm đội giao – điểm đội nhận – người giao thứ 1 hoặc 2.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block" id="lien-he" style="background:var(--surface)">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Liên hệ</div><h2>Cần tổ chức giải cho CLB, công ty?</h2></div></div>
+      <p class="muted" style="max-width:640px">Chúng tôi nhận tổ chức giải phong trào, giải nội bộ doanh nghiệp, giải CLB với đầy đủ lịch thi đấu online, trọng tài và giải thưởng.</p>
+      <div class="contact" id="contact"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container"><span>© <span data-year></span> <span data-site-name></span></span><a href="quan-ly.html">Trang ban tổ chức</a></div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

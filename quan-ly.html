@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ban tổ chức — Quản lý giải</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23d6f43a'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="index.html"><span class="dot" aria-hidden="true"></span><span data-site-name>Pickleball</span></a>
+      <button class="btn sm ghost menu-btn" aria-label="Mở menu">☰ Menu</button>
+      <nav class="nav-links">
+        <a href="index.html">Trang chủ</a>
+        <a href="quan-ly.html" class="active">Quản lý giải</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container admin">
+    <aside class="side card">
+      <h3 style="margin:0">Giải của tôi</h3>
+      <p class="hint" style="margin:2px 0 10px">Lưu trên trình duyệt máy này</p>
+      <div class="toolbar">
+        <button class="btn sm primary" id="new">+ Tạo giải mới</button>
+        <button class="btn sm" id="pull" title="Tải các giải đang có trên website về máy này">⤓ Lấy từ web</button>
+      </div>
+      <ul class="t-list" id="tlist"></ul>
+    </aside>
+    <section id="editor"></section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
