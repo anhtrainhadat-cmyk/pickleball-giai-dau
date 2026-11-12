@@ -417,7 +417,7 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 .lvl button.on[data-l="1"] { background: #3ad1f0; color: #04202a; border-color: transparent; }
 .lvl button.on[data-l="2"] { background: var(--gold); color: var(--brand-ink); border-color: transparent; }
 .lvl button.on[data-l="3"] { background: var(--magenta); color: #fff; border-color: transparent; }
-.player-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 74px auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.player-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 92px auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--border); }
 .player-row .no { color: var(--muted); font-weight: 700; text-align: center; font-size: .85rem; }
 .team-admin { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
 .sum-lvl { font-size: .82rem; color: var(--muted); }
