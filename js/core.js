@@ -353,6 +353,48 @@
     return null;
   };
 
+  /* ---------- Dự đoán vô địch ----------
+   * Mô phỏng Monte Carlo các nội dung chưa đấu.
+   * Sức mạnh mỗi đội = hiệu số điểm trung bình/nội dung đã đấu (có làm mượt),
+   * xác suất thắng 1 nội dung = logistic(chênh lệch sức mạnh).
+   * Mỗi lần mô phỏng xếp hạng đúng theo thể lệ (PB.standings).
+   */
+  PB.predict = function (t, runs = 2000, seed = 97) {
+    const ids = (t.teams || []).map((x) => x.id);
+    const ms = (t.matches || []).filter((m) => m.stage === 'group');
+    let doneSubs = 0, totalSubs = 0;
+    const agg = Object.fromEntries(ids.map((id) => [id, { pd: 0, n: 0 }]));
+    for (const m of ms) for (const sub of m.subs || []) {
+      totalSubs++;
+      const r = PB.gameResult(sub.games);
+      if (!r) continue;
+      doneSubs++;
+      if (agg[m.a]) { agg[m.a].pd += r.pa - r.pb; agg[m.a].n++; }
+      if (agg[m.b]) { agg[m.b].pd += r.pb - r.pa; agg[m.b].n++; }
+    }
+    const str = Object.fromEntries(ids.map((id) => [id, agg[id].pd / (agg[id].n + 8)]));
+    let x = seed >>> 0;
+    const rnd = () => { x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; };
+    const count = Object.fromEntries(ids.map((id) => [id, [0, 0, 0]]));
+    const open = [];
+    ms.forEach((m, mi) => (m.subs || []).forEach((sub, si) => { if (!PB.gameResult(sub.games)) open.push([mi, si]); }));
+    const n = open.length ? runs : 1;
+    for (let k = 0; k < n; k++) {
+      const sim = ms.map((m) => ({ ...m, subs: m.subs.map((s) => ({ games: s.games })) }));
+      for (const [mi, si] of open) {
+        const m = sim[mi];
+        const p = 1 / (1 + Math.exp(-(str[m.a] - str[m.b]) / 6));
+        const lose = 5 + Math.floor(rnd() * 9);
+        m.subs[si].games = [rnd() < p ? [15, lose] : [lose, 15]];
+      }
+      const order = PB.standings({ ...t, matches: sim }, (t.groups[0] || {}).name);
+      order.slice(0, 3).forEach((r, i) => count[r.id][i]++);
+    }
+    const rows = ids.map((id) => ({ id, p1: count[id][0] / n, p2: count[id][1] / n, p3: count[id][2] / n, top3: (count[id][0] + count[id][1] + count[id][2]) / n }))
+      .sort((a, b) => b.p1 - a.p1 || b.top3 - a.top3);
+    return { rows, doneSubs, totalSubs, complete: totalSubs > 0 && doneSubs === totalSubs };
+  };
+
   /* ---------- Lưu trữ ---------- */
   PB.loadLocal = function () {
     try { return JSON.parse(localStorage.getItem(PB.STORE_KEY)) || []; } catch (e) { return []; }

@@ -1,48 +1,34 @@
-# ĐÀO97 OPEN — Website giải Pickleball CLB Đào 97 Hà Nội
+# ĐÀO97 OPEN — Website giải Pickleball mừng sinh nhật 2 tuổi CLB Đào 97
 
-Giải đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 · 21/11/2026 · Sân Pick Ba Dứa – Nguyễn Xiển.
+Giải đồng đội · 21/11/2026 · **Sân Ba Dứa, Hà Nội** · Gala tại Nhà hàng Trống Đồng Linh Đàm.
+Trưởng BTC: Dương CT.
 
-Website tĩnh (HTML/CSS/JS thuần), chạy **miễn phí** trên GitHub Pages — không cần hosting, không cần domain, không cần database.
+🌐 Website: https://anhtrainhadat-cmyk.github.io/pickleball-giai-dau/
+🔐 Trang BTC: https://anhtrainhadat-cmyk.github.io/pickleball-giai-dau/btc.html
 
 ## Tính năng
-- **Trang chủ**: logo, đếm ngược, timeline chương trình, bảng xếp hạng trực tiếp, điều lệ, giải thưởng, hình ảnh, nhà tài trợ.
-- **Trang chi tiết giải**: thông tin, danh sách đội, bảng xếp hạng vòng bảng, nhánh loại trực tiếp, lịch & kết quả. Tự cập nhật mỗi 60 giây khi giải đang diễn ra.
-- **Trang ban tổ chức** (`quan-ly.html`):
-  - Tạo giải: **đồng đội vòng tròn** (mỗi vòng 4 nội dung, chạm 15, xếp hạng theo Điều 9 điều lệ), vòng tròn, loại trực tiếp, vòng bảng + loại trực tiếp
-  - Nhập đội hàng loạt (dán từ Google Sheets), xếp hạt giống, bốc thăm ngẫu nhiên
-  - Tự chia bảng, xếp lịch vòng tròn, dựng nhánh đấu (có miễn đấu, tránh đội cùng bảng gặp sớm)
-  - Nhập tỉ số → bảng xếp hạng & nhánh đấu tự cập nhật; in lịch thi đấu
-  - Xuất file `giai-dau.json` để đăng lên website
+**Trang chủ (khán giả)**
+- Đầu trang: **dự đoán đội vô địch** tự cập nhật theo kết quả đã nhập và thể lệ giải (mô phỏng các nội dung còn lại). Chưa có kết quả → dự đoán Team 2.
+- Bảng xếp hạng trực tiếp (Điều 9), lịch & kết quả 7 vòng, danh sách đội/VĐV.
+- **Dự đoán trúng thưởng**: khán giả nhập tên, chọn đội Vô địch – Nhì – Ba, gửi; xem tỉ lệ & dự đoán mới nhất; cuối giải tự đánh dấu người đoán trúng.
+- Timeline, thể lệ/điều lệ, giải thưởng, ủng hộ (QR MB Bank), hình ảnh, nhà tài trợ.
 
-## Đưa website lên mạng (GitHub Pages — miễn phí)
-1. Vào repo trên GitHub → **Settings** → **Pages**.
-2. Mục *Build and deployment*: Source = **Deploy from a branch**, Branch = **main**, thư mục **/ (root)** → **Save**.
-3. Sau 1–2 phút, website có địa chỉ: `https://<tên-tài-khoản>.github.io/<tên-repo>/`
+**Trang BTC (`btc.html`, cần đăng nhập)**
+- Nhập kết quả từng nội dung (lưu tự động, khán giả thấy ngay).
+- Đội & VĐV: tên đội, đội trưởng, 8 VĐV (6 nam, 2 nữ), **chấm trình 1-2-3 — chỉ BTC thấy**.
+- Quản lý dự đoán: khoá/mở cổng, xoá spam, tải CSV, xem người đoán trúng.
 
-## Sửa thông tin CLB / liên hệ
-Mở file `js/config.js` trên GitHub (bấm biểu tượng ✏️), sửa tên, giờ đếm ngược, số điện thoại, Zalo, Facebook, email → **Commit changes**.
-Mục Liên hệ trên trang chủ chỉ hiện khi có ít nhất 1 trong: điện thoại, Zalo, Facebook, email.
+## Kích hoạt hệ thống BTC
+Xem [HUONG-DAN-FIREBASE.md](HUONG-DAN-FIREBASE.md) (Firebase miễn phí, ~10 phút).
+Khi chưa kích hoạt, web vẫn chạy với dữ liệu tĩnh `data/giai-dau.json`.
 
-## Hình ảnh
-Ảnh nằm trong thư mục `img/` (logo, backdrop, giải thưởng, điều lệ, timeline, nhà tài trợ). Muốn thay ảnh: upload file mới **cùng tên** vào `img/`.
-
-## Nhập tên đội & tỉ số ngày thi đấu
-1. Vào `quan-ly.html` → **⤓ Lấy từ web** → chọn giải ĐÀO97 OPEN.
-2. Bước **2. Đội / VĐV**: sửa tên "Đội 1…8", đội trưởng, danh sách VĐV (đổi tên không làm mất lịch).
-3. Bước **3. Thi đấu & tỉ số**: nhập tỉ số từng nội dung (VD `15-12`; xử thua `0-15`), tên cặp VĐV, sân, giờ.
-4. Bước **4. Đăng lên web** → tải `giai-dau.json` → upload đè vào thư mục `data` trên GitHub.
-
-## Quy trình cập nhật giải đấu
-1. Mở `https://<tên-tài-khoản>.github.io/<tên-repo>/quan-ly.html`
-2. Bấm **⤓ Lấy từ web** để lấy dữ liệu hiện có.
-3. Tạo/sửa giải, nhập đội, tạo lịch, nhập tỉ số. Dữ liệu được lưu trong trình duyệt máy đó.
-4. Bước **4. Đăng lên web** → **Tải file giai-dau.json**.
-5. Trên GitHub: vào thư mục `data` → **Add file › Upload files** → kéo file vào → **Commit changes**. Khoảng 1 phút sau website cập nhật.
-
-## Đăng ký thi đấu (miễn phí)
-Tạo một Google Form (Tên đội, VĐV 1, VĐV 2, SĐT, CLB…), dán link vào ô **Link đăng ký** của giải.
-Kết quả form nằm trong Google Sheets — copy các cột *Tên đội | Thành viên | CLB* rồi dán vào ô **Thêm nhanh nhiều đội**.
-
-## Ghi chú
-- Trang `quan-ly.html` không có mật khẩu, nhưng chỉ người có quyền vào repo GitHub mới thay đổi được dữ liệu trên website.
-- Nên bấm **Sao lưu toàn bộ** định kỳ, vì dữ liệu nháp nằm trong trình duyệt.
+## Cấu trúc
+| File | Nội dung |
+|---|---|
+| `index.html`, `js/home.js` | Trang giải cho khán giả |
+| `btc.html`, `js/btc.js` | Khu vực BTC |
+| `js/core.js` | Lịch vòng tròn, tính điểm, xếp hạng theo Điều 9, dự đoán vô địch |
+| `js/store.js` | Kết nối Firebase / dữ liệu tĩnh |
+| `js/config.js` | Thông tin giải, sân, giờ, cấu hình Firebase |
+| `firestore.rules` | Luật bảo mật (trình VĐV chỉ BTC đọc, khán giả chỉ gửi dự đoán) |
+| `img/` | Logo, cúp, backdrop, QR ủng hộ, logo nhà tài trợ |

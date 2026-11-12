@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ĐÀO97 OPEN — Giải Pickleball mừng sinh nhật 2 tuổi CLB Đào 97</title>
-  <meta name="description" content="ĐÀO97 OPEN — giải pickleball đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 Hà Nội. Ngày 21/11/2026 tại sân Pick Ba Dứa – Nguyễn Xiển. Lịch thi đấu, bảng xếp hạng, điều lệ.">
+  <meta name="description" content="ĐÀO97 OPEN — giải pickleball đồng đội mừng sinh nhật 2 tuổi CLB Pickleball Đào 97 Hà Nội. 21/11/2026 tại Sân Ba Dứa, Hà Nội. Kết quả trực tiếp, bảng xếp hạng, dự đoán vô địch.">
   <meta property="og:title" content="ĐÀO97 OPEN — Mừng sinh nhật 2 tuổi CLB Pickleball Đào 97">
-  <meta property="og:description" content="21/11/2026 · Sân Pick Ba Dứa – Nguyễn Xiển · Gala tại Trống Đồng Linh Đàm">
+  <meta property="og:description" content="21/11/2026 · Sân Ba Dứa, Hà Nội · Dự đoán đội vô địch để nhận quà!">
   <meta property="og:image" content="img/og.jpg">
-  <meta name="theme-color" content="#12082b">
+  <meta name="theme-color" content="#0a0a24">
   <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
@@ -18,61 +19,100 @@
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a class="logo" href="index.html"><img src="img/logo.webp" alt="Logo CLB Pickleball Đào Duy Từ" width="52" height="40"><span><b>ĐÀO97 OPEN</b><small>CLB PICKLEBALL ĐÀO 97</small></span></a>
+      <a class="logo" href="#top"><img src="img/logo-sm.webp" alt="Logo CLB Pickleball Đào Duy Từ" width="54" height="41"><span><b>ĐÀO97 OPEN</b><small>SINH NHẬT 2 TUỔI CLB ĐÀO 97</small></span></a>
       <button class="btn sm ghost menu-btn" aria-label="Mở menu">☰ Menu</button>
       <nav class="nav-links">
-        <a href="#timeline">Timeline</a>
         <a href="#bxh">Bảng xếp hạng</a>
-        <a href="#dieu-le">Điều lệ</a>
-        <a href="#giai-thuong">Giải thưởng</a>
-        <a href="#tai-tro">Nhà tài trợ</a>
-        <a href="quan-ly.html">BTC</a>
+        <a href="#lich">Lịch đấu</a>
+        <a href="#doi">Các đội</a>
+        <a href="#du-doan">Dự đoán</a>
+        <a href="#the-le">Thể lệ</a>
+        <a href="#ung-ho">Ủng hộ</a>
+        <a href="btc.html">BTC</a>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero" id="top">
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="container hero-grid">
       <div>
-        <img class="hero-logo" src="img/logo.webp" alt="Logo CLB Pickleball Đào Duy Từ 1997–2000" width="430" height="326">
+        <img class="hero-logo" src="img/logo.webp" alt="Logo CLB Pickleball Đào Duy Từ 1997–2000" width="640" height="482">
         <h1 class="display grad-text">Đào97 Open</h1>
-        <div class="hero-sub">Mừng sinh nhật 2 tuổi · CLB Pickleball Đào 97 Hà Nội</div>
-        <p class="lead">Giải pickleball đồng đội: 8 đội, 7 vòng đấu, 4 nội dung mỗi vòng. Thi đấu xong là Gala sinh nhật.</p>
+        <div class="hero-sub neon-text">Mừng sinh nhật 2 tuổi · CLB Pickleball Đào 97</div>
         <div class="pills">
-          <div class="pill"><span class="t">12h30 · 21.11.2026</span><a href="https://www.google.com/maps/search/?api=1&query=S%C3%A2n%20pickleball%20Ba%20D%E1%BB%A9a%20Nguy%E1%BB%85n%20Xi%E1%BB%83n%20H%C3%A0%20N%E1%BB%99i" target="_blank" rel="noopener">📍 Sân Pick Ba Dứa – Nguyễn Xiển ↗</a></div>
-          <div class="pill pink"><span class="t">18h00 · 21.11.2026</span><a href="https://www.google.com/maps/search/?api=1&query=Nh%C3%A0%20h%C3%A0ng%20Tr%E1%BB%91ng%20%C4%90%E1%BB%93ng%20Linh%20%C4%90%C3%A0m" target="_blank" rel="noopener">🎉 Gala · Nhà hàng Trống Đồng Linh Đàm ↗</a></div>
+          <div class="pill"><span class="t">12h30 · 21.11.2026</span><a id="venue-link" href="#" target="_blank" rel="noopener">📍 <span data-venue></span> ↗</a></div>
+          <div class="pill pink"><span class="t">18h00 · 21.11.2026</span><a id="gala-link" href="#" target="_blank" rel="noopener">🎉 Gala · <span data-gala></span> ↗</a></div>
+          <div class="pill"><span class="t" id="cd-title">Khai mạc sau</span><span id="cd-text" style="font-variant-numeric:tabular-nums">—</span></div>
         </div>
         <div class="actions">
-          <a class="btn primary" id="cta-live" href="giai-dau.html?id=dao97-open-2026">Lịch thi đấu & kết quả</a>
-          <a class="btn ghost" href="#dieu-le">Xem điều lệ</a>
+          <a class="btn primary" href="#du-doan">🎯 Dự đoán trúng thưởng</a>
+          <a class="btn ghost" href="#lich">Lịch & kết quả</a>
         </div>
       </div>
-      <div class="countdown-card">
-        <h3 id="cd-title">Đếm ngược đến giờ khai mạc</h3>
-        <div id="countdown" class="countdown" aria-live="polite">
-          <div><b id="cd-d">--</b><span>Ngày</span></div>
-          <div><b id="cd-h">--</b><span>Giờ</span></div>
-          <div><b id="cd-m">--</b><span>Phút</span></div>
-          <div><b id="cd-s">--</b><span>Giây</span></div>
+      <div class="forecast" id="forecast" aria-live="polite"><div class="lbl">Dự đoán đội vô địch</div><p class="muted">Đang tính toán…</p></div>
+    </div>
+  </section>
+
+  <section class="block alt" id="bxh">
+    <div class="container">
+      <div class="section-head">
+        <div><div class="eyebrow">Cập nhật trực tiếp</div><h2 class="display">Bảng xếp hạng</h2></div>
+        <span class="pill-status" id="live-status">Đang tải…</span>
+      </div>
+      <div id="bxh-body"><p class="empty">Đang tải dữ liệu…</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="lich">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">7 vòng · 28 lượt đấu · 112 nội dung</div><h2 class="display">Lịch thi đấu & kết quả</h2></div></div>
+      <div class="round-tabs chips" id="round-tabs"></div>
+      <div id="round-body"></div>
+    </div>
+  </section>
+
+  <section class="block alt" id="doi">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">8 đội · mỗi đội 6 nam, 2 nữ</div><h2 class="display">Các đội tham gia</h2></div></div>
+      <div class="team-list" id="teams"></div>
+    </div>
+  </section>
+
+  <section class="block" id="du-doan">
+    <div class="container">
+      <div class="section-head"><div><div class="eyebrow">Minigame dành cho khán giả</div><h2 class="display grad-text">Dự đoán trúng thưởng</h2></div></div>
+      <div class="predict-wrap">
+        <div class="card">
+          <h3>Chọn đội Vô địch, Nhì, Ba</h3>
+          <p class="muted" style="margin-top:0">Đoán đúng cả 3 vị trí để có cơ hội nhận quà tại Gala. Mỗi người gửi 1 lần.</p>
+          <form class="pred-form" id="pred-form" autocomplete="off">
+            <label class="f">Tên của bạn<input name="name" required minlength="2" maxlength="40" placeholder="VD: Nguyễn Văn A"></label>
+            <div class="pick-row"><span class="md">🥇</span><label class="f">Đội Vô địch<select name="champion" required></select></label></div>
+            <div class="pick-row"><span class="md">🥈</span><label class="f">Đội Nhì<select name="second" required></select></label></div>
+            <div class="pick-row"><span class="md">🥉</span><label class="f">Đội Ba<select name="third" required></select></label></div>
+            <button class="btn primary" type="submit">Gửi dự đoán</button>
+            <p class="hint" id="pred-msg"></p>
+          </form>
         </div>
-        <div class="stats">
-          <div><b id="s-doi">8</b><span>đội</span></div>
-          <div><b id="s-tran">0/28</b><span>lượt đấu</span></div>
-          <div><b id="s-nd">0</b><span>nội dung đã đấu</span></div>
+        <div class="card">
+          <h3>Khán giả đang dự đoán</h3>
+          <div id="vote-stats" class="vote-stats"></div>
+          <h3 style="margin-top:8px;font-size:1rem">Dự đoán mới nhất</h3>
+          <div class="feed" id="feed"><p class="muted">Đang tải…</p></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="timeline">
+  <section class="block alt" id="timeline">
     <div class="container">
       <div class="section-head"><div><div class="eyebrow">Thứ Bảy · 21.11.2026</div><h2 class="display grad-text">Timeline chương trình</h2></div></div>
       <div class="timeline">
         <div class="card tl-group">
           <h3>I. Đón tiếp & <span>Khai mạc</span></h3>
           <ul class="tl">
-            <li><time>12h15 – 12h30</time>Đón tiếp khách mời và các vận động viên tại sân Ba Dứa.</li>
+            <li><time>12h15 – 12h30</time>Đón tiếp khách mời và các vận động viên tại Sân Ba Dứa, Hà Nội.</li>
             <li><time>12h30 – 12h45</time>Chụp ảnh lưu niệm và BTC trao tặng quà.</li>
             <li><time>12h45 – 13h00</time>Khai mạc giải<small>BTC phát biểu, cảm ơn nhà tài trợ, tuyên thệ</small></li>
           </ul>
@@ -95,19 +135,9 @@
     </div>
   </section>
 
-  <section class="block alt" id="bxh">
+  <section class="block" id="the-le">
     <div class="container">
-      <div class="section-head">
-        <div><div class="eyebrow">Cập nhật trực tiếp</div><h2 class="display">Bảng xếp hạng</h2></div>
-        <a class="btn primary sm" href="giai-dau.html?id=dao97-open-2026#lich">Xem tất cả lượt đấu →</a>
-      </div>
-      <div id="bxh-body"><p class="empty">Đang tải dữ liệu…</p></div>
-    </div>
-  </section>
-
-  <section class="block" id="dieu-le">
-    <div class="container">
-      <div class="section-head"><div><div class="eyebrow">Kỷ niệm 2 năm thành lập · Tháng 11/2026</div><h2 class="display grad-text">Điều lệ giải</h2></div></div>
+      <div class="section-head"><div><div class="eyebrow">Kỷ niệm 2 năm thành lập · Tháng 11/2026</div><h2 class="display grad-text">Thể lệ & điều lệ</h2></div></div>
 
       <div class="big-facts">
         <div class="fact"><b class="grad-text">08</b><span>đội tham gia</span></div>
@@ -193,70 +223,81 @@
       <details class="full-doc">
         <summary>📄 Xem bản điều lệ đầy đủ (ảnh gốc)</summary>
         <img class="zoomable" src="img/dieu-le.webp" alt="Điều lệ giải pickleball kỷ niệm 2 năm thành lập CLB Pickleball Đào 97 Hà Nội" loading="lazy" width="854" height="1280">
-        <p class="hint" style="text-align:center">CLB Pickleball Đào 97 Hà Nội · Chủ tịch: <span data-president></span></p>
+        <p class="hint" style="text-align:center">CLB Pickleball Đào 97 Hà Nội · Trưởng BTC: <span data-head></span></p>
       </details>
     </div>
   </section>
 
   <section class="block alt" id="giai-thuong">
     <div class="container prize-wrap">
-      <img class="prize-img zoomable" src="img/giai-thuong.webp" alt="Cúp và quà tặng giải ĐÀO97 OPEN" loading="lazy" width="1671" height="941">
+      <img class="prize-img zoomable" src="img/cup.webp" alt="Cúp Champion, Giải Nhì, Giải Ba của ĐÀO97 OPEN" loading="lazy" width="1199" height="1312" style="max-height:620px;object-fit:cover;object-position:center 30%">
       <div>
         <div class="eyebrow">Cơ cấu giải thưởng</div>
         <h2 class="display grad-text" style="font-size:clamp(1.7rem,4.5vw,2.6rem)">Giải thưởng</h2>
         <div class="prizes">
-          <div class="prize p1"><span class="ic">🏆</span><div><b>Giải Nhất · Đội vô địch</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
+          <div class="prize p1"><span class="ic">🏆</span><div><b>Champion · Đội vô địch</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
           <div class="prize"><span class="ic">🥈</span><div><b>Giải Nhì · Đội Á quân</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
           <div class="prize"><span class="ic">🥉</span><div><b>Giải Ba · Đội hạng Ba</b><span>Cúp và quà tặng của BTC/Nhà tài trợ</span></div></div>
           <div class="prize"><span class="ic">⭐</span><div><b>Best Player · VĐV xuất sắc nhất</b><span>Dựa trên số trận thắng, điểm số ghi được và tiêu chí của BTC</span></div></div>
+          <div class="prize"><span class="ic">🎯</span><div><b>Khán giả dự đoán trúng</b><span>Quà tặng cho người đoán đúng Vô địch – Nhì – Ba</span></div></div>
           <div class="prize"><span class="ic">🎁</span><div><b>Lucky Draw tại Gala</b><span>Bốc thăm trúng thưởng với nhiều phần quà hấp dẫn</span></div></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="hinh-anh">
+  <section class="block" id="ung-ho">
+    <div class="container donate">
+      <div>
+        <div class="eyebrow">Cùng chung tay cho sự kiện sinh nhật CLB</div>
+        <h2 class="display grad-text" style="font-size:clamp(1.7rem,4.5vw,2.6rem)">Đóng góp & ủng hộ</h2>
+        <div class="fees">
+          <div class="fee"><div class="t">🏓 Tham gia thi đấu</div><b>300k</b><span>/ 1 VĐV</span></div>
+          <div class="fee"><div class="t">🎉 Tham gia Gala</div><b>300k</b><span>/ 1 người</span></div>
+        </div>
+        <p class="muted">Quét mã QR (VietQR – MB Bank) để chuyển tiền ủng hộ CLB Pickleball Đào97. Cảm ơn mọi người!</p>
+        <img class="zoomable" src="img/ung-ho.webp" alt="Poster ủng hộ sinh nhật CLB Pickleball Đào97" loading="lazy" width="853" height="1280" style="max-width:260px;border-radius:14px;margin-top:10px">
+      </div>
+      <div class="qr-card">
+        <img src="img/qr-ung-ho.png" alt="Mã QR chuyển tiền ủng hộ CLB Pickleball Đào97 (VietQR – MB Bank)" width="640" height="640">
+        <b>Quét QR để chuyển tiền</b>
+        <small>Ủng hộ CLB Pickleball Đào97 · VietQR · MB Bank</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="hinh-anh">
     <div class="container">
       <div class="section-head"><div><div class="eyebrow">Hình ảnh</div><h2 class="display">Không khí giải đấu</h2></div></div>
       <div class="gallery">
         <img class="zoomable" src="img/backdrop.webp" alt="Sân thi đấu và backdrop ĐÀO97 OPEN" loading="lazy" width="1671" height="941">
-        <img class="zoomable" src="img/giai-thuong.webp" alt="Cúp và quà tặng sinh nhật" loading="lazy" width="1671" height="941">
+        <img class="zoomable" src="img/cup.webp" alt="Cúp giải ĐÀO97 OPEN" loading="lazy" width="1199" height="1312">
+        <img class="zoomable" src="img/giai-thuong.webp" alt="Quà tặng sinh nhật CLB" loading="lazy" width="1671" height="941">
         <img class="zoomable" src="img/timeline.webp" alt="Poster timeline chương trình" loading="lazy" width="828" height="1330" style="object-position:top">
       </div>
     </div>
   </section>
 
-  <section class="block alt sponsors" id="tai-tro">
+  <section class="block" id="tai-tro" style="text-align:center">
     <div class="container">
       <div class="eyebrow">Đồng hành cùng giải</div>
       <h2 class="display" style="font-size:clamp(1.6rem,4vw,2.3rem)">Nhà tài trợ chính</h2>
-      <img src="img/nha-tai-tro.webp" alt="Logo các nhà tài trợ: Sơn Cường, Medistar, STEC, CLB Đào Duy Từ, BN, Picksun" loading="lazy" width="800" height="160">
-      <p class="sponsor-names">Sơn Cường · Medistar · STEC · BN · Picksun</p>
-      <p class="muted" style="margin-top:18px">Chân thành cảm ơn các nhà tài trợ đã đồng hành cùng CLB!</p>
-    </div>
-  </section>
-
-  <section class="block" id="giai-dau">
-    <div class="container">
-      <div class="section-head">
-        <div><div class="eyebrow">Lịch giải</div><h2 class="display">Giải đấu của CLB</h2></div>
-        <div class="chips" id="filters" role="tablist"></div>
+      <div class="sponsor-grid">
+        <div class="sponsor"><img src="img/tt-son-cuong.png" alt="Sơn Cường" loading="lazy"><span>Sơn Cường</span></div>
+        <div class="sponsor"><img src="img/tt-medistar.png" alt="Medistar" loading="lazy"><span>Medistar</span></div>
+        <div class="sponsor"><img class="wide" src="img/tt-stec.png" alt="STEC" loading="lazy"><span>STEC</span></div>
+        <div class="sponsor"><img src="img/logo-sm.webp" alt="CLB Pickleball Đào Duy Từ" loading="lazy"><span>CLB Đào Duy Từ</span></div>
+        <div class="sponsor"><img src="img/tt-bn.png" alt="Dược phẩm BN" loading="lazy"><span>Dược phẩm BN</span></div>
+        <div class="sponsor"><img src="img/tt-picksun.png" alt="Picksun" loading="lazy"><span>Picksun</span></div>
       </div>
-      <div class="grid" id="list"><p class="empty">Đang tải dữ liệu…</p></div>
-    </div>
-  </section>
-
-  <section class="block alt" id="lien-he" hidden>
-    <div class="container">
-      <div class="section-head"><div><div class="eyebrow">Liên hệ</div><h2 class="display">Liên hệ Ban tổ chức</h2></div></div>
-      <div class="contact" id="contact"></div>
+      <p class="muted" style="margin-top:20px">Chân thành cảm ơn các nhà tài trợ đã đồng hành cùng CLB!</p>
     </div>
   </section>
 
   <footer>
     <div class="container">
-      <div class="f-brand"><img src="img/logo.webp" alt="" width="56" height="42"><div><b data-club></b><br>Since <span data-since></span> · Chủ tịch: <span data-president></span></div></div>
-      <span>© <span data-year></span> ĐÀO97 OPEN · <a href="quan-ly.html">Trang BTC</a></span>
+      <div class="f-brand"><img src="img/logo-sm.webp" alt="" width="64" height="48"><div><b data-club></b><br>Since <span data-since></span> · Trưởng BTC: <b data-head></b></div></div>
+      <span>© <span data-year></span> ĐÀO97 OPEN · <a href="btc.html">Đăng nhập BTC</a></span>
     </div>
   </footer>
   <div class="lightbox" id="lightbox" role="dialog" aria-label="Xem ảnh"><img alt=""></div>
@@ -264,6 +305,7 @@
   <script src="js/config.js"></script>
   <script src="js/core.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>

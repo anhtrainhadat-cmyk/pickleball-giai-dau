@@ -1,0 +1,53 @@
+rules_version = '2';
+// Luật bảo mật Firestore cho website ĐÀO97 OPEN.
+// Dán toàn bộ nội dung này vào Firebase Console › Firestore Database › Rules › Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Tài khoản BTC = có tài liệu admins/{email} (tạo trong Firebase Console).
+    function isBTC() {
+      return request.auth != null && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()));
+    }
+
+    // Danh sách BTC: mỗi người chỉ đọc được tài liệu của chính mình, không ai ghi từ web.
+    match /admins/{email} {
+      allow read: if request.auth != null && request.auth.token.email != null
+        && request.auth.token.email.lower() == email;
+      allow write: if false;
+    }
+
+    // Thông tin giải, danh sách đội, kết quả: ai cũng xem, chỉ BTC sửa.
+    match /event/{doc} {
+      allow read: if true;
+      allow write: if isBTC();
+    }
+    match /matches/{id} {
+      allow read: if true;
+      allow write: if isBTC();
+    }
+
+    // Trình VĐV (1-2-3): CHỈ BTC xem và chấm.
+    match /private/{doc} {
+      allow read, write: if isBTC();
+    }
+
+    // Dự đoán của khán giả: ai cũng gửi được khi BTC còn mở dự đoán; chỉ BTC xoá.
+    match /predictions/{id} {
+      allow read: if true;
+      allow create: if get(/databases/$(database)/documents/event/main).data.predictionsOpen == true
+        && request.resource.data.keys().hasOnly(['name', 'champion', 'second', 'third', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 40
+        && request.resource.data.champion is string && request.resource.data.champion.size() <= 30
+        && request.resource.data.second is string && request.resource.data.second.size() <= 30
+        && request.resource.data.third is string && request.resource.data.third.size() <= 30
+        && request.resource.data.champion != request.resource.data.second
+        && request.resource.data.champion != request.resource.data.third
+        && request.resource.data.second != request.resource.data.third
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if isBTC();
+    }
+  }
+}

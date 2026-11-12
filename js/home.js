@@ -1,122 +1,184 @@
-(async function () {
+(function () {
   const C = window.SITE_CONFIG || {};
   const $ = (s) => document.querySelector(s);
   const esc = PB.esc;
+  let T = null, preds = null, round = null, predCache = { sig: null, val: null };
 
-  /* Đếm ngược */
-  const start = new Date(C.eventStart || 0).getTime();
-  const end = new Date(C.eventEnd || C.eventStart || 0).getTime();
-  const pad = (n) => String(n).padStart(2, '0');
+  /* ---------- Đếm ngược ---------- */
+  const start = new Date(C.eventStart).getTime(), end = new Date(C.eventEnd).getTime();
   function tick() {
     const now = Date.now();
-    if (!start) return;
     if (now < start) {
       let s = Math.floor((start - now) / 1000);
-      const d = Math.floor(s / 86400); s -= d * 86400;
-      const h = Math.floor(s / 3600); s -= h * 3600;
-      const m = Math.floor(s / 60); s -= m * 60;
-      $('#cd-d').textContent = d; $('#cd-h').textContent = pad(h); $('#cd-m').textContent = pad(m); $('#cd-s').textContent = pad(s);
+      const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+      s %= 60;
+      $('#cd-title').textContent = 'Khai mạc sau';
+      $('#cd-text').textContent = `${d} ngày ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    } else if (now < end) { $('#cd-title').textContent = 'Trạng thái'; $('#cd-text').textContent = '🔴 Đang diễn ra'; }
+    else { $('#cd-title').textContent = 'Trạng thái'; $('#cd-text').textContent = '🏆 Đã kết thúc'; }
+  }
+  tick(); setInterval(tick, 1000);
+
+  const teamName = (id) => PB.teamName(T, id);
+  const pct = (x) => (x * 100 >= 99.5 ? '99%+' : x * 100 < 0.5 && x > 0 ? '<1%' : Math.round(x * 100) + '%');
+
+  /* ---------- Dự đoán vô địch (đầu trang) ---------- */
+  function forecast() {
+    const sig = JSON.stringify(T.matches.map((m) => m.subs.map((s) => s.games)));
+    if (predCache.sig !== sig) predCache = { sig, val: PB.predict(T, 2000) };
+    return predCache.val;
+  }
+  function renderForecast() {
+    const f = forecast();
+    const el = $('#forecast');
+    if (f.complete) {
+      const pod = PB.podium(T);
+      el.innerHTML = `<div class="lbl">Kết quả chung cuộc</div>
+        <div class="fav"><div class="cup">🏆</div><div><b class="grad-text">${esc(teamName(pod[0]))}</b><small>Nhà vô địch ĐÀO97 OPEN</small></div></div>
+        <div class="bars">${pod.map((id, i) => `<div class="bar"><span>${['🥇 Nhất', '🥈 Nhì', '🥉 Ba'][i]}</span><span class="nm">${esc(teamName(id))}</span><span></span></div>`).join('')}</div>`;
       return;
     }
-    clearInterval(timer);
-    $('#cd-title').textContent = now < end ? 'Giải đang diễn ra' : 'Giải đã kết thúc';
-    $('#countdown').outerHTML = now < end
-      ? '<div class="live-now">ĐANG THI ĐẤU</div>'
-      : '<div class="live-now" style="color:var(--gold)">🏆 Cảm ơn tất cả VĐV!</div>';
-  }
-  const timer = setInterval(tick, 1000); tick();
-
-  /* Liên hệ */
-  const contacts = [];
-  if (C.phone) contacts.push(['📞', 'Hotline', C.phone, 'tel:' + C.phone.replace(/\s/g, '')]);
-  if (C.zalo) contacts.push(['💬', 'Zalo', C.zalo, 'https://zalo.me/' + C.zalo.replace(/\s/g, '')]);
-  if (C.facebook) contacts.push(['👍', 'Facebook', 'Fanpage CLB', C.facebook]);
-  if (C.email) contacts.push(['✉️', 'Email', C.email, 'mailto:' + C.email]);
-  if (contacts.length) {
-    if (C.address) contacts.push(['📍', 'Khu vực', C.address, '']);
-    $('#lien-he').hidden = false;
-    $('#contact').innerHTML = contacts.map(([i, k, v, href]) =>
-      `<${href ? `a href="${esc(href)}" target="_blank" rel="noopener"` : 'div'} class="card"><small>${i} ${esc(k)}</small><b>${esc(v)}</b></${href ? 'a' : 'div'}>`).join('');
-  }
-
-  let data = [];
-  try { data = (await PB.loadPublic()).filter((t) => t.public !== false); }
-  catch (e) {
-    const msg = `<p class="empty">Không tải được dữ liệu. ${location.protocol === 'file:' ? 'Hãy mở website qua GitHub Pages thay vì mở file trực tiếp.' : 'Vui lòng tải lại trang.'}</p>`;
-    $('#bxh-body').innerHTML = msg; $('#list').innerHTML = msg;
-    return;
-  }
-
-  /* Giải chính */
-  const main = data.find((t) => t.id === C.mainTournament) || data[0];
-  if (main) {
-    const url = 'giai-dau.html?id=' + encodeURIComponent(main.id);
-    document.querySelectorAll('a[href^="giai-dau.html?id=dao97-open-2026"]').forEach((a) => (a.href = url + (a.hash || '')));
-    const ties = main.matches || [];
-    $('#s-doi').textContent = (main.teams || []).length;
-    $('#s-tran').textContent = `${ties.filter((m) => PB.result(m)).length}/${ties.length}`;
-    $('#s-nd').textContent = ties.reduce((n, m) => n + (m.subs ? PB.tieScore(m).done : PB.result(m) ? 1 : 0), 0);
-    renderMain(main, url);
-  } else $('#bxh-body').innerHTML = '<p class="empty">Chưa có dữ liệu giải.</p>';
-
-  function renderMain(t, url) {
-    if (!(t.groups || []).length) {
-      $('#bxh-body').innerHTML = (t.teams || []).length
-        ? `<div class="team-list">${t.teams.map((x) => `<div class="team-item"><div>${PB.teamCell(t, x.id, null, true)}${x.captain ? `<span class="tp">Đội trưởng: ${esc(x.captain)}</span>` : ''}</div></div>`).join('')}</div><p class="hint">Lịch thi đấu sẽ được công bố sau khi bốc thăm.</p>`
-        : '<p class="empty">Danh sách đội sẽ được công bố sớm.</p>';
+    if (!f.doneSubs) {
+      const fav = C.defaultFavorite && PB.team(T, C.defaultFavorite) ? C.defaultFavorite : T.teams[1] && T.teams[1].id;
+      el.innerHTML = `<div class="lbl">Dự đoán đội vô địch</div>
+        <div class="fav"><div class="cup">🏆</div><div><b class="grad-text">${esc(teamName(fav))}</b><small>Dự đoán ban đầu · chưa có kết quả thi đấu</small></div></div>
+        <p class="why">Ngay khi có kết quả nội dung đầu tiên, hệ thống sẽ tự tính lại xác suất vô địch của từng đội theo thể lệ giải (Điều 8–9).</p>
+        <a class="btn primary sm" href="#du-doan">Bạn nghĩ đội nào vô địch? →</a>`;
       return;
     }
-    const g = t.groups[0].name;
-    const ms = PB.groupMatches(t, g);
-    const pending = ms.filter((m) => !PB.result(m));
-    const curRound = pending.length ? Math.min(...pending.map((m) => m.round)) : null;
-    const podium = PB.podium(t);
-    $('#bxh-body').innerHTML = `
-      ${podium.length ? `<div class="card" style="margin-bottom:18px"><h3>🏆 Kết quả chung cuộc</h3><div class="podium">${podium.map((id, i) => `<div class="row"><span style="font-size:1.5rem">${['🥇', '🥈', '🥉'][i]}</span><div><small class="muted">${['Giải Nhất', 'Giải Nhì', 'Giải Ba'][i]}</small>${PB.teamCell(t, id, null, true)}</div></div>`).join('')}</div></div>` : ''}
-      <div class="card">${PB.renderStandings(t, g)}</div>
-      ${curRound ? `<div class="round-title">Vòng ${curRound} ${ms.some((m) => m.round === curRound && PB.tieScore(m).done) ? '· đang thi đấu' : '· tiếp theo'}</div>
-        <div class="match-list ties">${ms.filter((m) => m.round === curRound).map((m) => PB.renderMatch(t, m)).join('')}</div>` : ''}
-      <p style="margin-top:18px"><a class="btn ghost sm" href="${url}#lich">Xem toàn bộ 7 vòng đấu →</a></p>`;
+    const top = f.rows[0];
+    el.innerHTML = `<div class="lbl">Dự đoán đội vô địch · cập nhật trực tiếp</div>
+      <div class="fav"><div class="cup">🏆</div><div><b class="grad-text">${esc(teamName(top.id))}</b><small>Khả năng vô địch <b style="display:inline;font-size:1rem;color:var(--gold)">${pct(top.p1)}</b> · top 3: ${pct(top.top3)}</small></div></div>
+      <p class="why">Dựa trên ${f.doneSubs}/${f.totalSubs} nội dung đã có kết quả. Mô phỏng 2.000 lần các nội dung còn lại theo phong độ hiện tại và thể lệ xếp hạng.</p>
+      <div class="bars">${f.rows.slice(0, 5).map((r) => `<div class="bar"><span class="nm">${esc(teamName(r.id))}</span><span class="tk"><i style="width:${Math.max(2, r.p1 * 100)}%"></i></span><span class="pc">${pct(r.p1)}</span></div>`).join('')}</div>`;
   }
 
-  /* Danh sách giải */
-  const order = { 'dang-dien-ra': 0, 'mo-dang-ky': 1, 'sap-dien-ra': 2, 'da-ket-thuc': 3 };
-  data.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || String(a.date).localeCompare(b.date));
-  const filters = [['all', 'Tất cả'], ...Object.entries(PB.STATUS)];
-  let current = 'all';
-  $('#filters').innerHTML = data.length > 1 ? filters.map(([k, v]) => `<button class="chip ${k === 'all' ? 'active' : ''}" data-k="${k}" role="tab">${v}</button>`).join('') : '';
-  $('#filters').addEventListener('click', (e) => {
-    const b = e.target.closest('.chip'); if (!b) return;
-    current = b.dataset.k;
-    document.querySelectorAll('#filters .chip').forEach((x) => x.classList.toggle('active', x === b));
-    render();
+  /* ---------- Bảng xếp hạng + vòng hiện tại ---------- */
+  function currentRound() {
+    const pend = T.matches.filter((m) => !PB.result(m));
+    return pend.length ? Math.min(...pend.map((m) => m.round)) : Math.max(...T.matches.map((m) => m.round));
+  }
+  function renderStandings() {
+    const cr = currentRound();
+    const live = T.matches.filter((m) => m.round === cr);
+    const started = live.some((m) => PB.tieScore(m).done);
+    $('#bxh-body').innerHTML = `<div class="card">${PB.renderStandings(T, 'A')}</div>
+      ${T.matches.every((m) => PB.result(m)) ? '' : `<div class="round-title">Vòng ${cr} · ${started ? 'đang thi đấu' : 'sắp diễn ra'}</div>
+      <div class="match-list ties">${live.map((m) => PB.renderMatch(T, m)).join('')}</div>`}`;
+  }
+
+  /* ---------- Lịch theo vòng ---------- */
+  function renderRounds() {
+    const rounds = [...new Set(T.matches.map((m) => m.round))].sort((a, b) => a - b);
+    if (round === null || !rounds.includes(round)) round = currentRound();
+    $('#round-tabs').innerHTML = rounds.map((r) => {
+      const ms = T.matches.filter((m) => m.round === r);
+      const done = ms.every((m) => PB.result(m));
+      return `<button class="chip ${r === round ? 'active' : ''}" data-r="${r}">Vòng ${r}${done ? ' ✓' : ''}</button>`;
+    }).join('');
+    $('#round-body').innerHTML = `<div class="match-list ties">${T.matches.filter((m) => m.round === round).map((m) => PB.renderMatch(T, m)).join('')}</div>`;
+  }
+  $('#round-tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-r]'); if (!b) return;
+    round = +b.dataset.r; renderRounds();
   });
 
-  function card(t) {
-    const n = (t.teams || []).length;
-    const reg = t.registerUrl || C.registerUrl;
-    const champ = PB.champion(t);
-    const url = 'giai-dau.html?id=' + encodeURIComponent(t.id);
-    return `<article class="card t-card">
-      ${PB.statusBadge(t.status)}
-      <h3><a href="${url}">${esc(t.name)}</a></h3>
-      <div class="t-meta">
-        <span>📅 <b>${esc(PB.fmtDateRange(t))}</b>${t.time ? ' · ' + esc(t.time) : ''}</span>
-        ${t.location ? `<span>📍 ${esc(t.location)}</span>` : ''}
-        <span>🎾 ${esc([t.category, t.level].filter(Boolean).join(' · '))}</span>
-        <span>🧩 ${esc(PB.FORMATS[t.format] || '')}${n ? ` · ${n} đội` : ''}</span>
-        ${t.prize ? `<span>🏆 ${esc(t.prize)}</span>` : ''}
-        ${champ ? `<span>🥇 Vô địch: <b>${esc(PB.teamName(t, champ))}</b></span>` : ''}
-      </div>
-      <div class="foot">
-        <a class="btn sm primary" href="${url}">${t.status === 'dang-dien-ra' ? 'Xem trực tiếp' : t.status === 'da-ket-thuc' ? 'Xem kết quả' : 'Chi tiết'}</a>
-        ${t.status === 'mo-dang-ky' && reg ? `<a class="btn sm gold" href="${esc(reg)}" target="_blank" rel="noopener">Đăng ký</a>` : ''}
-      </div>
-    </article>`;
+  /* ---------- Các đội ---------- */
+  function renderTeams() {
+    $('#teams').innerHTML = T.teams.map((x) => {
+      const ps = (Array.isArray(x.players) ? x.players : []).filter((p) => p.name);
+      return `<div class="team-item team-card"><div style="min-width:0">
+        <span class="tn">${esc(x.name)}</span>
+        ${x.captain ? `<span class="cap">👑 Đội trưởng: ${esc(x.captain)}</span>` : ''}
+        ${ps.length ? `<ul class="roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}</li>`).join('')}</ul>` : '<span class="tp">Danh sách VĐV sẽ được cập nhật</span>'}
+      </div></div>`;
+    }).join('');
   }
-  function render() {
-    const list = data.filter((t) => current === 'all' || t.status === current);
-    $('#list').innerHTML = list.length ? list.map(card).join('') : '<p class="empty">Chưa có giải nào trong mục này.</p>';
+
+  /* ---------- Dự đoán của khán giả ---------- */
+  const form = $('#pred-form');
+  const DONE_KEY = 'dao97_du_doan';
+  const lsGet = () => { try { return localStorage.getItem(DONE_KEY); } catch (e) { return null; } };
+  const lsSet = (v) => { try { localStorage.setItem(DONE_KEY, v); } catch (e) { /* bỏ qua */ } };
+
+  function fillSelects() {
+    const opts = '<option value="">— Chọn đội —</option>' + T.teams.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+    form.querySelectorAll('select').forEach((s) => { const v = s.value; s.innerHTML = opts; s.value = v; });
   }
-  render();
+  function formState() {
+    const msg = $('#pred-msg');
+    const btn = form.querySelector('button');
+    let reason = '';
+    if (!Store.enabled) reason = 'Chức năng dự đoán sẽ mở khi BTC kích hoạt hệ thống.';
+    else if (!T.predictionsOpen) reason = '⏱ BTC đã khoá cổng dự đoán.';
+    else if (lsGet()) reason = '✅ Bạn đã gửi dự đoán từ thiết bị này. Cảm ơn bạn!';
+    btn.disabled = !!reason;
+    if (reason) msg.textContent = reason;
+  }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const p = { name: (fd.get('name') || '').trim(), champion: fd.get('champion'), second: fd.get('second'), third: fd.get('third') };
+    const msg = $('#pred-msg');
+    if (p.name.length < 2) { msg.textContent = 'Vui lòng nhập tên (ít nhất 2 ký tự).'; return; }
+    if (!p.champion || !p.second || !p.third) { msg.textContent = 'Vui lòng chọn đủ 3 đội.'; return; }
+    if (new Set([p.champion, p.second, p.third]).size < 3) { msg.textContent = 'Ba vị trí phải là 3 đội khác nhau.'; return; }
+    const btn = form.querySelector('button');
+    btn.disabled = true; msg.textContent = 'Đang gửi…';
+    try {
+      await Store.submitPrediction(p);
+      lsSet(String(Date.now()));
+      form.reset(); msg.textContent = '🎉 Đã ghi nhận dự đoán của bạn. Chúc may mắn!';
+      toast('Đã gửi dự đoán');
+    } catch (err) {
+      msg.textContent = /permission/i.test(err.message) ? 'Cổng dự đoán đã đóng hoặc dữ liệu không hợp lệ.' : 'Gửi chưa được, vui lòng thử lại.';
+      btn.disabled = false;
+    }
+  });
+
+  function renderPredictions() {
+    if (!T) return;
+    if (preds === null) {
+      $('#vote-stats').innerHTML = '';
+      $('#feed').innerHTML = '<p class="muted">Dự đoán của khán giả sẽ hiện ở đây khi hệ thống được kích hoạt.</p>';
+      return;
+    }
+    const valid = preds.filter((p) => PB.team(T, p.champion));
+    const n = valid.length;
+    const votes = Object.fromEntries(T.teams.map((x) => [x.id, 0]));
+    valid.forEach((p) => votes[p.champion]++);
+    const ranked = Object.entries(votes).sort((a, b) => b[1] - a[1]).filter(([, v]) => v > 0);
+    $('#vote-stats').innerHTML = n
+      ? `<p class="muted" style="margin:0 0 4px">${n >= 300 ? '300 dự đoán mới nhất' : n + ' lượt dự đoán'} · tỉ lệ chọn đội vô địch:</p>` +
+        ranked.slice(0, 5).map(([id, v]) => `<div class="bar"><span class="nm">${esc(teamName(id))}</span><span class="tk"><i style="width:${(v / n) * 100}%"></i></span><span class="pc">${Math.round((v / n) * 100)}%</span></div>`).join('')
+      : '<p class="muted">Chưa có ai dự đoán — hãy là người đầu tiên!</p>';
+    const pod = PB.podium(T);
+    const hit = (p) => pod.length === 3 && p.champion === pod[0] && p.second === pod[1] && p.third === pod[2];
+    const winners = valid.filter(hit);
+    const fmt = (d) => d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+    const item = (p) => `<div class="feed-item ${hit(p) ? 'hit' : ''}"><b>${hit(p) ? '🎯 ' : ''}${esc(p.name)}</b><time>${fmt(p.createdAt)}</time>
+      <div class="picks">🥇 <span>${esc(teamName(p.champion))}</span> · 🥈 <span>${esc(teamName(p.second))}</span> · 🥉 <span>${esc(teamName(p.third))}</span></div></div>`;
+    $('#feed').innerHTML =
+      (pod.length === 3 ? `<p style="margin:0 0 6px"><b>${winners.length ? `🎉 ${winners.length} người đoán trúng cả 3 vị trí!` : 'Chưa có ai đoán trúng cả 3 vị trí.'}</b></p>${winners.map(item).join('')}` : '') +
+      (valid.length ? valid.slice(0, 30).map(item).join('') : '<p class="muted">Chưa có dự đoán nào.</p>');
+  }
+
+  /* ---------- Tải dữ liệu ---------- */
+  function renderAll() {
+    renderForecast(); renderStandings(); renderRounds(); renderTeams(); fillSelects(); formState(); renderPredictions();
+    const st = $('#live-status');
+    st.className = 'pill-status ' + (Store.enabled ? 'ok' : 'off');
+    st.textContent = Store.enabled ? 'Trực tiếp' : 'Dữ liệu tĩnh';
+  }
+  Store.watch((t) => { T = t; renderAll(); }, (e) => {
+    console.error(e);
+    $('#bxh-body').innerHTML = '<p class="empty">Không tải được dữ liệu. Vui lòng tải lại trang.</p>';
+  });
+  // Chỉ tải dự đoán khi người xem cuộn gần tới mục Dự đoán (tiết kiệm lượt đọc)
+  let predStarted = false;
+  const startPreds = () => { if (predStarted) return; predStarted = true; Store.watchPredictions((list) => { preds = list; renderPredictions(); }, console.error); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); startPreds(); } }, { rootMargin: '600px' });
+    io.observe($('#du-doan'));
+  } else startPreds();
 })();

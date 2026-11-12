@@ -1,1051 +1,1471 @@
-[
+{
+ "id": "dao97-open-2026",
+ "name": "ĐÀO97 OPEN",
+ "status": "sap-dien-ra",
+ "format": "team-rr",
+ "subEvents": [
+  "Đôi nam 1",
+  "Đôi nam nữ 1",
+  "Đôi nam 2",
+  "Đôi nam nữ 2"
+ ],
+ "teams": [
   {
-    "id": "dao97-open-2026",
-    "name": "ĐÀO97 OPEN – Mừng sinh nhật 2 tuổi CLB Pickleball Đào 97",
-    "status": "sap-dien-ra",
-    "public": true,
-    "date": "2026-11-21",
-    "endDate": "",
-    "time": "12:30 – 18:00",
-    "location": "Sân Pick Ba Dứa – Nguyễn Xiển, Hà Nội",
-    "category": "Đồng đội",
-    "level": "Nội bộ CLB & khách mời",
-    "format": "team-rr",
-    "subEvents": [
-      "Đôi nam 1",
-      "Đôi nam nữ 1",
-      "Đôi nam 2",
-      "Đôi nam nữ 2"
-    ],
-    "scoring": "Mỗi nội dung 1 game chạm 15 (không cần cách biệt), đổi sân tại điểm 8. Thắng 1 nội dung = 1 điểm; kết quả vòng 4–0, 3–1 hoặc 2–2.",
-    "maxTeams": 8,
-    "fee": "",
-    "prize": "Giải Nhất, Nhì, Ba (cúp + quà) và Best Player",
-    "registerUrl": "",
-    "contact": "",
-    "description": "Giải đồng đội vòng tròn một lượt: 8 đội × 8 VĐV (6 nam, 2 nữ).\nMỗi vòng đối đầu 4 nội dung: Đôi nam 1 → Đôi nam nữ 1 → Đôi nam 2 → Đôi nam nữ 2.\n\n12h15 Đón tiếp · 12h45 Khai mạc · 13h00–17h30 Thi đấu · 17h30 Trao giải & Bế mạc\n18h00–22h00 Gala sinh nhật tại Nhà hàng Trống Đồng Linh Đàm.",
-    "teams": [
-      {
-        "id": "doi1",
-        "name": "Đội 1",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi2",
-        "name": "Đội 2",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi3",
-        "name": "Đội 3",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi4",
-        "name": "Đội 4",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi5",
-        "name": "Đội 5",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi6",
-        "name": "Đội 6",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi7",
-        "name": "Đội 7",
-        "captain": "",
-        "players": ""
-      },
-      {
-        "id": "doi8",
-        "name": "Đội 8",
-        "captain": "",
-        "players": ""
-      }
-    ],
-    "groups": [
-      {
-        "name": "A",
-        "teamIds": [
-          "doi1",
-          "doi2",
-          "doi3",
-          "doi4",
-          "doi5",
-          "doi6",
-          "doi7",
-          "doi8"
-        ]
-      }
-    ],
-    "matches": [
-      {
-        "id": "y90hxt7br",
-        "stage": "group",
-        "group": "A",
-        "round": 1,
-        "a": "doi1",
-        "b": "doi8",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "cdl7yx7br",
-        "stage": "group",
-        "group": "A",
-        "round": 1,
-        "a": "doi2",
-        "b": "doi7",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "yzuvmu7br",
-        "stage": "group",
-        "group": "A",
-        "round": 1,
-        "a": "doi3",
-        "b": "doi6",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "0xnaig7br",
-        "stage": "group",
-        "group": "A",
-        "round": 1,
-        "a": "doi4",
-        "b": "doi5",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "a06un87br",
-        "stage": "group",
-        "group": "A",
-        "round": 2,
-        "a": "doi7",
-        "b": "doi1",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "ui6wz87br",
-        "stage": "group",
-        "group": "A",
-        "round": 2,
-        "a": "doi6",
-        "b": "doi8",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "9f8r957br",
-        "stage": "group",
-        "group": "A",
-        "round": 2,
-        "a": "doi5",
-        "b": "doi2",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "979bs47br",
-        "stage": "group",
-        "group": "A",
-        "round": 2,
-        "a": "doi4",
-        "b": "doi3",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "kci4mw7br",
-        "stage": "group",
-        "group": "A",
-        "round": 3,
-        "a": "doi1",
-        "b": "doi6",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "bmeuwp7br",
-        "stage": "group",
-        "group": "A",
-        "round": 3,
-        "a": "doi7",
-        "b": "doi5",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "eun3mu7br",
-        "stage": "group",
-        "group": "A",
-        "round": 3,
-        "a": "doi8",
-        "b": "doi4",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "otkx2y7br",
-        "stage": "group",
-        "group": "A",
-        "round": 3,
-        "a": "doi2",
-        "b": "doi3",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "oyr6f07br",
-        "stage": "group",
-        "group": "A",
-        "round": 4,
-        "a": "doi5",
-        "b": "doi1",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "b7ma8q7br",
-        "stage": "group",
-        "group": "A",
-        "round": 4,
-        "a": "doi4",
-        "b": "doi6",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "s3nmet7br",
-        "stage": "group",
-        "group": "A",
-        "round": 4,
-        "a": "doi3",
-        "b": "doi7",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "r2bu9d7br",
-        "stage": "group",
-        "group": "A",
-        "round": 4,
-        "a": "doi2",
-        "b": "doi8",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "3z6eb47br",
-        "stage": "group",
-        "group": "A",
-        "round": 5,
-        "a": "doi1",
-        "b": "doi4",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "r6g7ng7br",
-        "stage": "group",
-        "group": "A",
-        "round": 5,
-        "a": "doi5",
-        "b": "doi3",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "y14w937br",
-        "stage": "group",
-        "group": "A",
-        "round": 5,
-        "a": "doi6",
-        "b": "doi2",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "hohx8y7br",
-        "stage": "group",
-        "group": "A",
-        "round": 5,
-        "a": "doi7",
-        "b": "doi8",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "8z1o567br",
-        "stage": "group",
-        "group": "A",
-        "round": 6,
-        "a": "doi3",
-        "b": "doi1",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "tu1hvh7br",
-        "stage": "group",
-        "group": "A",
-        "round": 6,
-        "a": "doi2",
-        "b": "doi4",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "t1x42v7br",
-        "stage": "group",
-        "group": "A",
-        "round": 6,
-        "a": "doi8",
-        "b": "doi5",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "5wkcyb7br",
-        "stage": "group",
-        "group": "A",
-        "round": 6,
-        "a": "doi7",
-        "b": "doi6",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "jinrs87br",
-        "stage": "group",
-        "group": "A",
-        "round": 7,
-        "a": "doi1",
-        "b": "doi2",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "q6z5e87br",
-        "stage": "group",
-        "group": "A",
-        "round": 7,
-        "a": "doi3",
-        "b": "doi8",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "b160g67br",
-        "stage": "group",
-        "group": "A",
-        "round": 7,
-        "a": "doi4",
-        "b": "doi7",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      },
-      {
-        "id": "owrrhm7br",
-        "stage": "group",
-        "group": "A",
-        "round": 7,
-        "a": "doi5",
-        "b": "doi6",
-        "subs": [
-          {
-            "label": "Đôi nam 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 1",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          },
-          {
-            "label": "Đôi nam nữ 2",
-            "games": [],
-            "pa": "",
-            "pb": ""
-          }
-        ]
-      }
-    ],
-    "koRounds": 0,
-    "createdAt": 1794471277526,
-    "updatedAt": 1794471277526,
-    "generatedAt": 1794471277527
+   "id": "doi1",
+   "name": "Team 1",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi1-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi1-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi1-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi2",
+   "name": "Team 2",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi2-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi2-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi2-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi3",
+   "name": "Team 3",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi3-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi3-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi3-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi4",
+   "name": "Team 4",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi4-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi4-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi4-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi5",
+   "name": "Team 5",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi5-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi5-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi5-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi6",
+   "name": "Team 6",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi6-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi6-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi6-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi7",
+   "name": "Team 7",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi7-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi7-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi7-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
+  },
+  {
+   "id": "doi8",
+   "name": "Team 8",
+   "captain": "",
+   "players": [
+    {
+     "id": "doi8-1",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-2",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-3",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-4",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-5",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-6",
+     "name": "",
+     "gender": "nam"
+    },
+    {
+     "id": "doi8-7",
+     "name": "",
+     "gender": "nu"
+    },
+    {
+     "id": "doi8-8",
+     "name": "",
+     "gender": "nu"
+    }
+   ]
   }
-]
+ ],
+ "groups": [
+  {
+   "name": "A",
+   "teamIds": [
+    "doi1",
+    "doi2",
+    "doi3",
+    "doi4",
+    "doi5",
+    "doi6",
+    "doi7",
+    "doi8"
+   ]
+  }
+ ],
+ "matches": [
+  {
+   "id": "y90hxt7br",
+   "stage": "group",
+   "group": "A",
+   "round": 1,
+   "a": "doi1",
+   "b": "doi8",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "cdl7yx7br",
+   "stage": "group",
+   "group": "A",
+   "round": 1,
+   "a": "doi2",
+   "b": "doi7",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "yzuvmu7br",
+   "stage": "group",
+   "group": "A",
+   "round": 1,
+   "a": "doi3",
+   "b": "doi6",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "0xnaig7br",
+   "stage": "group",
+   "group": "A",
+   "round": 1,
+   "a": "doi4",
+   "b": "doi5",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "a06un87br",
+   "stage": "group",
+   "group": "A",
+   "round": 2,
+   "a": "doi7",
+   "b": "doi1",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "ui6wz87br",
+   "stage": "group",
+   "group": "A",
+   "round": 2,
+   "a": "doi6",
+   "b": "doi8",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "9f8r957br",
+   "stage": "group",
+   "group": "A",
+   "round": 2,
+   "a": "doi5",
+   "b": "doi2",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "979bs47br",
+   "stage": "group",
+   "group": "A",
+   "round": 2,
+   "a": "doi4",
+   "b": "doi3",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "kci4mw7br",
+   "stage": "group",
+   "group": "A",
+   "round": 3,
+   "a": "doi1",
+   "b": "doi6",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "bmeuwp7br",
+   "stage": "group",
+   "group": "A",
+   "round": 3,
+   "a": "doi7",
+   "b": "doi5",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "eun3mu7br",
+   "stage": "group",
+   "group": "A",
+   "round": 3,
+   "a": "doi8",
+   "b": "doi4",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "otkx2y7br",
+   "stage": "group",
+   "group": "A",
+   "round": 3,
+   "a": "doi2",
+   "b": "doi3",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "oyr6f07br",
+   "stage": "group",
+   "group": "A",
+   "round": 4,
+   "a": "doi5",
+   "b": "doi1",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "b7ma8q7br",
+   "stage": "group",
+   "group": "A",
+   "round": 4,
+   "a": "doi4",
+   "b": "doi6",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "s3nmet7br",
+   "stage": "group",
+   "group": "A",
+   "round": 4,
+   "a": "doi3",
+   "b": "doi7",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "r2bu9d7br",
+   "stage": "group",
+   "group": "A",
+   "round": 4,
+   "a": "doi2",
+   "b": "doi8",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "3z6eb47br",
+   "stage": "group",
+   "group": "A",
+   "round": 5,
+   "a": "doi1",
+   "b": "doi4",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "r6g7ng7br",
+   "stage": "group",
+   "group": "A",
+   "round": 5,
+   "a": "doi5",
+   "b": "doi3",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "y14w937br",
+   "stage": "group",
+   "group": "A",
+   "round": 5,
+   "a": "doi6",
+   "b": "doi2",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "hohx8y7br",
+   "stage": "group",
+   "group": "A",
+   "round": 5,
+   "a": "doi7",
+   "b": "doi8",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "8z1o567br",
+   "stage": "group",
+   "group": "A",
+   "round": 6,
+   "a": "doi3",
+   "b": "doi1",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "tu1hvh7br",
+   "stage": "group",
+   "group": "A",
+   "round": 6,
+   "a": "doi2",
+   "b": "doi4",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "t1x42v7br",
+   "stage": "group",
+   "group": "A",
+   "round": 6,
+   "a": "doi8",
+   "b": "doi5",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "5wkcyb7br",
+   "stage": "group",
+   "group": "A",
+   "round": 6,
+   "a": "doi7",
+   "b": "doi6",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "jinrs87br",
+   "stage": "group",
+   "group": "A",
+   "round": 7,
+   "a": "doi1",
+   "b": "doi2",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "q6z5e87br",
+   "stage": "group",
+   "group": "A",
+   "round": 7,
+   "a": "doi3",
+   "b": "doi8",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "b160g67br",
+   "stage": "group",
+   "group": "A",
+   "round": 7,
+   "a": "doi4",
+   "b": "doi7",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  },
+  {
+   "id": "owrrhm7br",
+   "stage": "group",
+   "group": "A",
+   "round": 7,
+   "a": "doi5",
+   "b": "doi6",
+   "subs": [
+    {
+     "key": "s0",
+     "label": "Đôi nam 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s1",
+     "label": "Đôi nam nữ 1",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s2",
+     "label": "Đôi nam 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    },
+    {
+     "key": "s3",
+     "label": "Đôi nam nữ 2",
+     "games": [],
+     "pa": "",
+     "pb": ""
+    }
+   ]
+  }
+ ]
+}

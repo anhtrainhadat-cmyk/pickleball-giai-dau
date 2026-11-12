@@ -5,7 +5,11 @@
   fill('[data-site-name]', C.name || 'Pickleball');
   fill('[data-club]', C.club);
   fill('[data-since]', C.since);
-  fill('[data-president]', C.president);
+  fill('[data-head]', C.head);
+  fill('[data-venue]', C.venue);
+  fill('[data-gala]', C.gala);
+  const vl = document.getElementById('venue-link'); if (vl) vl.href = C.venueMap || '#';
+  const gl = document.getElementById('gala-link'); if (gl) gl.href = C.galaMap || '#';
   fill('[data-year]', new Date().getFullYear());
 
   const btn = document.querySelector('.menu-btn');
