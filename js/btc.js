@@ -48,7 +48,8 @@
 
   Store.onAuth((user, ok) => {
     if (!user) return loginView();
-    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">📱 ${esc(Store.loginToPhone(user.email))}</span><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
+    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">📱 ${esc(Store.loginToPhone(user.email))}</span><button class="btn sm ghost" id="chpw">🔑 Đổi mật khẩu</button><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
+    $('#chpw').addEventListener('click', () => { tab = 'cai-dat'; render(); setTimeout(() => { const f = $('#pw-old'); if (f) { f.scrollIntoView({ block: 'center' }); f.focus(); } }, 50); });
     $('#logout').addEventListener('click', () => Store.signOut());
     if (!ok) {
       app.innerHTML = `<div class="card login"><h2>Chưa có quyền BTC</h2><p class="muted">Tài khoản <b>${esc(Store.loginToPhone(user.email))}</b> đã đăng nhập nhưng chưa được thêm vào danh sách BTC. Trưởng BTC thêm <code>${esc(user.email)}</code> vào Firebase Console › Firestore › <code>admins</code>.</p></div>`;
@@ -177,6 +178,13 @@
   function settingsView() {
     return `<div class="card"><h3>Trạng thái giải</h3>
       <label class="f" style="max-width:320px">Trạng thái<select data-ev="status">${['sap-dien-ra', 'dang-dien-ra', 'da-ket-thuc'].map((k) => `<option value="${k}" ${T.status === k ? 'selected' : ''}>${PB.STATUS[k]}</option>`).join('')}</select></label>
+      <h3 style="margin-top:22px">🔑 Đổi mật khẩu tài khoản đang đăng nhập</h3>
+      <form id="pw-form" class="form-grid" style="max-width:640px" autocomplete="off">
+        <label class="f">Mật khẩu hiện tại<input type="password" id="pw-old" required autocomplete="current-password"></label>
+        <label class="f">Mật khẩu mới <small>(ít nhất 6 ký tự)</small><input type="password" id="pw-new" required minlength="6" autocomplete="new-password"></label>
+        <label class="f">Nhập lại mật khẩu mới<input type="password" id="pw-new2" required minlength="6" autocomplete="new-password"></label>
+        <div class="full toolbar"><button class="btn primary" type="submit">Đổi mật khẩu</button><span class="hint" id="pw-msg"></span></div>
+      </form>
       <h3 style="margin-top:22px">Sao lưu</h3>
       <p class="muted">Tải toàn bộ dữ liệu (đội, kết quả, trình VĐV, dự đoán) về máy để lưu trữ.</p>
       <button class="btn" data-act="backup">⤓ Tải bản sao lưu</button>
@@ -229,6 +237,17 @@
     } else if (a.dataset.act === 'backup') {
       download('sao-luu-dao97-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ tournament: T, ratings, predictions: preds }, null, 2), 'application/json');
     }
+  });
+
+  app.addEventListener('submit', async (e) => {
+    if (e.target.id !== 'pw-form') return;
+    e.preventDefault();
+    const msg = $('#pw-msg'), o = $('#pw-old').value, n = $('#pw-new').value, n2 = $('#pw-new2').value;
+    if (n.length < 6) { msg.textContent = 'Mật khẩu mới phải có ít nhất 6 ký tự.'; return; }
+    if (n !== n2) { msg.textContent = 'Hai lần nhập mật khẩu mới không khớp.'; return; }
+    msg.textContent = 'Đang đổi…';
+    try { await Store.changePassword(o, n); e.target.reset(); msg.textContent = '✅ Đã đổi mật khẩu. Lần sau đăng nhập bằng mật khẩu mới.'; toast('Đã đổi mật khẩu'); }
+    catch (er) { msg.textContent = /wrong-password|invalid-credential|invalid-login/i.test(er.code || er.message) ? 'Mật khẩu hiện tại không đúng.' : 'Không đổi được: ' + (er.message || er); }
   });
 
   let teamTimer;

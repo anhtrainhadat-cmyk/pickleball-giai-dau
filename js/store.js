@@ -137,6 +137,13 @@
   Store.loginToPhone = (email) => String(email || '').replace('@' + Store.PHONE_DOMAIN, '');
   Store.signIn = (phone, pw) => auth.signInWithEmailAndPassword(Store.phoneToLogin(phone), pw);
   Store.signOut = () => auth.signOut();
+  // Đổi mật khẩu: xác nhận lại mật khẩu cũ rồi đặt mật khẩu mới
+  Store.changePassword = async (oldPw, newPw) => {
+    const u = auth.currentUser;
+    if (!u) throw new Error('Chưa đăng nhập');
+    await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, oldPw));
+    await u.updatePassword(newPw);
+  };
   Store.resetPassword = (email) => auth.sendPasswordResetEmail(email.trim());
 
   Store.seed = async function (t) {
