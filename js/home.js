@@ -84,13 +84,23 @@
   });
 
   /* ---------- Các đội ---------- */
+  // Trình VĐV: chỉ hiện trên trang VĐV (trang chính), không hiện trên trang khán giả xem.html
+  const SHOW_LV = document.body.dataset.mode !== 'xem';
+  let LV = {};
+  function teamLevel(ps) {
+    const r = ps.filter((p) => LV[p.id]);
+    if (!r.length) return '';
+    const sum = r.reduce((s, p) => s + LV[p.id], 0);
+    return `<div class="lv-sum">Trình TB <b>${(sum / r.length).toFixed(2)}</b> · tổng <b>${sum}</b>${r.length < ps.length ? ` <small>(${r.length}/${ps.length} VĐV)</small>` : ''}</div>`;
+  }
   function renderTeams() {
     $('#teams').innerHTML = T.teams.map((x) => {
       const ps = (Array.isArray(x.players) ? x.players : []).filter((p) => p.name);
       return `<div class="team-item team-card"><div style="min-width:0">
         <span class="tn">${esc(x.name)}</span>
         ${x.captain ? `<span class="cap">👑 Đội trưởng: ${esc(x.captain)}</span>` : ''}
-        ${ps.length ? `<ul class="roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''}</li>`).join('')}</ul>` : '<span class="tp">Danh sách VĐV sẽ được cập nhật</span>'}
+        ${ps.length ? `<ul class="roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''}${SHOW_LV && LV[p.id] ? ` <span class="lv lv${LV[p.id]}" title="Trình ${LV[p.id]}">T${LV[p.id]}</span>` : ''}</li>`).join('')}</ul>` : '<span class="tp">Danh sách VĐV sẽ được cập nhật</span>'}
+        ${SHOW_LV ? teamLevel(ps) : ''}
       </div></div>`;
     }).join('') + (T.reserves ? `<div class="team-item team-card reserve" style="grid-column:1/-1"><div><span class="tn">VĐV dự bị</span><span class="tp">${esc(T.reserves)}</span></div></div>` : '');
   }
@@ -172,6 +182,7 @@
     st.className = 'pill-status ' + (Store.enabled ? 'ok' : 'off');
     st.textContent = Store.enabled ? 'Trực tiếp' : 'Dữ liệu tĩnh';
   }
+  if (SHOW_LV) Store.watchPublicRatings((l) => { LV = l || {}; if (T) renderTeams(); }, () => {});
   Store.watch((t) => { T = t; renderAll(); }, (e) => {
     console.error(e);
     $('#bxh-body').innerHTML = '<p class="empty">Không tải được dữ liệu. Vui lòng tải lại trang.</p>';

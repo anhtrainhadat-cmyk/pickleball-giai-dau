@@ -58,7 +58,12 @@
     if (!watching) {
       watching = true;
       Store.watch((t) => { T = t; schedule(); }, (e) => toast('Lỗi tải dữ liệu: ' + e.message));
-      Store.watchRatings((r) => { ratings = r; schedule(); }, () => {});
+      let synced = false;
+      Store.watchRatings((r) => {
+        ratings = r; schedule();
+        // Lần đầu: chép trình đã chấm trước đây sang bản công khai cho trang VĐV
+        if (!synced) { synced = true; Store.syncPublicRatings(r).catch(() => { synced = false; }); }
+      }, () => {});
       Store.watchPredictions((l) => { preds = l || []; schedule(); }, () => {});
     }
     schedule();
@@ -137,7 +142,7 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    return `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (5 mức: 1 – 2 – 3 – 4 – 5) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
+    return `<p class="notice" style="margin-bottom:16px">📊 <b>Trình VĐV (5 mức: 1 – 2 – 3 – 4 – 5)</b> hiện trên <b>trang VĐV</b> (trang chính), <b>không hiện</b> trên trang khán giả <code>xem.html</code>. Bấm số là tự lưu; bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));

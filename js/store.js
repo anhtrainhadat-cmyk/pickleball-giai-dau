@@ -162,7 +162,21 @@
   Store.saveSub = (mid, key, field, value) => db.doc('matches/' + mid).update(`subs.${key}.${field}`, value);
   Store.saveMatch = (mid, field, value) => db.doc('matches/' + mid).update(field, value);
   Store.watchRatings = (cb, onErr) => db.doc('private/ratings').onSnapshot((s) => cb((s.exists && s.data().levels) || {}), onErr);
-  Store.saveRating = (pid, level) => db.doc('private/ratings').set({ levels: { [pid]: level || firebase.firestore.FieldValue.delete() } }, { merge: true });
+  // Lưu trình vào vùng BTC (private/ratings) và chép bản công khai (event/ratings) để trang VĐV hiển thị
+  Store.saveRating = (pid, level) => {
+    const v = { levels: { [pid]: level || firebase.firestore.FieldValue.delete() } };
+    const b = db.batch();
+    b.set(db.doc('private/ratings'), v, { merge: true });
+    b.set(db.doc('event/ratings'), v, { merge: true });
+    return b.commit();
+  };
+  // Đồng bộ toàn bộ trình sang bản công khai (dùng 1 lần cho trình đã chấm trước đây)
+  Store.syncPublicRatings = (levels) => db.doc('event/ratings').set({ levels });
+  Store.watchPublicRatings = async (cb, onErr) => {
+    await Store.init();
+    if (!Store.enabled) return cb({});
+    db.doc('event/ratings').onSnapshot((s) => cb((s.exists && s.data().levels) || {}), onErr);
+  };
   Store.deletePrediction = (id) => db.doc('predictions/' + id).delete();
 
   window.Store = Store;
