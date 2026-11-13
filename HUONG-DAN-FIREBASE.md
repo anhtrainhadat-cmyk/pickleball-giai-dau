@@ -1,6 +1,6 @@
 # Kích hoạt hệ thống BTC (Firebase — miễn phí)
 
-Firebase lưu: kết quả trận đấu (cập nhật trực tiếp cho khán giả), danh sách đội & VĐV, **trình VĐV 1-2-3 (chỉ BTC xem)**, dự đoán của khán giả và tài khoản đăng nhập BTC.
+Firebase lưu: kết quả trận đấu (cập nhật trực tiếp cho khán giả), danh sách đội & VĐV, **trình VĐV 1–5 (chỉ BTC xem)**, dự đoán của khán giả và tài khoản đăng nhập BTC.
 Dùng gói **Spark (miễn phí)**, không cần thẻ ngân hàng. Làm 1 lần, khoảng 10 phút.
 
 ## 1. Tạo dự án
@@ -43,7 +43,7 @@ Trong Firestore tab **Data**:
 ## 6. Khởi tạo dữ liệu giải
 1. Mở `https://anhtrainhadat-cmyk.github.io/pickleball-giai-dau/btc.html` → đăng nhập.
 2. Bấm **Khởi tạo dữ liệu** (tạo 8 đội, 7 vòng, 28 lượt đấu).
-3. Tab **Đội & chấm trình**: nhập tên đội, đội trưởng, tên 8 VĐV, chấm trình 1-2-3.
+3. Tab **Đội & chấm trình**: nhập tên đội, đội trưởng, tên 8 VĐV, chấm trình 1–5.
 4. Ngày thi đấu: tab **Nhập kết quả** → nhập tỉ số từng nội dung → khán giả thấy ngay.
 5. Tab **Dự đoán**: khoá cổng dự đoán khi vòng 1 bắt đầu; cuối giải xem ai đoán trúng.
 

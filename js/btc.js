@@ -48,7 +48,7 @@
 
   Store.onAuth((user, ok) => {
     if (!user) return loginView();
-    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">📱 ${esc(Store.loginToPhone(user.email))}</span><button class="btn sm ghost" id="chpw">🔑 Đổi mật khẩu</button><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
+    $('#who').innerHTML = `<span class="pill-status ${ok ? 'ok' : 'off'}">📱 ${esc(Store.loginToPhone(user.email))}</span><button class="btn sm ghost" id="chpw" title="Đổi mật khẩu">🔑<span class="hide-m"> Đổi mật khẩu</span></button><button class="btn sm ghost" id="logout">Đăng xuất</button>`;
     $('#chpw').addEventListener('click', () => { tab = 'cai-dat'; render(); setTimeout(() => { const f = $('#pw-old'); if (f) { f.scrollIntoView({ block: 'center' }); f.focus(); } }, 50); });
     $('#logout').addEventListener('click', () => Store.signOut());
     if (!ok) {
@@ -137,7 +137,7 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    return `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (1 – 2 – 3) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
+    return `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (5 mức: 1 – 2 – 3 – 4 – 5) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));
@@ -151,7 +151,7 @@
             <span class="no">${pi + 1}</span>
             <input data-ti="${ti}" data-pi="${pi}" data-pf="name" value="${esc(p.name)}" placeholder="Tên VĐV" aria-label="Tên VĐV ${pi + 1}">
             <select data-ti="${ti}" data-pi="${pi}" data-pf="gender" aria-label="Giới tính"><option value="nam" ${p.gender !== 'nu' ? 'selected' : ''}>Nam</option><option value="nu" ${p.gender === 'nu' ? 'selected' : ''}>Nữ</option></select>
-            <span class="lvl" role="group" aria-label="Trình">${[1, 2, 3].map((l) => `<button type="button" data-pid="${esc(p.id)}" data-l="${l}" class="${lv(p.id) === l ? 'on' : ''}" title="Trình ${l}">${l}</button>`).join('')}</span>
+            <span class="lvl" role="group" aria-label="Trình">${[1, 2, 3, 4, 5].map((l) => `<button type="button" data-pid="${esc(p.id)}" data-l="${l}" class="${lv(p.id) === l ? 'on' : ''}" title="Trình ${l}">${l}</button>`).join('')}</span>
           </div>`).join('')}
           <p class="sum-lvl">Đã chấm ${rated.length}/${ps.length} VĐV · tổng trình <b>${sum}</b>${rated.length ? ` · trung bình <b>${(sum / rated.length).toFixed(2)}</b>` : ''}</p>
         </div>`;
