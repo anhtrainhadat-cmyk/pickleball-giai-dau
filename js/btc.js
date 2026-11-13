@@ -4,6 +4,14 @@
   const $ = (s, r = document) => r.querySelector(s);
   const app = $('#app');
   let T = null, ratings = {}, preds = [], tab = 'ket-qua', round = null, watching = false, pending = false;
+  // Danh sách đội chuẩn do BTC công bố (data/doi-hinh.json) — dùng để cập nhật 1 lần bấm
+  let ROSTER = null;
+  fetch('data/doi-hinh.json?v=' + Date.now(), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((j) => { ROSTER = j; if (T) schedule(); }).catch(() => {});
+  const sameRoster = () => !ROSTER || ROSTER.teams.every((rt) => {
+    const t = (T.teams || []).find((x) => x.id === rt.id);
+    return t && t.captain === rt.captain && (T.reserves || '') === (ROSTER.reserves || '') &&
+      rt.players.every((p, i) => t.players && t.players[i] && t.players[i].name === p.name && t.players[i].gender === p.gender && (t.players[i].note || '') === (p.note || ''));
+  });
 
   /* ---------- Chưa cấu hình Firebase ---------- */
   if (!Store.enabled) {
@@ -121,7 +129,11 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    return `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (1 – 2 – 3) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
+    const banner = sameRoster() ? '' : `<div class="notice warn" style="margin-bottom:16px">
+        <b>📋 Có danh sách 8 đội chính thức (${ROSTER.teams.reduce((n, t) => n + t.players.length, 0)} VĐV, cập nhật ${esc(ROSTER.version)})</b> khác với dữ liệu hiện tại.
+        <p style="margin:6px 0 10px">Bấm để điền đội trưởng, tên VĐV, giới tính và VĐV dự bị cho cả 8 đội. Tên đội bạn đã tự đổi, trình VĐV đã chấm và dự đoán của khán giả <b>được giữ nguyên</b>.</p>
+        <button class="btn primary sm" data-act="apply-roster">⤓ Cập nhật danh sách 8 đội</button></div>`;
+    return banner + `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (1 – 2 – 3) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));
@@ -192,6 +204,19 @@
     }
     const a = e.target.closest('[data-act]');
     if (!a) return;
+    if (a.dataset.act === 'apply-roster') {
+      if (!ROSTER || !confirm('Cập nhật đội trưởng và danh sách VĐV của 8 đội theo danh sách chính thức?')) return;
+      // Giữ nguyên id đội/VĐV (để không ảnh hưởng dự đoán và trình đã chấm) và tên đội nếu BTC đã tự đặt
+      const teams = T.teams.map((t) => {
+        const rt = ROSTER.teams.find((x) => x.id === t.id);
+        if (!rt) return t;
+        return { ...t, name: /^Team \d+$/.test(t.name || '') || !t.name ? rt.name : t.name, captain: rt.captain,
+          players: rt.players.map((p, i) => ({ ...(t.players && t.players[i] ? t.players[i] : {}), ...p, id: (t.players && t.players[i] && t.players[i].id) || p.id })) };
+      });
+      try { a.disabled = true; await Store.saveEvent({ teams, reserves: ROSTER.reserves || '' }); toast('Đã cập nhật danh sách 8 đội'); }
+      catch (er) { a.disabled = false; toast('Lỗi: ' + er.message); }
+      return;
+    }
     if (a.dataset.act === 'toggle-pred') {
       try { await Store.saveEvent({ predictionsOpen: !T.predictionsOpen }); } catch (er) { toast('Lỗi: ' + er.message); }
     } else if (a.dataset.act === 'csv') {

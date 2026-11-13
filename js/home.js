@@ -90,9 +90,9 @@
       return `<div class="team-item team-card"><div style="min-width:0">
         <span class="tn">${esc(x.name)}</span>
         ${x.captain ? `<span class="cap">👑 Đội trưởng: ${esc(x.captain)}</span>` : ''}
-        ${ps.length ? `<ul class="roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}</li>`).join('')}</ul>` : '<span class="tp">Danh sách VĐV sẽ được cập nhật</span>'}
+        ${ps.length ? `<ul class="roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''}</li>`).join('')}</ul>` : '<span class="tp">Danh sách VĐV sẽ được cập nhật</span>'}
       </div></div>`;
-    }).join('');
+    }).join('') + (T.reserves ? `<div class="team-item team-card reserve" style="grid-column:1/-1"><div><span class="tn">VĐV dự bị</span><span class="tp">${esc(T.reserves)}</span></div></div>` : '');
   }
 
   /* ---------- Dự đoán của khán giả ---------- */

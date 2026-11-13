@@ -48,6 +48,7 @@
       id: 'dao97-open-2026', name: C.name, format: 'team-rr',
       status: ev.status || 'sap-dien-ra',
       predictionsOpen: ev.predictionsOpen !== false,
+      reserves: ev.reserves || '',
       subEvents: ev.subEvents || PB.DEFAULT_SUBS,
       teams,
       groups: [{ name: 'A', teamIds: teams.map((x) => x.id) }],
@@ -141,7 +142,7 @@
   Store.seed = async function (t) {
     const batch = db.batch();
     batch.set(db.doc('event/main'), {
-      teams: t.teams, status: t.status || 'sap-dien-ra', predictionsOpen: true, subEvents: t.subEvents || PB.DEFAULT_SUBS
+      teams: t.teams, reserves: t.reserves || '', status: t.status || 'sap-dien-ra', predictionsOpen: true, subEvents: t.subEvents || PB.DEFAULT_SUBS
     });
     t.matches.forEach((m, i) => {
       const subs = {};

@@ -13,46 +13,47 @@
   {
    "id": "doi1",
    "name": "Team 1",
-   "captain": "",
+   "captain": "LinhPN",
    "players": [
     {
      "id": "doi1-1",
-     "name": "",
-     "gender": "nam"
+     "name": "LinhPN",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi1-2",
-     "name": "",
+     "name": "Đào Duy Quân",
      "gender": "nam"
     },
     {
      "id": "doi1-3",
-     "name": "",
+     "name": "Hoàng Sỹ Trung",
      "gender": "nam"
     },
     {
      "id": "doi1-4",
-     "name": "",
+     "name": "Hoàng KTS",
      "gender": "nam"
     },
     {
      "id": "doi1-5",
-     "name": "",
+     "name": "Thắng Lê",
      "gender": "nam"
     },
     {
      "id": "doi1-6",
-     "name": "",
+     "name": "Trungmisago",
      "gender": "nam"
     },
     {
      "id": "doi1-7",
-     "name": "",
+     "name": "Mina Vân",
      "gender": "nu"
     },
     {
      "id": "doi1-8",
-     "name": "",
+     "name": "Ngọc Hà",
      "gender": "nu"
     }
    ]
@@ -60,46 +61,47 @@
   {
    "id": "doi2",
    "name": "Team 2",
-   "captain": "",
+   "captain": "Đức Thọ",
    "players": [
     {
      "id": "doi2-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Đức Thọ",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi2-2",
-     "name": "",
+     "name": "Trọng Thành",
      "gender": "nam"
     },
     {
      "id": "doi2-3",
-     "name": "",
+     "name": "Thịnh Lê",
      "gender": "nam"
     },
     {
      "id": "doi2-4",
-     "name": "",
+     "name": "Mạnh Hùng",
      "gender": "nam"
     },
     {
      "id": "doi2-5",
-     "name": "",
+     "name": "Bình Lê",
      "gender": "nam"
     },
     {
      "id": "doi2-6",
-     "name": "",
+     "name": "Thành Lữ",
      "gender": "nam"
     },
     {
      "id": "doi2-7",
-     "name": "",
+     "name": "Lê Vân",
      "gender": "nu"
     },
     {
      "id": "doi2-8",
-     "name": "",
+     "name": "Kiên Nguyễn",
      "gender": "nu"
     }
    ]
@@ -107,46 +109,47 @@
   {
    "id": "doi3",
    "name": "Team 3",
-   "captain": "",
+   "captain": "Nam Hoàng",
    "players": [
     {
      "id": "doi3-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Nam Hoàng",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi3-2",
-     "name": "",
+     "name": "Thắng Bùi",
      "gender": "nam"
     },
     {
      "id": "doi3-3",
-     "name": "",
+     "name": "Quân Kul",
      "gender": "nam"
     },
     {
      "id": "doi3-4",
-     "name": "",
+     "name": "Lâm Tới",
      "gender": "nam"
     },
     {
      "id": "doi3-5",
-     "name": "",
+     "name": "Cường Vũ",
      "gender": "nam"
     },
     {
      "id": "doi3-6",
-     "name": "",
+     "name": "Hải Lê",
      "gender": "nam"
     },
     {
      "id": "doi3-7",
-     "name": "",
+     "name": "Ánh Tuyết",
      "gender": "nu"
     },
     {
      "id": "doi3-8",
-     "name": "",
+     "name": "Thuỷ Đặng",
      "gender": "nu"
     }
    ]
@@ -154,46 +157,47 @@
   {
    "id": "doi4",
    "name": "Team 4",
-   "captain": "",
+   "captain": "Huỳnh Hùng",
    "players": [
     {
      "id": "doi4-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Huỳnh Hùng",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi4-2",
-     "name": "",
+     "name": "Huỳnh Tùng",
      "gender": "nam"
     },
     {
      "id": "doi4-3",
-     "name": "",
+     "name": "Cường Lê",
      "gender": "nam"
     },
     {
      "id": "doi4-4",
-     "name": "",
+     "name": "Thành Lê",
      "gender": "nam"
     },
     {
      "id": "doi4-5",
-     "name": "",
+     "name": "Phạm Tuấn Dũng",
      "gender": "nam"
     },
     {
      "id": "doi4-6",
-     "name": "",
+     "name": "Tú Tí",
      "gender": "nam"
     },
     {
      "id": "doi4-7",
-     "name": "",
+     "name": "Đỗ Xuân",
      "gender": "nu"
     },
     {
      "id": "doi4-8",
-     "name": "",
+     "name": "Thu Hiền",
      "gender": "nu"
     }
    ]
@@ -201,46 +205,47 @@
   {
    "id": "doi5",
    "name": "Team 5",
-   "captain": "",
+   "captain": "Tân Bò",
    "players": [
     {
      "id": "doi5-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Tân Bò",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi5-2",
-     "name": "",
+     "name": "Thành Khiêm",
      "gender": "nam"
     },
     {
      "id": "doi5-3",
-     "name": "",
+     "name": "Tuấn Gà",
      "gender": "nam"
     },
     {
      "id": "doi5-4",
-     "name": "",
+     "name": "Thắng Được",
      "gender": "nam"
     },
     {
      "id": "doi5-5",
-     "name": "",
+     "name": "Nghĩa Ku",
      "gender": "nam"
     },
     {
      "id": "doi5-6",
-     "name": "",
+     "name": "Văn Thái",
      "gender": "nam"
     },
     {
      "id": "doi5-7",
-     "name": "",
+     "name": "Thuỷ Tiên",
      "gender": "nu"
     },
     {
      "id": "doi5-8",
-     "name": "",
+     "name": "Huyền An",
      "gender": "nu"
     }
    ]
@@ -248,46 +253,47 @@
   {
    "id": "doi6",
    "name": "Team 6",
-   "captain": "",
+   "captain": "Loan Nguyễn",
    "players": [
     {
      "id": "doi6-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Loan Nguyễn",
+     "gender": "nu",
+     "note": "Đội trưởng · VĐV nữ thi đấu vị trí nam"
     },
     {
      "id": "doi6-2",
-     "name": "",
+     "name": "Hưng Đặng",
      "gender": "nam"
     },
     {
      "id": "doi6-3",
-     "name": "",
+     "name": "Thắng XD",
      "gender": "nam"
     },
     {
      "id": "doi6-4",
-     "name": "",
+     "name": "A Đồng",
      "gender": "nam"
     },
     {
      "id": "doi6-5",
-     "name": "",
+     "name": "Tuấn Lê",
      "gender": "nam"
     },
     {
      "id": "doi6-6",
-     "name": "",
+     "name": "Hoàng Tùng",
      "gender": "nam"
     },
     {
      "id": "doi6-7",
-     "name": "",
+     "name": "Thuận",
      "gender": "nu"
     },
     {
      "id": "doi6-8",
-     "name": "",
+     "name": "Hương Giang A7",
      "gender": "nu"
     }
    ]
@@ -295,46 +301,47 @@
   {
    "id": "doi7",
    "name": "Team 7",
-   "captain": "",
+   "captain": "Dương Duy",
    "players": [
     {
      "id": "doi7-1",
-     "name": "",
-     "gender": "nam"
+     "name": "A Dương Duy",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi7-2",
-     "name": "",
+     "name": "Thế Cường",
      "gender": "nam"
     },
     {
      "id": "doi7-3",
-     "name": "",
+     "name": "Kiên Cường",
      "gender": "nam"
     },
     {
      "id": "doi7-4",
-     "name": "",
+     "name": "Thắng Phan",
      "gender": "nam"
     },
     {
      "id": "doi7-5",
-     "name": "",
+     "name": "Đinh Công Tuấn A6",
      "gender": "nam"
     },
     {
      "id": "doi7-6",
-     "name": "",
+     "name": "Phan Lê Minh",
      "gender": "nam"
     },
     {
      "id": "doi7-7",
-     "name": "",
+     "name": "Loan Trần",
      "gender": "nu"
     },
     {
      "id": "doi7-8",
-     "name": "",
+     "name": "Phương Lê",
      "gender": "nu"
     }
    ]
@@ -342,46 +349,47 @@
   {
    "id": "doi8",
    "name": "Team 8",
-   "captain": "",
+   "captain": "Đông Lê",
    "players": [
     {
      "id": "doi8-1",
-     "name": "",
-     "gender": "nam"
+     "name": "Đông Lê",
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi8-2",
-     "name": "",
+     "name": "Cường Giss",
      "gender": "nam"
     },
     {
      "id": "doi8-3",
-     "name": "",
+     "name": "Hồng Sơn A1",
      "gender": "nam"
     },
     {
      "id": "doi8-4",
-     "name": "",
+     "name": "Đức Dương",
      "gender": "nam"
     },
     {
      "id": "doi8-5",
-     "name": "",
+     "name": "Sơn Trương",
      "gender": "nam"
     },
     {
      "id": "doi8-6",
-     "name": "",
+     "name": "Kiên Nam Phong",
      "gender": "nam"
     },
     {
      "id": "doi8-7",
-     "name": "",
+     "name": "Mai Hiền",
      "gender": "nu"
     },
     {
      "id": "doi8-8",
-     "name": "",
+     "name": "Hằng Nguyễn",
      "gender": "nu"
     }
    ]
@@ -1467,5 +1475,6 @@
     }
    ]
   }
- ]
+ ],
+ "reserves": "Mạnh Tùng, Thành Sơn, Mai Trang Dung"
 }
