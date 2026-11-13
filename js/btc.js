@@ -168,9 +168,9 @@
         <div><b>${preds.length}</b> lượt dự đoán · Cổng dự đoán: <b style="color:${T.predictionsOpen ? '#4ade80' : 'var(--danger)'}">${T.predictionsOpen ? 'ĐANG MỞ' : 'ĐÃ KHOÁ'}</b></div>
         <div class="toolbar"><button class="btn sm ${T.predictionsOpen ? 'danger' : 'primary'}" data-act="toggle-pred">${T.predictionsOpen ? '🔒 Khoá dự đoán' : '🔓 Mở dự đoán'}</button><button class="btn sm" data-act="csv">⤓ Tải danh sách (CSV)</button></div></div>
         <p class="hint">Nên khoá dự đoán khi vòng 1 bắt đầu. Sau khi có kết quả chung cuộc, người đoán đúng cả Nhất – Nhì – Ba được đánh dấu 🎯.</p></div>
-      ${pod.length === 3 ? `<div class="card" style="margin-bottom:16px"><h3>🎯 Đoán trúng cả 3 vị trí: ${winners.length}</h3>${winners.map((p) => `<div>${esc(p.name)} — ${p.createdAt.toLocaleString('vi-VN')}</div>`).join('') || '<p class="muted">Không có ai.</p>'}</div>` : ''}
+      ${pod.length === 3 ? `<div class="card" style="margin-bottom:16px"><h3>🎯 Đoán trúng cả 3 vị trí: ${winners.length}</h3>${winners.map((p) => `<div>${esc(p.name)} — ${p.createdAt.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}</div>`).join('') || '<p class="muted">Không có ai.</p>'}</div>` : ''}
       <div class="table-wrap card"><table class="standings"><thead><tr><th>#</th><th class="l">Tên</th><th class="l">🥇</th><th class="l">🥈</th><th class="l">🥉</th><th>Thời gian</th><th></th></tr></thead><tbody>
-      ${preds.map((p, i) => `<tr class="${hit(p) ? 'adv' : ''}"><td>${preds.length - i}</td><td class="l">${esc(p.name)}</td><td class="l">${esc(name(p.champion))}</td><td class="l">${esc(name(p.second))}</td><td class="l">${esc(name(p.third))}</td><td>${p.createdAt.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}</td><td><button class="icon-btn" data-del="${esc(p.id)}" title="Xoá">✕</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Chưa có dự đoán.</td></tr>'}
+      ${preds.map((p, i) => `<tr class="${hit(p) ? 'adv' : ''}"><td>${preds.length - i}</td><td class="l">${esc(p.name)}</td><td class="l">${esc(name(p.champion))}</td><td class="l">${esc(name(p.second))}</td><td class="l">${esc(name(p.third))}</td><td>${p.createdAt.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })}</td><td><button class="icon-btn" data-del="${esc(p.id)}" title="Xoá">✕</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Chưa có dự đoán.</td></tr>'}
       </tbody></table></div>`;
   }
 
@@ -232,7 +232,7 @@
       try { await Store.saveEvent({ predictionsOpen: !T.predictionsOpen }); } catch (er) { toast('Lỗi: ' + er.message); }
     } else if (a.dataset.act === 'csv') {
       const name = (id) => PB.teamName(T, id);
-      const rows = [['Ten', 'Vo dich', 'Nhi', 'Ba', 'Thoi gian']].concat(preds.map((p) => [p.name, name(p.champion), name(p.second), name(p.third), p.createdAt.toLocaleString('vi-VN')]));
+      const rows = [['Ten', 'Vo dich', 'Nhi', 'Ba', 'Thoi gian']].concat(preds.map((p) => [p.name, name(p.champion), name(p.second), name(p.third), p.createdAt.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })]));
       download('du-doan-dao97.csv', '﻿' + rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n'), 'text/csv');
     } else if (a.dataset.act === 'backup') {
       download('sao-luu-dao97-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ tournament: T, ratings, predictions: preds }, null, 2), 'application/json');

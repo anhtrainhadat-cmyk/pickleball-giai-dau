@@ -433,3 +433,4 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 }
 .roster .note { color: var(--gold); font-size: .76rem; }
 .team-item.reserve::before { content: "🔄"; counter-increment: none; background: var(--surface-2); }
+.predict-wrap.one { grid-template-columns: minmax(0, 1fr); max-width: 760px; }

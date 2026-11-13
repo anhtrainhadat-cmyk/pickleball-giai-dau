@@ -102,10 +102,12 @@
   const lsSet = (v) => { try { localStorage.setItem(DONE_KEY, v); } catch (e) { /* bỏ qua */ } };
 
   function fillSelects() {
+    if (!form) return;
     const opts = '<option value="">— Chọn đội —</option>' + T.teams.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
     form.querySelectorAll('select').forEach((s) => { const v = s.value; s.innerHTML = opts; s.value = v; });
   }
   function formState() {
+    if (!form) return;
     const msg = $('#pred-msg');
     const btn = form.querySelector('button');
     let reason = '';
@@ -115,7 +117,7 @@
     btn.disabled = !!reason;
     if (reason) msg.textContent = reason;
   }
-  form.addEventListener('submit', async (e) => {
+  if (form) form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const p = { name: (fd.get('name') || '').trim(), champion: fd.get('champion'), second: fd.get('second'), third: fd.get('third') };
@@ -155,7 +157,7 @@
     const pod = PB.podium(T);
     const hit = (p) => pod.length === 3 && p.champion === pod[0] && p.second === pod[1] && p.third === pod[2];
     const winners = valid.filter(hit);
-    const fmt = (d) => d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+    const fmt = (d) => d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
     const item = (p) => `<div class="feed-item ${hit(p) ? 'hit' : ''}"><b>${hit(p) ? '🎯 ' : ''}${esc(p.name)}</b><time>${fmt(p.createdAt)}</time>
       <div class="picks">🥇 <span>${esc(teamName(p.champion))}</span> · 🥈 <span>${esc(teamName(p.second))}</span> · 🥉 <span>${esc(teamName(p.third))}</span></div></div>`;
     $('#feed').innerHTML =
