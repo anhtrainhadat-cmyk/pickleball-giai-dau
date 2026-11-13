@@ -92,10 +92,17 @@
     }
     const y = scrollY;
     const views = { 'ket-qua': resultsView, doi: teamsView, 'du-doan': predsView, 'cai-dat': settingsView };
-    app.innerHTML = `<nav class="tabs" style="margin-top:0">${TABS.map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? 'active' : ''}">${v}</button>`).join('')}</nav>
+    app.innerHTML = rosterBanner() + `<nav class="tabs" style="margin-top:0">${TABS.map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? 'active' : ''}">${v}</button>`).join('')}</nav>
       <div id="pane">${views[tab]()}</div>`;
     if (tab === 'ket-qua') attachDatalists();
     scrollTo(0, y);
+  }
+
+  function rosterBanner() {
+    return sameRoster() ? '' : `<div class="notice warn" style="margin-bottom:16px">
+        <b>📋 Có danh sách 8 đội chính thức (${ROSTER.teams.reduce((n, t) => n + t.players.length, 0)} VĐV, cập nhật ${esc(ROSTER.version)})</b> khác với dữ liệu hiện tại.
+        <p style="margin:6px 0 10px">Bấm để điền đội trưởng, tên VĐV, giới tính và VĐV dự bị cho cả 8 đội. Tên đội bạn đã tự đổi, trình VĐV đã chấm và dự đoán của khán giả <b>được giữ nguyên</b>.</p>
+        <button class="btn primary" data-act="apply-roster">⤓ BẤM VÀO ĐÂY ĐỂ CẬP NHẬT DANH SÁCH 8 ĐỘI</button></div>`;
   }
 
   /* --- Nhập kết quả --- */
@@ -129,11 +136,7 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    const banner = sameRoster() ? '' : `<div class="notice warn" style="margin-bottom:16px">
-        <b>📋 Có danh sách 8 đội chính thức (${ROSTER.teams.reduce((n, t) => n + t.players.length, 0)} VĐV, cập nhật ${esc(ROSTER.version)})</b> khác với dữ liệu hiện tại.
-        <p style="margin:6px 0 10px">Bấm để điền đội trưởng, tên VĐV, giới tính và VĐV dự bị cho cả 8 đội. Tên đội bạn đã tự đổi, trình VĐV đã chấm và dự đoán của khán giả <b>được giữ nguyên</b>.</p>
-        <button class="btn primary sm" data-act="apply-roster">⤓ Cập nhật danh sách 8 đội</button></div>`;
-    return banner + `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (1 – 2 – 3) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
+    return `<p class="notice" style="margin-bottom:16px">🔒 <b>Trình VĐV (1 – 2 – 3) chỉ BTC nhìn thấy.</b> Khán giả chỉ thấy tên đội, đội trưởng và tên VĐV. Bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));
