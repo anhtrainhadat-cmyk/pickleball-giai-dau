@@ -5,7 +5,9 @@
   const app = $('#app');
   let T = null, ratings = {}, preds = [], tab = 'ket-qua', round = null, watching = false, pending = false;
   // Danh sách đội chuẩn do BTC công bố (data/doi-hinh.json) — dùng để cập nhật 1 lần bấm
-  let ROSTER = null;
+  let ROSTER = null, LEVELS = null;
+  fetch('data/trinh.json?v=' + Date.now(), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((j) => { LEVELS = j; if (T) schedule(); }).catch(() => {});
+  const sameLevels = () => !LEVELS || Object.entries(LEVELS.levels).every(([pid, l]) => ratings[pid] === l);
   fetch('data/doi-hinh.json?v=' + Date.now(), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((j) => { ROSTER = j; if (T) schedule(); }).catch(() => {});
   const sameRoster = () => !ROSTER || ROSTER.teams.every((rt) => {
     const t = (T.teams || []).find((x) => x.id === rt.id);
@@ -98,12 +100,20 @@
     }
     const y = scrollY;
     const views = { 'ket-qua': resultsView, doi: teamsView, 'du-doan': predsView, 'cai-dat': settingsView };
-    app.innerHTML = rosterBanner() + `<nav class="tabs" style="margin-top:0">${TABS.map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? 'active' : ''}">${v}</button>`).join('')}</nav>
+    app.innerHTML = rosterBanner() + levelBanner() + `<nav class="tabs" style="margin-top:0">${TABS.map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? 'active' : ''}">${v}</button>`).join('')}</nav>
       <div id="pane">${views[tab]()}</div>`;
     if (tab === 'ket-qua') attachDatalists();
     scrollTo(0, y);
   }
 
+  function levelBanner() {
+    if (sameLevels()) return '';
+    const n = Object.keys(LEVELS.levels).length;
+    return `<div class="notice warn" style="margin-bottom:16px">
+      <b>📊 Có bảng trình chính thức của ${n} VĐV (6 nhóm, cập nhật ${esc(LEVELS.version)})</b> khác với trình hiện tại.
+      <p style="margin:6px 0 10px">Bấm để nhập trình cho cả ${n} VĐV một lần (thay toàn bộ trình đang có). Danh sách đội và dự đoán của khán giả <b>giữ nguyên</b>.</p>
+      <button class="btn primary" data-act="apply-levels">⤓ BẤM VÀO ĐÂY ĐỂ NHẬP TRÌNH ${n} VĐV</button></div>`;
+  }
   function rosterBanner() {
     return sameRoster() ? '' : `<div class="notice warn" style="margin-bottom:16px">
         <b>📋 Có danh sách 8 đội chính thức (${ROSTER.teams.reduce((n, t) => n + t.players.length, 0)} VĐV, cập nhật ${esc(ROSTER.version)})</b> khác với dữ liệu hiện tại.
@@ -142,7 +152,7 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    return `<p class="notice" style="margin-bottom:16px">📊 <b>Trình VĐV (5 mức: 1 – 2 – 3 – 4 – 5)</b> hiện trên <b>trang VĐV</b> (trang chính), <b>không hiện</b> trên trang khán giả <code>xem.html</code>. Bấm số là tự lưu; bấm lại vào mức đang chọn để bỏ chấm.</p>
+    return `<p class="notice" style="margin-bottom:16px">📊 <b>Trình VĐV (6 nhóm: 1 – 2 – 3 – 4 – 5 – 6)</b> hiện trên <b>trang VĐV</b> (trang chính), <b>không hiện</b> trên trang khán giả <code>xem.html</code>. Bấm số là tự lưu; bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));
@@ -156,7 +166,7 @@
             <span class="no">${pi + 1}</span>
             <input data-ti="${ti}" data-pi="${pi}" data-pf="name" value="${esc(p.name)}" placeholder="Tên VĐV" aria-label="Tên VĐV ${pi + 1}">
             <select data-ti="${ti}" data-pi="${pi}" data-pf="gender" aria-label="Giới tính"><option value="nam" ${p.gender !== 'nu' ? 'selected' : ''}>Nam</option><option value="nu" ${p.gender === 'nu' ? 'selected' : ''}>Nữ</option></select>
-            <span class="lvl" role="group" aria-label="Trình">${[1, 2, 3, 4, 5].map((l) => `<button type="button" data-pid="${esc(p.id)}" data-l="${l}" class="${lv(p.id) === l ? 'on' : ''}" title="Trình ${l}">${l}</button>`).join('')}</span>
+            <span class="lvl" role="group" aria-label="Trình">${[1, 2, 3, 4, 5, 6].map((l) => `<button type="button" data-pid="${esc(p.id)}" data-l="${l}" class="${lv(p.id) === l ? 'on' : ''}" title="Trình ${l}">${l}</button>`).join('')}</span>
           </div>`).join('')}
           <p class="sum-lvl">Đã chấm ${rated.length}/${ps.length} VĐV · tổng trình <b>${sum}</b>${rated.length ? ` · trung bình <b>${(sum / rated.length).toFixed(2)}</b>` : ''}</p>
         </div>`;
@@ -220,6 +230,12 @@
     }
     const a = e.target.closest('[data-act]');
     if (!a) return;
+    if (a.dataset.act === 'apply-levels') {
+      if (!LEVELS || !confirm('Nhập trình cho ' + Object.keys(LEVELS.levels).length + ' VĐV theo bảng chính thức (thay toàn bộ trình đang có)?')) return;
+      try { a.disabled = true; await Store.setAllRatings(LEVELS.levels); toast('Đã nhập trình'); }
+      catch (er) { a.disabled = false; toast('Lỗi: ' + er.message); }
+      return;
+    }
     if (a.dataset.act === 'apply-roster') {
       if (!ROSTER || !confirm('Cập nhật đội trưởng và danh sách VĐV của 8 đội theo danh sách chính thức?')) return;
       // Giữ nguyên id đội/VĐV (để không ảnh hưởng dự đoán và trình đã chấm) và tên đội nếu BTC đã tự đặt

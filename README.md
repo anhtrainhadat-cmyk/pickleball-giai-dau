@@ -15,7 +15,7 @@ Trưởng BTC: Dương CT.
 
 **Trang BTC (`btc.html`, cần đăng nhập)**
 - Nhập kết quả từng nội dung (lưu tự động, khán giả thấy ngay).
-- Đội & VĐV: tên đội, đội trưởng, 8 VĐV (6 nam, 2 nữ), **chấm trình 1–5 — chỉ BTC thấy**.
+- Đội & VĐV: tên đội, đội trưởng, 8 VĐV (6 nam, 2 nữ), **chấm trình 1–6 — chỉ BTC thấy**.
 - Quản lý dự đoán: khoá/mở cổng, xoá spam, tải CSV, xem người đoán trúng.
 
 ## Kích hoạt hệ thống BTC

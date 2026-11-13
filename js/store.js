@@ -172,6 +172,13 @@
   };
   // Đồng bộ toàn bộ trình sang bản công khai (dùng 1 lần cho trình đã chấm trước đây)
   Store.syncPublicRatings = (levels) => db.doc('event/ratings').set({ levels });
+  // Nhập toàn bộ trình (thay thế) cho cả vùng BTC và bản công khai
+  Store.setAllRatings = (levels) => {
+    const b = db.batch();
+    b.set(db.doc('private/ratings'), { levels });
+    b.set(db.doc('event/ratings'), { levels });
+    return b.commit();
+  };
   Store.watchPublicRatings = async (cb, onErr) => {
     await Store.init();
     if (!Store.enabled) return cb({});

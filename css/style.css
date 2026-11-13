@@ -421,6 +421,8 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 .lvl button.on[data-l="3"] { background: var(--gold); color: var(--brand-ink); }
 .lvl button.on[data-l="4"] { background: #ff8a3d; color: #2a0f00; }
 .lvl button.on[data-l="5"] { background: var(--magenta); color: #fff; }
+.lvl button.on[data-l="6"] { background: #8b5cf6; color: #fff; }
+.lvl button { width: 30px; }
 .player-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 92px auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--border); }
 .player-row .no { color: var(--muted); font-weight: 700; text-align: center; font-size: .85rem; }
 .team-admin { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); }
@@ -455,5 +457,5 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 }
 .lv { display: inline-block; min-width: 26px; padding: 0 6px; margin-left: 4px; border-radius: 6px; font-size: .72rem; font-weight: 800; text-align: center; line-height: 18px; vertical-align: 1px; }
 .lv1 { background: #3ad1f0; color: #04202a; } .lv2 { background: #7ee36b; color: #0b2a06; } .lv3 { background: var(--gold); color: var(--brand-ink); }
-.lv4 { background: #ff8a3d; color: #2a0f00; } .lv5 { background: var(--magenta); color: #fff; }
+.lv4 { background: #ff8a3d; color: #2a0f00; } .lv5 { background: var(--magenta); color: #fff; } .lv6 { background: #8b5cf6; color: #fff; }
 .lv-sum { margin-top: 8px; font-size: .82rem; color: var(--muted); } .lv-sum b { color: var(--gold); }
