@@ -81,7 +81,9 @@
       <div class="nb-pane" id="pane-cam-nang">${renderPage()}</div>
       <div class="nb-pane" id="pane-ky-nang" hidden></div>
       <div class="nb-pane" id="pane-dau-phap" hidden></div>`;
-    showTab((() => { try { return localStorage.getItem('dao97_nb_tab'); } catch (e) { return null; } })() || 'cam-nang');
+    // Link có &tab=dau-phap (link riêng của Cap) thì mở thẳng tab đó
+    const ht = (location.hash.match(/[#&]tab=([a-z-]+)/) || [])[1];
+    showTab(ht || (() => { try { return localStorage.getItem('dao97_nb_tab'); } catch (e) { return null; } })() || 'cam-nang');
     document.title = D.title + ' · ĐÀO97 OPEN';
     bind();
     startLive();
