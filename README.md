@@ -18,6 +18,11 @@ Trưởng BTC: Dương CT.
 - Đội & VĐV: tên đội, đội trưởng, 8 VĐV (6 nam, 2 nữ), **chấm trình 1–6 — chỉ BTC thấy**.
 - Quản lý dự đoán: khoá/mở cổng, xoá spam, tải CSV, xem người đoán trúng.
 
+**Trang nội bộ đội (`noi-bo.html`)**
+- Cẩm nang chiến thuật riêng của một đội, chỉ mở được bằng link riêng có khoá `#k=…` (khoá không nằm trên GitHub).
+- Nội dung mã hoá AES-GCM trong `data/noi-bo.json`. Sửa nội dung: `node tools/noi-bo.mjs giai-ma <khoá> > _rieng/team2.json`, sửa file, rồi `node tools/noi-bo.mjs ma-hoa _rieng/team2.json <khoá>` (giữ khoá cũ để link/QR đã phát vẫn dùng được).
+- Kèm thông tin giải trực tiếp: hạng, lịch 7 lượt của đội, soi trình đối thủ.
+
 ## Kích hoạt hệ thống BTC
 Xem [HUONG-DAN-FIREBASE.md](HUONG-DAN-FIREBASE.md) (Firebase miễn phí, ~10 phút).
 Khi chưa kích hoạt, web vẫn chạy với dữ liệu tĩnh `data/giai-dau.json`.
