@@ -22,6 +22,8 @@ Trưởng BTC: Dương CT.
 - Cẩm nang chiến thuật riêng của một đội, chỉ mở được bằng link riêng có khoá `#k=…` (khoá không nằm trên GitHub).
 - Nội dung mã hoá AES-GCM trong `data/noi-bo.json`. Sửa nội dung: `node tools/noi-bo.mjs giai-ma <khoá> > _rieng/team2.json`, sửa file, rồi `node tools/noi-bo.mjs ma-hoa _rieng/team2.json <khoá>` (giữ khoá cũ để link/QR đã phát vẫn dùng được).
 - Kèm thông tin giải trực tiếp: hạng, lịch 7 lượt của đội, soi trình đối thủ.
+- Tài khoản **Cap** sửa cẩm nang ngay trên web (lưu bản mã hoá ở Firestore `noibo/content`, ưu tiên hơn file tĩnh).
+- Tab **Kỹ năng VĐV** (Cap + BAU dùng chung) và **Đấu pháp** (riêng Cap – Team 2, riêng BAU – Team 3). Xem `js/cap.js`.
 
 ## Kích hoạt hệ thống BTC
 Xem [HUONG-DAN-FIREBASE.md](HUONG-DAN-FIREBASE.md) (Firebase miễn phí, ~10 phút).

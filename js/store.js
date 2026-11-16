@@ -8,7 +8,11 @@
  *   private/ratings   { levels: { playerId: 1..6 } }                        — CHỈ BTC đọc/ghi
  *   predictions/{id}  { name, champion, second, third, createdAt }         — ai cũng gửi, BTC xoá
  *   admins/{email}    (tạo trong Firebase Console)                         — danh sách tài khoản BTC
- *   cap/skills, cap/plan                                                   — CHỈ tài khoản Cap (kỹ năng VĐV, đấu pháp)
+ *   cap/skills        kỹ năng VĐV (Tốt/TB/Yếu)                              — Cap + BAU cùng xem/sửa
+ *   cap/plan          đấu pháp Team 2                                       — CHỈ Cap
+ *   cap/plan-bau      đấu pháp Team 3                                       — CHỈ BAU
+ *   noibo/content     cẩm nang đã sửa (mã hoá)                              — ai cũng đọc bản mã, chỉ Cap ghi
+ *   acct/{email}      { pwChanged } — mỗi tài khoản tự đọc/ghi của mình
  */
 (function () {
   const C = window.SITE_CONFIG || {};
@@ -192,6 +196,13 @@
   Store.watchCap = (name, cb, onErr) => db.doc('cap/' + name).onSnapshot((s) => cb(s.exists ? s.data() : {}), onErr);
   Store.setCap = (name, data) => db.doc('cap/' + name).set(data, { merge: true });
   Store.del = () => firebase.firestore.FieldValue.delete();
+  Store.BAU_EMAIL = 'bau@' + Store.PHONE_DOMAIN;
+  // Trạng thái tài khoản (VD đã đổi mật khẩu lần đầu chưa) — mỗi người chỉ đọc/ghi của chính mình
+  Store.getAcct = (email) => db.doc('acct/' + email).get().then((s) => (s.exists ? s.data() : {}));
+  Store.setAcct = (email, d) => db.doc('acct/' + email).set(d, { merge: true });
+  // Cẩm nang đã sửa trên web (mã hoá bằng khoá trong link) — ai cũng đọc được bản mã, chỉ Cap ghi
+  Store.watchNoiBo = async (cb) => { await Store.init(); if (!Store.enabled) return; db.doc('noibo/content').onSnapshot((s) => cb(s.exists ? s.data() : null), () => {}); };
+  Store.saveNoiBo = (enc) => db.doc('noibo/content').set({ ...enc, at: firebase.firestore.FieldValue.serverTimestamp() });
   Store.deletePrediction = (id) => db.doc('predictions/' + id).delete();
 
   window.Store = Store;

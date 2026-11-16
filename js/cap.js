@@ -1,40 +1,53 @@
 /*
- * Khu vực đội trưởng trên trang nội bộ (chỉ tài khoản "Cap"):
- *   📝 Kỹ năng VĐV — chấm Tốt / TB / Kém cho 7 kỹ năng của từng VĐV mọi đội
- *   ♟️ Đấu pháp     — đặc điểm từng đối thủ, kịch bản đưa quân của họ, đội hình tối ưu của mình (sửa tay được)
- * Dữ liệu: Firestore cap/skills { s: { pid: { drive: 'T'|'B'|'K', ... } } }
- *                    cap/plan   { r: { oppId: { them: {s0:[pid,pid],..}, us: {...}, lock: {s0:true}, scen: 'A'|'B' } } }
+ * Khu vực đội trưởng trên trang nội bộ (tài khoản "Cap" – Team 2 và "BAU" – Team 3):
+ *   📝 Kỹ năng VĐV — chấm Tốt / TB / Yếu cho 7 kỹ năng của từng VĐV mọi đội (Cap và BAU dùng chung)
+ *   ♟️ Đấu pháp     — riêng từng tài khoản: đặc điểm đối thủ, kịch bản đưa quân, đội hình tối ưu (sửa tay được)
+ * Dữ liệu: Firestore cap/skills    { s: { pid: { drive: 'T'|'B'|'K', ... } } }   (K = Yếu)
+ *                    cap/plan      (Cap) · cap/plan-bau (BAU)
+ *                                  { r: { oppId: { them: {s0:[pid,pid],..}, us: {...}, lock: {s0:true}, scen: 'A'|'B' } } }
+ * BAU phải đổi mật khẩu ở lần đăng nhập đầu tiên (acct/{email}.pwChanged).
  */
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
   const esc = PB.esc;
-  const SK = [['drive', 'Đoa/Drive'], ['luoi', 'Đánh lưới'], ['drop', 'Drop'], ['lop', 'Lốp'], ['nong', 'Nóng vội'], ['bao', 'Bao bóng'], ['ben', 'Bền bóng']];
+  const SK = [['drive', 'Đoa/Drive'], ['luoi', 'Đánh lưới'], ['drop', 'Drop'], ['lop', 'Lốp'], ['nong', 'Kiểm soát nhịp'], ['bao', 'Bao bóng'], ['ben', 'Bền bóng']];
   const SKN = Object.fromEntries(SK);
-  const LVLS = [['T', 'Tốt'], ['B', 'TB'], ['K', 'Kém']];
+  const LVLS = [['T', 'Tốt'], ['B', 'TB'], ['K', 'Yếu']];
+  const LVN = Object.fromEntries(LVLS);
   const VAL = { T: 1, B: 0, K: -1 };
   const W = { drive: 0.5, luoi: 0.6, drop: 0.5, lop: 0.3, nong: 0.4, bao: 0.35, ben: 0.5 };
   // Cặp "điểm mạnh của bên này ↔ điểm yếu của bên kia"
   const EDGES = [['drive', 'luoi'], ['lop', 'bao'], ['ben', 'nong'], ['drop', 'drive']];
-  const GOOD = { drive: 'drive tốt', luoi: 'đánh lưới tốt', drop: 'drop tốt', lop: 'lốp tốt', nong: 'bình tĩnh', bao: 'bao bóng tốt', ben: 'bền bóng' };
-  const BAD = { drive: 'drive kém', luoi: 'đánh lưới kém', drop: 'drop kém', lop: 'lốp kém', nong: 'hay nóng vội', bao: 'bao bóng kém', ben: 'bền bóng kém' };
+  const GOOD = { drive: 'drive tốt', luoi: 'đánh lưới tốt', drop: 'drop tốt', lop: 'lốp tốt', nong: 'kiểm soát nhịp tốt', bao: 'bao bóng tốt', ben: 'bền bóng' };
+  const BAD = { drive: 'drive yếu', luoi: 'đánh lưới yếu', drop: 'drop yếu', lop: 'lốp yếu', nong: 'kiểm soát nhịp yếu (hay vội)', bao: 'bao bóng yếu', ben: 'bền bóng yếu' };
   const SCEN = { A: 'Xếp mạnh trước (khả năng cao nhất)', B: 'Dàn đều sức các cặp' };
 
+  // Tài khoản được vào khu vực này: đội của mình (để lên đấu pháp) và nơi lưu đấu pháp riêng
+  const ACC = {
+    [Store.CAP_EMAIL]: { label: 'Cap', team: 'doi2', plan: 'plan' },
+    [Store.BAU_EMAIL]: { label: 'BAU', team: 'doi3', plan: 'plan-bau', forcePw: true }
+  };
   let user = null, T = null, LV = {}, ME = 'doi2', SKL = {}, PLAN = {}, unsub = [], skTeam = null, dpOpp = null, tab = null, err = '';
+  let mustPw = false, pwOpen = false, pop = null;
 
   /* ---------- Dữ liệu từ trang nội bộ ---------- */
-  document.addEventListener('nb:data', (e) => { ({ T, LV, me: ME } = e.detail); render(); });
-  document.addEventListener('nb:tab', (e) => { tab = e.detail; render(); });
-  Store.onUser((u) => {
-    user = u; err = '';
+  document.addEventListener('nb:data', (e) => { ({ T, LV } = e.detail); render(); });
+  document.addEventListener('nb:tab', (e) => { tab = e.detail; closePop(); render(); });
+  Store.onUser(async (u) => {
+    user = u; err = ''; mustPw = false; pwOpen = false; SKL = {}; PLAN = {};
     unsub.forEach((f) => f()); unsub = [];
-    if (isCap()) {
-      const fail = (er) => { err = /permission/i.test(er.message) ? 'Firebase chưa cho phép tài khoản Cap đọc dữ liệu: cần dán lại luật bảo mật mới (firestore.rules).' : er.message; render(); };
+    const A = acct();
+    if (A) {
+      ME = A.team; skTeam = null; dpOpp = null;
+      if (A.forcePw) { try { mustPw = !(await Store.getAcct(u.email)).pwChanged; } catch (er) { mustPw = true; } }
+      const fail = (er) => { err = /permission/i.test(er.message) ? 'Firebase chưa cho phép tài khoản này đọc dữ liệu: cần dán lại luật bảo mật mới (firestore.rules).' : er.message; render(); };
       unsub.push(Store.watchCap('skills', (d) => { SKL = d.s || {}; render(); }, fail));
-      unsub.push(Store.watchCap('plan', (d) => { PLAN = d.r || {}; render(); }, fail));
+      unsub.push(Store.watchCap(A.plan, (d) => { PLAN = d.r || {}; render(); }, fail));
     }
     render();
   });
-  const isCap = () => user && user.email === Store.CAP_EMAIL;
+  const acct = () => (user && ACC[user.email]) || null;
+  const isCap = () => !!acct();
 
   /* ---------- Tiện ích ---------- */
   const players = (id) => ((PB.team(T, id) || {}).players || []).filter((p) => p && p.name);
@@ -128,22 +141,22 @@
   const EXPLOIT = {
     drive: (n) => `<b>${n}</b> drive yếu → chủ động drive/đẩy nhanh vào ${n}`,
     luoi: (n) => `<b>${n}</b> đánh lưới yếu → dink/drop vào ${n}, chờ bóng nổi`,
-    drop: (n) => `<b>${n}</b> drop kém → ép ${n} đánh quả thứ 3 từ cuối sân`,
-    lop: (n) => `<b>${n}</b> lốp kém → có thể dâng sát lưới ép ${n}`,
-    nong: (n) => `<b>${n}</b> hay nóng vội → kéo dài rally, đánh chắc chờ ${n} tự lỗi`,
-    bao: (n) => `<b>${n}</b> bao bóng kém → đánh vào giữa và khoảng trống phía ${n}`,
-    ben: (n) => `<b>${n}</b> bền bóng kém → giữ bóng qua lưới thêm vài quả, ${n} sẽ tự lỗi`
+    drop: (n) => `<b>${n}</b> drop yếu → ép ${n} đánh quả thứ 3 từ cuối sân`,
+    lop: (n) => `<b>${n}</b> lốp yếu → có thể dâng sát lưới ép ${n}`,
+    nong: (n) => `<b>${n}</b> kiểm soát nhịp yếu, hay vội → kéo dài rally, đánh chắc chờ ${n} tự lỗi`,
+    bao: (n) => `<b>${n}</b> bao bóng yếu → đánh vào giữa và khoảng trống phía ${n}`,
+    ben: (n) => `<b>${n}</b> bền bóng yếu → giữ bóng qua lưới thêm vài quả, ${n} sẽ tự lỗi`
   };
   const CAUTION = {
     drive: (n) => `<b>${n}</b> drive mạnh → block chắc, vợt trước ngực, không đôi công`,
     luoi: (n) => `<b>${n}</b> lưới chắc → tránh đẩy bóng cao ở lưới, ưu tiên reset`,
     drop: (n) => `<b>${n}</b> drop hay → chuẩn bị chân sớm, xử lý bóng thấp`,
     lop: (n) => `<b>${n}</b> hay lốp → người đứng lưới đừng dâng quá sát`,
-    nong: (n) => `<b>${n}</b> rất bình tĩnh → đừng trông chờ tự lỗi, phải chủ động tạo thế`,
+    nong: (n) => `<b>${n}</b> kiểm soát nhịp tốt → đừng trông chờ tự lỗi, phải chủ động tạo thế`,
     bao: (n) => `<b>${n}</b> bao sân rộng → đánh dọc biên phía ${n} bỏ trống`,
     ben: (n) => `<b>${n}</b> bền bóng → chuẩn bị rally dài, kiên nhẫn`
   };
-  const USE = { drive: 'drive tốt', luoi: 'lưới chắc', drop: 'drop tốt', lop: 'lốp tốt', nong: 'bình tĩnh', bao: 'bao sân tốt', ben: 'bền bóng' };
+  const USE = { drive: 'drive tốt', luoi: 'lưới chắc', drop: 'drop tốt', lop: 'lốp tốt', nong: 'kiểm soát nhịp tốt', bao: 'bao sân tốt', ben: 'bền bóng' };
   function subTips(us, them) {
     const t = [];
     if (them[0] && them[1]) {
@@ -190,16 +203,16 @@
   function gate() {
     if (!Store.enabled) return '<div class="card cap-gate"><p>Chức năng này cần kết nối Firebase.</p></div>';
     if (user && !isCap()) return `<div class="card cap-gate"><div class="lock-ic">⛔</div><h2>Tài khoản không có quyền</h2>
-      <p class="muted">Đang đăng nhập: <b>${esc(Store.loginToPhone(user.email))}</b>. Khu vực này chỉ dành cho tài khoản <b>Cap</b>.</p>
+      <p class="muted">Đang đăng nhập: <b>${esc(Store.loginToPhone(user.email))}</b>. Khu vực này chỉ dành cho tài khoản <b>Cap</b> và <b>BAU</b>.</p>
       <button class="btn ghost" data-cap="out">Đăng xuất</button></div>`;
     return `<div class="card cap-gate"><div class="lock-ic">🔒</div><h2>Khu vực đội trưởng</h2>
-      <p class="muted">Chỉ tài khoản <b>Cap</b> đăng nhập mới xem được kỹ năng VĐV và đấu pháp.</p>
-      <form class="cap-login"><input name="u" placeholder="Tài khoản" value="Cap" autocomplete="username" aria-label="Tài khoản">
+      <p class="muted">Chỉ tài khoản <b>Cap</b> hoặc <b>BAU</b> đăng nhập mới xem được kỹ năng VĐV và đấu pháp.</p>
+      <form class="cap-login"><input name="u" placeholder="Tài khoản (Cap hoặc BAU)" autocomplete="username" aria-label="Tài khoản">
         <input name="p" type="password" placeholder="Mật khẩu" autocomplete="current-password" aria-label="Mật khẩu">
         <button class="btn primary" type="submit">Đăng nhập</button><p class="cap-msg muted"></p></form></div>`;
   }
   const bar = (title, eyebrow) => `<div class="section-head"><div><div class="eyebrow">${eyebrow}</div><h2 class="display">${title}</h2></div>
-    <span class="cap-who">🔓 ${esc(Store.loginToPhone(user.email))} · <button class="linkbtn" data-cap="out">Đăng xuất</button></span></div>
+    <span class="cap-who">🔓 ${esc(acct().label)} · <button class="linkbtn" data-cap="pw">🔑 Đổi mật khẩu</button> · <button class="linkbtn" data-cap="out">Đăng xuất</button></span></div>
     ${err ? `<p class="notice">⚠️ ${esc(err)}</p>` : ''}`;
 
   function teamOrder() {
@@ -212,15 +225,15 @@
     const ps = players(skTeam).slice().sort(byLevel);
     const total = ps.length * SK.length;
     return `${bar('Kỹ năng VĐV', 'Đội trưởng nhập · bấm là tự lưu')}
-      <p class="muted cap-legend"><span class="sk-b on" data-v="T">Tốt</span> <span class="sk-b on" data-v="B">TB</span> <span class="sk-b on" data-v="K">Kém</span>
-        Bấm lại mức đang chọn để bỏ. <b>Nóng vội:</b> Tốt = bình tĩnh, Kém = hay nóng vội. VĐV xếp theo trình T1 (cao nhất) → T6.</p>
+      <p class="muted cap-legend">Bấm vào ô của từng VĐV để chọn <span class="sk-v" data-v="T">Tốt</span> <span class="sk-v" data-v="B">TB</span> <span class="sk-v" data-v="K">Yếu</span>.
+        <b>Kiểm soát nhịp:</b> Tốt = giữ nhịp tốt, bình tĩnh; Yếu = hay vội. VĐV xếp theo trình T1 (cao nhất) → T6. Cap và BAU dùng chung bảng này.</p>
       <div class="chips cap-teams">${ids.map((id) => `<button class="chip ${id === skTeam ? 'active' : ''}" data-skt="${esc(id)}">${id === ME ? '⭐ ' : 'V' + roundOf(id) + ' · '}${esc(tn(id))} <small>${skCount(id)}/${players(id).length * SK.length}</small></button>`).join('')}</div>
       <div class="card sk-card"><div class="sk-head"><h3>${esc(tn(skTeam))}</h3><span class="muted">Đã nhập ${skCount(skTeam)}/${total} ô</span></div>
       <p class="muted sk-swipe">← Vuốt ngang bảng để xem đủ 7 kỹ năng →</p>
       <div class="table-wrap"><table class="sk-table">
         <thead><tr><th class="l">VĐV</th><th>Trình</th>${SK.map(([, n]) => `<th>${n}</th>`).join('')}</tr></thead>
         <tbody>${ps.map((p) => `<tr><td class="l"><span class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}</span></td><td>${lvTag(p.id)}</td>
-          ${SK.map(([k]) => `<td><span class="sk-seg" role="group" aria-label="${esc(SKN[k])} – ${esc(p.name)}">${LVLS.map(([v, n]) => `<button class="sk-b ${sk(p.id, k) === v ? 'on' : ''}" data-v="${v}" data-pid="${esc(p.id)}" data-k="${k}" title="${esc(SKN[k])}: ${n}">${n}</button>`).join('')}</span></td>`).join('')}</tr>`).join('')}
+          ${SK.map(([k]) => { const v = sk(p.id, k); return `<td><button class="sk-cell" data-v="${v || ''}" data-pid="${esc(p.id)}" data-k="${k}" aria-haspopup="menu" aria-label="${esc(SKN[k])} – ${esc(p.name)}: ${v ? LVN[v] : 'chưa chọn'}">${v ? LVN[v] : '＋'}</button></td>`; }).join('')}</tr>`).join('')}
         </tbody></table></div></div>`;
   }
 
@@ -299,6 +312,17 @@
       </div>`;
   }
 
+  function pwForm(forced) {
+    return `<div class="card cap-gate"><div class="lock-ic">🔑</div><h2>${forced ? 'Đổi mật khẩu lần đầu' : 'Đổi mật khẩu'}</h2>
+      <p class="muted">${forced ? `Tài khoản <b>${esc(acct().label)}</b> đăng nhập lần đầu: hãy <b>đặt mật khẩu riêng</b> ngay để giữ quyền riêng tư. Sau khi đổi, chỉ bạn biết mật khẩu này.` : 'Nhập mật khẩu hiện tại và mật khẩu mới.'}</p>
+      <form class="cap-pw"><input name="o" type="password" placeholder="Mật khẩu hiện tại" autocomplete="current-password" aria-label="Mật khẩu hiện tại">
+        <input name="n" type="password" placeholder="Mật khẩu mới (ít nhất 6 ký tự)" autocomplete="new-password" aria-label="Mật khẩu mới">
+        <input name="n2" type="password" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" aria-label="Nhập lại mật khẩu mới">
+        <button class="btn primary" type="submit">Đổi mật khẩu</button>
+        ${forced ? '' : '<button class="btn ghost" type="button" data-cap="pw-cancel">Huỷ</button>'}
+        <p class="cap-msg muted"></p></form>
+      ${forced ? '<button class="linkbtn" data-cap="out">Đăng xuất</button>' : ''}</div>`;
+  }
   function render() {
     const kn = $('#pane-ky-nang'), dp = $('#pane-dau-phap');
     if (!kn || !dp) return;
@@ -307,13 +331,58 @@
     const a = document.activeElement;
     if (a && pane.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'SELECT')) return; // đang thao tác, chờ xong
     const html = !isCap() ? `<section class="block"><div class="container">${gate()}</div></section>`
+      : mustPw || pwOpen ? `<section class="block"><div class="container">${pwForm(mustPw)}</div></section>`
       : !T ? '<section class="block"><div class="container"><p class="muted">Đang tải dữ liệu giải…</p></div></section>'
       : `<section class="block"><div class="container">${tab === 'ky-nang' ? renderSkills() : renderPlan()}</div></section>`;
     pane.innerHTML = html;
   }
 
+  /* ---------- Menu chọn mức kỹ năng ---------- */
+  function openPop(cell) {
+    closePop();
+    const { pid, k } = cell.dataset, cur = sk(pid, k);
+    const el = document.createElement('div');
+    el.className = 'sk-pop'; el.setAttribute('role', 'menu');
+    el.innerHTML = `<div class="sk-pop-h">${esc(pName(pid))} · ${esc(SKN[k])}</div>
+      ${LVLS.map(([v, n]) => `<button role="menuitem" data-pick="${v}" data-v="${v}" class="${cur === v ? 'cur' : ''}">${n}${cur === v ? ' ✓' : ''}</button>`).join('')}
+      ${cur ? '<button role="menuitem" data-pick="" class="clr">Bỏ chọn</button>' : ''}`;
+    document.body.appendChild(el);
+    const r = cell.getBoundingClientRect(), w = el.offsetWidth, h = el.offsetHeight;
+    let left = r.left + r.width / 2 - w / 2 + scrollX, top = r.bottom + 6 + scrollY;
+    left = Math.max(8 + scrollX, Math.min(left, scrollX + document.documentElement.clientWidth - w - 8));
+    if (r.bottom + h + 12 > innerHeight) top = r.top - h - 6 + scrollY;
+    el.style.left = left + 'px'; el.style.top = top + 'px';
+    cell.classList.add('open');
+    pop = { el, pid, k, cell };
+    el.querySelector('button').focus({ preventScroll: true });
+  }
+  function closePop() {
+    if (!pop) return;
+    pop.el.remove(); if (pop.cell) pop.cell.classList.remove('open');
+    pop = null;
+  }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+  window.addEventListener('resize', closePop);
+
   /* ---------- Thao tác ---------- */
   document.addEventListener('submit', async (e) => {
+    const pf = e.target.closest('.cap-pw');
+    if (pf) {
+      e.preventDefault();
+      const msg = $('.cap-msg', pf), o = pf.o.value, n = pf.n.value;
+      if (n.length < 6) { msg.textContent = 'Mật khẩu mới phải có ít nhất 6 ký tự.'; return; }
+      if (n !== pf.n2.value) { msg.textContent = 'Hai lần nhập mật khẩu mới không khớp.'; return; }
+      if (n === o) { msg.textContent = 'Mật khẩu mới phải khác mật khẩu hiện tại.'; return; }
+      msg.textContent = 'Đang đổi…';
+      try {
+        await Store.changePassword(o, n);
+        await Store.setAcct(user.email, { pwChanged: true }).catch(() => {});
+        mustPw = false; pwOpen = false; toast('✅ Đã đổi mật khẩu'); render();
+      } catch (er) {
+        msg.textContent = /wrong-password|invalid/i.test(er.code || er.message) ? 'Mật khẩu hiện tại không đúng.' : /weak/i.test(er.code || '') ? 'Mật khẩu mới quá yếu.' : 'Chưa đổi được: ' + (er.code || er.message);
+      }
+      return;
+    }
     const f = e.target.closest('.cap-login'); if (!f) return;
     e.preventDefault();
     const msg = $('.cap-msg', f);
@@ -327,15 +396,20 @@
     if (t.closest('[data-cap="out"]')) { Store.signOut(); return; }
     const st = t.closest('[data-skt]'); if (st) { skTeam = st.dataset.skt; render(); return; }
     const gs = t.closest('[data-goskill]'); if (gs) { skTeam = gs.dataset.goskill; $('.nb-tabs [data-tab="ky-nang"]').click(); return; }
-    const b = t.closest('.sk-b[data-pid]');
-    if (b) {
-      const { pid, k, v } = b.dataset;
-      const next = sk(pid, k) === v ? null : v;
-      SKL = { ...SKL, [pid]: { ...(SKL[pid] || {}), [k]: next || undefined } };
+    if (t.closest('[data-cap="pw"]')) { pwOpen = true; render(); scrollTo({ top: 0 }); return; }
+    if (t.closest('[data-cap="pw-cancel"]')) { pwOpen = false; render(); return; }
+    const pick = t.closest('.sk-pop [data-pick]');
+    if (pick && pop) {
+      const { pid, k } = pop, v = pick.dataset.pick || null;
+      closePop();
+      SKL = { ...SKL, [pid]: { ...(SKL[pid] || {}), [k]: v || undefined } };
       render();
-      Store.setCap('skills', { s: { [pid]: { [k]: next || Store.del() } } }).catch((er) => toast('Chưa lưu được: ' + er.message));
+      Store.setCap('skills', { s: { [pid]: { [k]: v || Store.del() } } }).catch((er) => toast('Chưa lưu được: ' + er.message));
       return;
     }
+    const cell = t.closest('.sk-cell');
+    if (cell) { openPop(cell); return; }
+    if (pop && !t.closest('.sk-pop')) closePop();
     const o = t.closest('[data-dpo]'); if (o) { dpOpp = o.dataset.dpo; render(); return; }
     const a = t.closest('[data-dp]');
     if (a) {

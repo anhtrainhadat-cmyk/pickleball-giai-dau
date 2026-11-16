@@ -15,6 +15,11 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email == 'cap@dao97open.vn';
     }
 
+    // Tài khoản BAU (đội trưởng Team 3, đăng nhập "BAU" = bau@dao97open.vn).
+    function isBau() {
+      return request.auth != null && request.auth.token.email == 'bau@dao97open.vn';
+    }
+
     // Danh sách BTC: mỗi người chỉ đọc được tài liệu của chính mình, không ai ghi từ web.
     match /admins/{email} {
       allow read: if request.auth != null && request.auth.token.email != null
@@ -32,9 +37,22 @@ service cloud.firestore {
       allow write: if isBTC();
     }
 
-    // Kỹ năng VĐV và đấu pháp của Team 2: CHỈ tài khoản Cap xem và sửa (BTC cũng không xem được).
+    // Kỹ năng VĐV (skills): Cap và BAU cùng xem/sửa. Đấu pháp tách riêng: plan = Cap, plan-bau = BAU.
     match /cap/{doc} {
-      allow read, write: if isCap();
+      allow read, write: if (doc == 'skills' && (isCap() || isBau()))
+        || (doc == 'plan' && isCap())
+        || (doc == 'plan-bau' && isBau());
+    }
+
+    // Cẩm nang đã sửa trên web: là bản MÃ HOÁ (chỉ ai có link mới giải mã được) → ai cũng đọc, chỉ Cap ghi.
+    match /noibo/{doc} {
+      allow read: if true;
+      allow write: if isCap();
+    }
+
+    // Trạng thái tài khoản (đã đổi mật khẩu lần đầu chưa): mỗi người chỉ đọc/ghi của chính mình.
+    match /acct/{email} {
+      allow read, write: if request.auth != null && request.auth.token.email == email;
     }
 
     // Trình VĐV (T1–T6, bản gốc): CHỈ BTC xem và chấm.

@@ -51,8 +51,12 @@ Trong Firestore tab **Data**:
 Gói Spark: 50.000 lượt đọc/ngày, 20.000 lượt ghi/ngày — đủ cho giải khoảng vài trăm người xem.
 Website đã bật bộ nhớ đệm và chỉ tải dự đoán khi người xem cuộn tới, để tiết kiệm lượt đọc.
 
-## Tài khoản đội trưởng "Cap" (trang nội bộ Team 2)
-Tab **Kỹ năng VĐV** và **Đấu pháp** trên trang nội bộ chỉ tài khoản Cap xem được (BTC cũng không xem được).
-1. **Authentication › Users › Add user**: Email `cap@dao97open.vn`, Password tuỳ chọn (≥ 6 ký tự) → **Add user**.
-2. **Firestore › Rules**: dán lại toàn bộ file [`firestore.rules`](firestore.rules) mới → **Publish** (có thêm phần `cap`).
-3. Trên trang nội bộ, mở tab Kỹ năng VĐV hoặc Đấu pháp → đăng nhập: tài khoản `Cap`, mật khẩu vừa đặt.
+## Tài khoản đội trưởng "Cap" và "BAU" (trang nội bộ)
+- **Cap** (Team 2): sửa Cẩm nang (nút ✏️ Sửa cẩm nang → UPDATE), nhập Kỹ năng VĐV, lên Đấu pháp riêng của Team 2.
+- **BAU** (Team 3): dùng chung Cẩm nang (chỉ xem) và bảng Kỹ năng VĐV với Cap; Đấu pháp riêng của Team 3, Cap không xem được.
+- BAU **bắt buộc đổi mật khẩu** ở lần đăng nhập đầu tiên.
+
+Cách tạo:
+1. **Authentication › Users › Add user**: `cap@dao97open.vn` + mật khẩu; lặp lại với `bau@dao97open.vn` + mật khẩu tạm.
+2. **Firestore › Rules**: dán lại toàn bộ file [`firestore.rules`](firestore.rules) mới → **Publish**.
+3. Trên trang nội bộ, tab Kỹ năng VĐV hoặc Đấu pháp → đăng nhập bằng `Cap` hoặc `BAU`.

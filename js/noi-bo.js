@@ -20,9 +20,9 @@
   const b64u = (s) => b64(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
   const keyFrom = (v) => { const m = String(v || '').match(/(?:#|^)k=([A-Za-z0-9_-]{20,})/) || String(v || '').trim().match(/^([A-Za-z0-9_-]{22})$/); return m ? m[1] : null; };
   let encP = null;
-  async function decrypt(k) {
+  async function decrypt(k, given) {
     encP = encP || fetch('data/noi-bo.json?v=' + Date.now(), { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('fetch'); return r.json(); });
-    const e = await encP;
+    const e = given || await encP;
     const key = await crypto.subtle.importKey('raw', b64u(k), 'AES-GCM', false, ['decrypt']);
     const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(e.iv) }, key, b64(e.ct));
     return JSON.parse(new TextDecoder().decode(pt));
@@ -36,10 +36,10 @@
     if (!k) return showLock();
     if (!window.crypto || !crypto.subtle) return showLock('Trình duyệt này không hỗ trợ mở trang nội bộ. Vui lòng mở bằng Chrome hoặc Safari bản mới.');
     try {
-      const D = await decrypt(k);
-      ls.set(k);
+      const data = await decrypt(k);
+      ls.set(k); KEY = k;
       if (fromInput) history.replaceState(null, '', '#k=' + k);
-      start(D);
+      if (D) { D = data; paint(); } else start(data);
     } catch (err) {
       if (!fromInput && k === ls.get()) ls.del();
       showLock(err.message === 'fetch' ? 'Không tải được nội dung, vui lòng kiểm tra mạng rồi tải lại trang.' : '⚠ Link hoặc mã truy cập <b>không đúng</b> (có thể đã được đổi). Hãy xin lại link mới từ đội trưởng.');
@@ -67,7 +67,7 @@
   };
 
   /* ---------- Nội dung chiến thuật ---------- */
-  let D = null;
+  let D = null, KEY = null, EDIT = false, W = null, canEdit = false, pending = null;
   function start(data) {
     D = data;
     $('#lock').hidden = true;
@@ -78,97 +78,140 @@
         <button role="tab" data-tab="ky-nang">📝 Kỹ năng VĐV <small>🔒</small></button>
         <button role="tab" data-tab="dau-phap">♟️ Đấu pháp <small>🔒</small></button>
       </div></nav>
-      <div class="nb-pane" id="pane-cam-nang">${renderPage()}</div>
+      <div class="nb-pane" id="pane-cam-nang"><div id="cn"></div>${liveHtml()}</div>
       <div class="nb-pane" id="pane-ky-nang" hidden></div>
       <div class="nb-pane" id="pane-dau-phap" hidden></div>`;
+    paint();
     // Link có &tab=dau-phap (link riêng của Cap) thì mở thẳng tab đó
     const ht = (location.hash.match(/[#&]tab=([a-z-]+)/) || [])[1];
     showTab(ht || (() => { try { return localStorage.getItem('dao97_nb_tab'); } catch (e) { return null; } })() || 'cam-nang');
-    document.title = D.title + ' · ĐÀO97 OPEN';
     bind();
     startLive();
+    watchRemote();
+    Store.onUser((u) => { canEdit = !!(u && u.email === Store.CAP_EMAIL); if (!EDIT) paint(); });
   }
 
-  const sectionHtml = (s, i) => `
-    <details class="tac" id="ct-${i + 1}">
-      <summary>
-        <span class="tac-n">${i + 1}</span>
-        <span class="tac-h"><span class="tac-t">${esc(s.icon || '')} ${esc(s.title)}</span><span class="tac-s">${esc(s.sub || '')}</span>
-          <span class="tac-r">💡 ${esc(s.remember || '')}</span></span>
-        <span class="tac-chev" aria-hidden="true">⌄</span>
-      </summary>
-      <div class="tac-body">
-        ${s.viz && VIZ[s.viz] ? VIZ[s.viz]() : ''}
-        ${s.points ? `<ul class="ticks">${s.points.map((p) => `<li>${md(p)}</li>`).join('')}</ul>` : ''}
-        ${s.cols ? `<div class="cols">${s.cols.map((c) => `<div class="col"><h4>${esc(c.title)}</h4><ul class="ticks">${c.points.map((p) => `<li>${md(p)}</li>`).join('')}</ul></div>`).join('')}</div>` : ''}
-        ${s.calls ? `<div class="calls"><span>Gọi nhau ngắn gọn:</span>${s.calls.map((c) => `<b>“${esc(c)}”</b>`).join('')}</div>` : ''}
-        ${s.diag ? `<h4 class="mini-h">Đánh hỏng? Tự hỏi nhanh:</h4><div class="diag">${s.diag.map(([a, b]) => `<div class="dg"><b>${esc(a)}</b><span>${md(b)}</span></div>`).join('')}</div>` : ''}
-        ${s.fix ? `<h4 class="mini-h">Điều chỉnh ngay:</h4><div class="diag fix">${s.fix.map(([a, b]) => `<div class="dg"><b>${esc(a)}</b><span>→ ${md(b)}</span></div>`).join('')}</div>` : ''}
-        ${s.rule ? `<div class="callout rule-c">📜 ${md(s.rule)}</div>` : ''}
-        ${s.tip ? `<div class="callout tip-c">🔎 ${md(s.tip)} <a href="#doi-thu">Xem ngay ↓</a></div>` : ''}
-        ${s.remember ? `<div class="nho"><span>NHỚ</span><p>${md(s.remember)}</p></div>` : ''}
-      </div>
-    </details>`;
+  /* Vẽ phần nội dung cẩm nang (xem hoặc sửa) */
+  function paint() {
+    const open = [...document.querySelectorAll('details.tac[open]')].map((d) => d.id);
+    $('#cn').innerHTML = renderPage(EDIT ? W : D);
+    open.forEach((id) => { const d = $('#' + id); if (d && d.tagName === 'DETAILS') d.open = true; });
+    document.title = (D.title || 'Nội bộ') + ' · ĐÀO97 OPEN';
+    document.body.classList.toggle('editing', EDIT);
+    if (typeof renderAll === 'function') renderAll();
+  }
 
-  function renderPage() {
-    const sp = D.spirit || {};
+  // Ô chữ: xem bình thường, hoặc sửa trực tiếp (contenteditable) khi đang ở chế độ sửa
+  const H_DEF = {
+    kicker: 'Tài liệu nội bộ', sub: 'Đánh chắc hơn · Tự lỗi ít hơn · Phối hợp tốt hơn · Kiên nhẫn hơn đối thủ',
+    pillarsEb: 'Tinh thần ĐÀO97 OPEN', pillarsH: '4 chữ “hơn” của cả đội',
+    tacEb: 'Đọc kỹ trước giải · bấm từng mục để mở', tacH: '{n} nhóm chiến thuật',
+    rulesEb: 'Xem lại ngay trước khi vào sân', rulesH: '🔥 {n} điều phải nhớ', spiritEb: '🏆 Tinh thần ĐÀO97 OPEN'
+  };
+  function F(path, text, cls = '', tag = 'span', rich = true) {
+    text = text == null ? '' : String(text);
+    if (!EDIT) return `<${tag}${cls ? ` class="${cls}"` : ''}>${rich ? md(text) : esc(text)}</${tag}>`;
+    return `<${tag} class="${cls} ed" contenteditable="true" spellcheck="false" data-path="${path}" data-ph="(trống)">${esc(text)}</${tag}>`;
+  }
+  const DEL = (path) => (EDIT ? `<button class="ed-x" data-del="${path}" title="Xoá dòng này" aria-label="Xoá">✕</button>` : '');
+  const ADD = (path, label = '+ Thêm dòng') => (EDIT ? `<button class="ed-add" data-add="${path}">${label}</button>` : '');
+  const head = (X, k, n) => {
+    const v = (X.heads || {})[k];
+    return v != null ? v : H_DEF[k].replace('{n}', n);
+  };
+  const list = (X, path, arr, cls = 'ticks') => `<ul class="${cls}">${(arr || []).map((p, j) => `<li>${F(path + '.' + j, p)}${DEL(path + '.' + j)}</li>`).join('')}</ul>${ADD(path)}`;
+
+  const sectionHtml = (X) => (s, i) => {
+    const P = 'sections.' + i;
+    const headInner = `<span class="tac-n">${i + 1}</span>
+        <span class="tac-h"><span class="tac-t">${F(P + '.icon', s.icon || '', 'ic', 'span', false)} ${F(P + '.title', s.title, '', 'span', false)}</span>${F(P + '.sub', s.sub || '', 'tac-s', 'span', false)}
+          ${EDIT ? '' : `<span class="tac-r">💡 ${esc(s.remember || '')}</span>`}</span>`;
+    const body = `<div class="tac-body">
+        ${s.viz && VIZ[s.viz] ? VIZ[s.viz]() : ''}
+        ${s.points || EDIT ? list(X, P + '.points', s.points || []) : ''}
+        ${s.cols ? `<div class="cols">${s.cols.map((c, ci) => `<div class="col">${F(`${P}.cols.${ci}.title`, c.title, '', 'h4', false)}${list(X, `${P}.cols.${ci}.points`, c.points)}</div>`).join('')}</div>` : ''}
+        ${s.calls ? `<div class="calls">${F(P + '.callsH', s.callsH != null ? s.callsH : 'Gọi nhau ngắn gọn:', '', 'span', false)}${s.calls.map((c, j) => `<b>“${F(P + '.calls.' + j, c, '', 'span', false)}”${DEL(P + '.calls.' + j)}</b>`).join('')}${ADD(P + '.calls', '+ Thêm câu')}</div>` : ''}
+        ${s.diag ? `${F(P + '.diagH', s.diagH != null ? s.diagH : 'Đánh hỏng? Tự hỏi nhanh:', 'mini-h', 'h4', false)}<div class="diag">${s.diag.map(([a, b], j) => `<div class="dg">${F(`${P}.diag.${j}.0`, a, '', 'b', false)}${F(`${P}.diag.${j}.1`, b)}${DEL(P + '.diag.' + j)}</div>`).join('')}</div>${ADD(P + '.diag', '+ Thêm dòng lỗi')}` : ''}
+        ${s.fix ? `${F(P + '.fixH', s.fixH != null ? s.fixH : 'Điều chỉnh ngay:', 'mini-h', 'h4', false)}<div class="diag fix">${s.fix.map(([a, b], j) => `<div class="dg">${F(`${P}.fix.${j}.0`, a, '', 'b', false)}<span>→ ${F(`${P}.fix.${j}.1`, b)}</span>${DEL(P + '.fix.' + j)}</div>`).join('')}</div>${ADD(P + '.fix', '+ Thêm dòng')}` : ''}
+        ${s.rule || EDIT ? `<div class="callout rule-c">📜 ${F(P + '.rule', s.rule || '')}</div>` : ''}
+        ${s.tip ? `<div class="callout tip-c">🔎 ${F(P + '.tip', s.tip)} ${EDIT ? '' : '<a href="#doi-thu">Xem ngay ↓</a>'}</div>` : ''}
+        ${s.remember || EDIT ? `<div class="nho"><span>NHỚ</span>${F(P + '.remember', s.remember || '', '', 'p')}</div>` : ''}
+        ${EDIT ? `<button class="ed-add danger" data-delsec="${i}">🗑 Xoá cả nhóm này</button>` : ''}
+      </div>`;
+    if (EDIT) return `<div class="tac ed-sec" id="ct-${i + 1}"><div class="tac-sum">${headInner}</div>${body}</div>`;
+    return `<details class="tac" id="ct-${i + 1}"><summary>${headInner}<span class="tac-chev" aria-hidden="true">⌄</span></summary>${body}</details>`;
+  };
+
+  function renderPage(X) {
+    const sp = X.spirit || {};
+    const secs = X.sections || [], rules = X.rules || [];
     return `
     <section class="hero nb-hero" id="top">
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div>
-          <div class="nb-kicker"><span id="team-name">Team</span> · Tài liệu nội bộ</div>
-          <h1 class="display grad-text nb-title">${esc(D.title)}</h1>
-          <p class="hero-sub neon-text">Đánh chắc hơn · Tự lỗi ít hơn · Phối hợp tốt hơn · Kiên nhẫn hơn đối thủ</p>
+          <div class="nb-kicker"><span id="team-name">Team</span> · ${F('heads.kicker', head(X, 'kicker'), '', 'span', false)}</div>
+          ${F('title', X.title, 'display grad-text nb-title', 'h1', false)}
+          ${F('heads.sub', head(X, 'sub'), 'hero-sub neon-text', 'p', false)}
           <div class="actions">
             <button class="btn primary" data-fl="open">🔥 10 điều trước khi vào sân</button>
             <a class="btn ghost" href="#lich-doi">📋 Lịch đấu của đội</a>
+            ${canEdit && !EDIT ? '<button class="btn neon" data-ed="start">✏️ Sửa cẩm nang</button>' : ''}
           </div>
+          ${pending && !EDIT ? '' : ''}
         </div>
         <div class="forecast nb-live" id="nb-live" aria-live="polite"><div class="lbl">Đội mình trên bảng</div><p class="muted">Đang tải dữ liệu giải…</p></div>
       </div>
     </section>
+    ${EDIT ? `<div class="container"><p class="notice ed-help">✏️ <b>Đang sửa cẩm nang.</b> Bấm vào chữ bất kỳ để sửa (kể cả tiêu đề). Dùng <code>**chữ**</code> để in đậm. Sửa xong bấm <b>UPDATE</b> ở cuối trang để cập nhật lên web ngay.</p></div>` : ''}
 
     <section class="block alt">
       <div class="container">
-        <div class="section-head"><div><div class="eyebrow">Tinh thần ĐÀO97 OPEN</div><h2 class="display">4 chữ “hơn” của cả đội</h2></div></div>
-        <div class="pillars">${(D.pillars || []).map(([a, b], i) => `<div class="pillar"><span class="pi-n">0${i + 1}</span><b>${esc(a)}</b><small>${esc(b)}</small></div>`).join('')}</div>
+        <div class="section-head"><div>${F('heads.pillarsEb', head(X, 'pillarsEb'), 'eyebrow', 'div', false)}${F('heads.pillarsH', head(X, 'pillarsH'), 'display', 'h2', false)}</div></div>
+        <div class="pillars">${(X.pillars || []).map(([a, b], i) => `<div class="pillar"><span class="pi-n">0${i + 1}</span>${F(`pillars.${i}.0`, a, '', 'b', false)}${F(`pillars.${i}.1`, b, '', 'small', false)}${DEL('pillars.' + i)}</div>`).join('')}</div>
+        ${ADD('pillars', '+ Thêm ô')}
       </div>
     </section>
 
     <section class="block" id="chien-thuat">
       <div class="container">
         <div class="section-head">
-          <div><div class="eyebrow">Đọc kỹ trước giải · bấm từng mục để mở</div><h2 class="display">${(D.sections || []).length} nhóm chiến thuật</h2></div>
-          <button class="btn sm ghost" id="toggle-all">Mở tất cả</button>
+          <div>${F('heads.tacEb', head(X, 'tacEb'), 'eyebrow', 'div', false)}${F('heads.tacH', head(X, 'tacH', secs.length), 'display', 'h2', false)}</div>
+          ${EDIT ? '' : '<button class="btn sm ghost" id="toggle-all">Mở tất cả</button>'}
         </div>
-        <nav class="tac-index chips">${(D.sections || []).map((s, i) => `<a class="chip" href="#ct-${i + 1}" data-open="${i + 1}">${i + 1}. ${esc(s.title)}</a>`).join('')}</nav>
-        <div class="tac-list">${(D.sections || []).map(sectionHtml).join('')}</div>
+        ${EDIT ? '' : `<nav class="tac-index chips">${secs.map((s, i) => `<a class="chip" href="#ct-${i + 1}" data-open="${i + 1}">${i + 1}. ${esc(s.title)}</a>`).join('')}</nav>`}
+        <div class="tac-list">${secs.map(sectionHtml(X)).join('')}</div>
+        ${ADD('sections', '+ Thêm nhóm chiến thuật')}
       </div>
     </section>
 
     <section class="block alt" id="10-dieu">
       <div class="container">
         <div class="section-head">
-          <div><div class="eyebrow">Xem lại ngay trước khi vào sân</div><h2 class="display">🔥 ${(D.rules || []).length} điều phải nhớ</h2></div>
-          <button class="btn sm primary" data-fl="open">▶ Xem nhanh từng điều</button>
+          <div>${F('heads.rulesEb', head(X, 'rulesEb'), 'eyebrow', 'div', false)}${F('heads.rulesH', head(X, 'rulesH', rules.length), 'display', 'h2', false)}</div>
+          ${EDIT ? '' : '<button class="btn sm primary" data-fl="open">▶ Xem nhanh từng điều</button>'}
         </div>
-        <ol class="rules10">${(D.rules || []).map((r, i) => `<li data-fl-i="${i}"><span class="r-n">${i + 1}</span><b>${esc(r)}</b></li>`).join('')}</ol>
+        <ol class="rules10">${rules.map((r, i) => `<li ${EDIT ? '' : `data-fl-i="${i}"`}><span class="r-n">${i + 1}</span>${F('rules.' + i, r, '', 'b', false)}${DEL('rules.' + i)}</li>`).join('')}</ol>
+        ${ADD('rules', '+ Thêm điều')}
       </div>
     </section>
 
     <section class="block spirit">
       <div class="container">
         <div class="spirit-card">
-          <div class="eyebrow">🏆 Tinh thần ĐÀO97 OPEN</div>
-          <p class="sp-lead">${esc(sp.lead || '')}</p>
-          <ul class="sp-nots">${(sp.nots || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-          <p class="sp-need">${esc(sp.need || '')}</p>
-          <p class="sp-close grad-text">${esc(sp.close || '')}</p>
+          ${F('heads.spiritEb', head(X, 'spiritEb'), 'eyebrow', 'div', false)}
+          ${F('spirit.lead', sp.lead, 'sp-lead', 'p', false)}
+          <ul class="sp-nots">${(sp.nots || []).map((x, j) => `<li>${F('spirit.nots.' + j, x, '', 'span', false)}${DEL('spirit.nots.' + j)}</li>`).join('')}</ul>
+          ${ADD('spirit.nots')}
+          ${F('spirit.need', sp.need, 'sp-need', 'p', false)}
+          ${F('spirit.close', sp.close, 'sp-close grad-text', 'p', false)}
         </div>
       </div>
     </section>
+    ${EDIT ? `<div class="ed-bar"><div class="container"><span>✏️ Đang sửa cẩm nang</span><button class="btn ghost" data-ed="cancel">Huỷ</button><button class="btn primary" data-ed="save">⬆️ UPDATE lên web</button></div></div>` : ''}`;
+  }
 
+  const liveHtml = () => `
     <section class="block alt" id="lich-doi">
       <div class="container">
         <div class="section-head"><div><div class="eyebrow">Cập nhật trực tiếp từ BTC</div><h2 class="display">Đội mình tại giải</h2></div><span class="pill-status" id="live-status">Đang tải…</span></div>
@@ -190,6 +233,75 @@
         <div id="opp-body" class="opp-body"></div>
       </div>
     </section>`;
+
+  /* ---------- Sửa cẩm nang ---------- */
+  const getP = (o, path) => path.split('.').reduce((x, k) => (x == null ? x : x[k]), o);
+  function setP(o, path, v) {
+    const ks = path.split('.');
+    let x = o;
+    ks.slice(0, -1).forEach((k, i) => { if (x[k] == null) x[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; x = x[k]; });
+    x[ks[ks.length - 1]] = v;
+  }
+  // Lấy chữ gốc (không dùng innerText vì bị CSS viết hoa ảnh hưởng)
+  function plain(el) {
+    const c = el.cloneNode(true);
+    c.querySelectorAll('br').forEach((b) => b.replaceWith('\n'));
+    c.querySelectorAll('div, p').forEach((d) => d.prepend('\n'));
+    return c.textContent.replace(/\u00a0/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function collect() {
+    document.querySelectorAll('#cn [data-path]').forEach((el) => setP(W, el.dataset.path, plain(el)));
+  }
+  function prune(X) {
+    X.heads = X.heads || {};
+    // tiêu đề có số đếm: nếu không đổi thì để tự đếm
+    ['tacH', 'rulesH'].forEach((k) => {
+      const n = k === 'tacH' ? (X.sections || []).length : (X.rules || []).length;
+      if (X.heads[k] === H_DEF[k].replace('{n}', n)) delete X.heads[k];
+    });
+    const clean = (arr) => (arr || []).filter((x) => (Array.isArray(x) ? x.some((y) => String(y).trim()) : String(x).trim()));
+    X.pillars = clean(X.pillars); X.rules = clean(X.rules);
+    X.spirit = X.spirit || {}; X.spirit.nots = clean(X.spirit.nots);
+    (X.sections || []).forEach((s) => {
+      ['points', 'calls', 'diag', 'fix'].forEach((k) => { if (s[k]) { s[k] = clean(s[k]); if (!s[k].length && k !== 'points') delete s[k]; } });
+      if (s.points && !s.points.length && s.cols) delete s.points;
+      (s.cols || []).forEach((c) => (c.points = clean(c.points)));
+      ['rule', 'tip', 'remember'].forEach((k) => { if (!String(s[k] || '').trim()) delete s[k]; });
+    });
+    return X;
+  }
+  function structural(fn) { collect(); fn(); paint(); }
+  async function encrypt(obj) {
+    const key = await crypto.subtle.importKey('raw', b64u(KEY), 'AES-GCM', false, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(obj))));
+    const enc = (u8) => btoa(Array.from(u8, (c) => String.fromCharCode(c)).join(''));
+    return { v: 1, iv: enc(iv), ct: enc(ct) };
+  }
+  async function save() {
+    collect();
+    const X = prune(JSON.parse(JSON.stringify(W)));
+    const btn = $('[data-ed="save"]'); if (btn) { btn.disabled = true; btn.textContent = 'Đang cập nhật…'; }
+    try {
+      await Store.saveNoiBo(await encrypt(X));
+      D = X; EDIT = false; W = null; paint();
+      toast('✅ Đã cập nhật cẩm nang lên web');
+    } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = '⬆️ UPDATE lên web'; }
+      toast(/permission/i.test(e.message) ? 'Chưa có quyền lưu: cần dán lại luật Firebase mới' : 'Chưa cập nhật được: ' + e.message);
+    }
+  }
+  // Bản mới nhất trên Firebase (đã mã hoá bằng cùng khoá) → hiện ngay cho mọi người có link
+  function watchRemote() {
+    Store.watchNoiBo(async (e) => {
+      if (!e || !e.ct) return;
+      try {
+        const X = await decrypt(KEY, e);
+        if (JSON.stringify(X) === JSON.stringify(D)) return;
+        if (EDIT) { pending = X; return; }
+        D = X; paint();
+      } catch (er) { /* khoá khác → bỏ qua */ }
+    });
   }
 
   function showTab(id) {
@@ -204,19 +316,49 @@
     $('.nb-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { showTab(b.dataset.tab); scrollTo({ top: 0 }); } });
     document.querySelectorAll('.nav-links a[href^="#"]').forEach((a) => a.addEventListener('click', () => showTab('cam-nang')));
     const all = () => [...document.querySelectorAll('details.tac')];
-    $('#toggle-all').addEventListener('click', (e) => {
-      const open = !all().every((d) => d.open);
-      all().forEach((d) => (d.open = open));
-      e.target.textContent = open ? 'Thu gọn tất cả' : 'Mở tất cả';
-    });
-    document.querySelector('.tac-index').addEventListener('click', (e) => {
-      const a = e.target.closest('[data-open]'); if (a) $('#ct-' + a.dataset.open).open = true;
-    });
     document.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-fl]');
+      const t = e.target;
+      if (t.closest('#toggle-all')) {
+        const open = !all().every((d) => d.open);
+        all().forEach((d) => (d.open = open));
+        t.closest('#toggle-all').textContent = open ? 'Thu gọn tất cả' : 'Mở tất cả';
+        return;
+      }
+      const io = t.closest('.tac-index [data-open]'); if (io) { const d = $('#ct-' + io.dataset.open); if (d) d.open = true; return; }
+      const ed = t.closest('[data-ed]');
+      if (ed) {
+        const a = ed.dataset.ed;
+        if (a === 'start') { W = JSON.parse(JSON.stringify(D)); EDIT = true; paint(); }
+        else if (a === 'cancel') { if (confirm('Bỏ các thay đổi chưa UPDATE?')) { EDIT = false; W = null; if (pending) { D = pending; pending = null; } paint(); } }
+        else if (a === 'save') save();
+        return;
+      }
+      const ad = t.closest('[data-add]');
+      if (ad) {
+        structural(() => {
+          const path = ad.dataset.add; let arr = getP(W, path);
+          if (!Array.isArray(arr)) { setP(W, path, []); arr = getP(W, path); }
+          if (path === 'sections') arr.push({ icon: '🎯', title: 'Nhóm chiến thuật mới', sub: 'Tiêu đề phụ', points: ['Nội dung chi tiết'], remember: '' });
+          else if (path === 'pillars' || /\.(diag|fix)$/.test(path)) arr.push(['', '']);
+          else arr.push('');
+        });
+        return;
+      }
+      const dl = t.closest('[data-del]');
+      if (dl) { structural(() => { const ks = dl.dataset.del.split('.'); const i = +ks.pop(); getP(W, ks.join('.')).splice(i, 1); }); return; }
+      const ds = t.closest('[data-delsec]');
+      if (ds && confirm('Xoá cả nhóm chiến thuật này?')) { structural(() => W.sections.splice(+ds.dataset.delsec, 1)); return; }
+      const b = t.closest('[data-fl]');
       if (b) { const a = b.dataset.fl; if (a === 'open') flash(0); else if (a === 'close') flashClose(); else flashGo(a === 'next' ? 1 : -1); return; }
-      const li = e.target.closest('[data-fl-i]'); if (li) flash(+li.dataset.flI);
+      const li = t.closest('[data-fl-i]'); if (li) flash(+li.dataset.flI);
     });
+    // Dán chữ: chỉ lấy chữ thuần
+    document.addEventListener('paste', (e) => {
+      if (!e.target.closest || !e.target.closest('[data-path]')) return;
+      e.preventDefault();
+      document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
+    });
+    window.addEventListener('beforeunload', (e) => { if (EDIT) { e.preventDefault(); e.returnValue = ''; } });
     // mở đúng mục khi vào link #ct-3
     const h = location.hash.match(/^#ct-(\d+)/); if (h && $('#ct-' + h[1])) $('#ct-' + h[1]).open = true;
   }
