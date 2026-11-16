@@ -10,6 +10,11 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()));
     }
 
+    // Tài khoản đội trưởng Team 2 (đăng nhập "Cap" = cap@dao97open.vn).
+    function isCap() {
+      return request.auth != null && request.auth.token.email == 'cap@dao97open.vn';
+    }
+
     // Danh sách BTC: mỗi người chỉ đọc được tài liệu của chính mình, không ai ghi từ web.
     match /admins/{email} {
       allow read: if request.auth != null && request.auth.token.email != null
@@ -27,7 +32,12 @@ service cloud.firestore {
       allow write: if isBTC();
     }
 
-    // Trình VĐV (1-2-3): CHỈ BTC xem và chấm.
+    // Kỹ năng VĐV và đấu pháp của Team 2: CHỈ tài khoản Cap xem và sửa (BTC cũng không xem được).
+    match /cap/{doc} {
+      allow read, write: if isCap();
+    }
+
+    // Trình VĐV (T1–T6, bản gốc): CHỈ BTC xem và chấm.
     match /private/{doc} {
       allow read, write: if isBTC();
     }

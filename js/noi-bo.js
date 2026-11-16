@@ -73,10 +73,17 @@
     $('#lock').hidden = true;
     const app = $('#app'); app.hidden = false;
     document.querySelectorAll('.nav-links, .menu-btn').forEach((el) => (el.hidden = false));
-    app.innerHTML = renderPage();
+    app.innerHTML = `<nav class="nb-tabs" role="tablist"><div class="container">
+        <button role="tab" data-tab="cam-nang">📘 Cẩm nang</button>
+        <button role="tab" data-tab="ky-nang">📝 Kỹ năng VĐV <small>🔒</small></button>
+        <button role="tab" data-tab="dau-phap">♟️ Đấu pháp <small>🔒</small></button>
+      </div></nav>
+      <div class="nb-pane" id="pane-cam-nang">${renderPage()}</div>
+      <div class="nb-pane" id="pane-ky-nang" hidden></div>
+      <div class="nb-pane" id="pane-dau-phap" hidden></div>`;
+    showTab((() => { try { return localStorage.getItem('dao97_nb_tab'); } catch (e) { return null; } })() || 'cam-nang');
     document.title = D.title + ' · ĐÀO97 OPEN';
     bind();
-    tick(); setInterval(tick, 1000);
     startLive();
   }
 
@@ -111,10 +118,6 @@
           <div class="nb-kicker"><span id="team-name">Team</span> · Tài liệu nội bộ</div>
           <h1 class="display grad-text nb-title">${esc(D.title)}</h1>
           <p class="hero-sub neon-text">Đánh chắc hơn · Tự lỗi ít hơn · Phối hợp tốt hơn · Kiên nhẫn hơn đối thủ</p>
-          <div class="pills">
-            <div class="pill"><span class="t">12h30 · 21.11.2026</span><a href="${esc(C.venueMap || '#')}" target="_blank" rel="noopener">📍 ${esc(C.venue || '')} ↗</a></div>
-            <div class="pill"><span class="t" id="cd-title">Khai mạc sau</span><span id="cd-text" style="font-variant-numeric:tabular-nums">—</span></div>
-          </div>
           <div class="actions">
             <button class="btn primary" data-fl="open">🔥 10 điều trước khi vào sân</button>
             <a class="btn ghost" href="#lich-doi">📋 Lịch đấu của đội</a>
@@ -180,14 +183,24 @@
     <section class="block" id="doi-thu">
       <div class="container">
         <div class="section-head"><div><div class="eyebrow">Áp dụng mục 2 · Chọn hướng đánh</div><h2 class="display">Soi đối thủ</h2></div></div>
-        <p class="muted nb-note">Trình do BTC chấm (1 → 6, càng cao càng mạnh). Đây chỉ là tham khảo: <b>vẫn phải quan sát thực tế trên sân</b> để biết ai đỡ bóng yếu hơn.</p>
+        <p class="muted nb-note">Trình do BTC chấm: <b>T1 là trình cao nhất</b>, T6 thấp nhất. Đây chỉ là tham khảo: <b>vẫn phải quan sát thực tế trên sân</b> để biết ai đỡ bóng yếu hơn.</p>
         <div class="chips" id="opp-tabs"></div>
         <div id="opp-body" class="opp-body"></div>
       </div>
     </section>`;
   }
 
+  function showTab(id) {
+    if (!$('#pane-' + id)) id = 'cam-nang';
+    document.querySelectorAll('.nb-pane').forEach((p) => (p.hidden = p.id !== 'pane-' + id));
+    document.querySelectorAll('.nb-tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === id));
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach((a) => (a.hidden = id !== 'cam-nang'));
+    try { localStorage.setItem('dao97_nb_tab', id); } catch (e) { /* bỏ qua */ }
+    document.dispatchEvent(new CustomEvent('nb:tab', { detail: id }));
+  }
   function bind() {
+    $('.nb-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { showTab(b.dataset.tab); scrollTo({ top: 0 }); } });
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach((a) => a.addEventListener('click', () => showTab('cam-nang')));
     const all = () => [...document.querySelectorAll('details.tac')];
     $('#toggle-all').addEventListener('click', (e) => {
       const open = !all().every((d) => d.open);
@@ -229,19 +242,6 @@
   $('#flash').addEventListener('touchstart', (e) => (tx = e.touches[0].clientX), { passive: true });
   $('#flash').addEventListener('touchend', (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 50) flashGo(dx < 0 ? 1 : -1); });
 
-  /* ---------- Đếm ngược ---------- */
-  const startT = new Date(C.eventStart).getTime(), endT = new Date(C.eventEnd).getTime();
-  function tick() {
-    const el = $('#cd-text'); if (!el) return;
-    const now = Date.now();
-    if (now < startT) {
-      let s = Math.floor((startT - now) / 1000);
-      const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
-      s %= 60;
-      el.textContent = `${d} ngày ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    } else { $('#cd-title').textContent = 'Trạng thái'; el.textContent = now < endT ? '🔴 Đang diễn ra' : '🏆 Đã kết thúc'; }
-  }
-
   /* ---------- Dữ liệu giải trực tiếp ---------- */
   let T = null, LV = {}, myRound = null, opp = null, predCache = { sig: null, val: null };
   const ME = () => (D && D.team) || C.defaultFavorite || 'doi2';
@@ -272,21 +272,21 @@
         <div><b>${sign(r.pf - r.pa)}</b><small>HS điểm</small></div>
         <div><b>${started && fr ? pct(fr.p1) : '—'}</b><small>Tỉ lệ vô địch</small></div>
       </div>
-      ${next ? `<div class="nb-next"><span>Lượt tới · Vòng ${next.round}${next.time ? ' · ' + esc(next.time) : ''}${next.court ? ' · Sân ' + esc(next.court) : ''}</span>
+      ${next ? `<div class="nb-next"><span>Lượt tới · Vòng ${next.round}</span>
         <b>gặp ${esc(tn(oppOf(next)))}</b><button class="btn sm ghost" data-opp="${esc(oppOf(next))}">🔎 Soi đối thủ</button></div>`
         : `<div class="nb-next"><b>Đã đấu xong 7 lượt</b></div>`}
       <p class="why">${started ? `Dựa trên ${f.doneSubs}/${f.totalSubs} nội dung đã có kết quả toàn giải.` : 'Chưa có kết quả. Các con số sẽ tự cập nhật khi BTC nhập tỉ số.'}</p>`;
   }
 
   function renderMine() {
-    const ps = players(ME());
+    const ps = players(ME()).slice().sort((x, y) => (x.gender === 'nu') - (y.gender === 'nu') || (LV[x.id] || 9) - (LV[y.id] || 9));
     const a = avg(ps);
     $('#team-name').textContent = tn(ME());
     $('#nb-tag').textContent = tn(ME()).toUpperCase() + ' · NỘI BỘ';
     const tm = PB.team(T, ME()) || {};
     $('#my-roster').innerHTML = ps.length ? `${tm.captain ? `<p class="cap">👑 Đội trưởng: ${esc(tm.captain)}</p>` : ''}
       <ul class="roster nb-roster">${ps.map((p) => `<li class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''} ${badge(p.id)}</li>`).join('')}</ul>
-      ${a ? `<div class="lv-sum">Trình TB <b>${a.toFixed(2)}</b></div>` : ''}` : '<p class="muted">Danh sách VĐV sẽ được cập nhật.</p>';
+      ${a ? `<div class="lv-sum">Trình TB <b>${a.toFixed(2)}</b> <small>(T1 cao nhất)</small></div>` : ''}` : '<p class="muted">Danh sách VĐV sẽ được cập nhật.</p>';
     $('#nb-bxh').innerHTML = PB.renderStandings(T, 'A');
     $('#nb-bxh').querySelectorAll('tbody tr').forEach((tr) => { if ((tr.querySelector('.tn') || {}).textContent === tn(ME())) tr.classList.add('me'); });
 
@@ -310,18 +310,18 @@
     if (!opp) { $('#opp-body').innerHTML = ''; return; }
     const ps = players(opp), mine = players(ME());
     const rated = ps.filter((p) => LV[p.id]);
-    const minLv = rated.length ? Math.min(...rated.map((p) => LV[p.id])) : null;
+    const lowLv = rated.length ? Math.max(...rated.map((p) => LV[p.id])) : null; // T1 cao nhất → số lớn nhất là trình thấp nhất
     const grp = (g) => ps.filter((p) => (g === 'nu' ? p.gender === 'nu' : p.gender !== 'nu')).sort((x, y) => (LV[x.id] || 9) - (LV[y.id] || 9));
-    const li = (p) => `<li class="${p.gender === 'nu' ? 'f' : ''} ${minLv && LV[p.id] === minLv ? 'low' : ''}">${badge(p.id)} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''}${minLv && LV[p.id] === minLv ? ' <small class="tgt">trình thấp nhất đội</small>' : ''}</li>`;
+    const li = (p) => `<li class="${p.gender === 'nu' ? 'f' : ''} ${lowLv && LV[p.id] === lowLv ? 'low' : ''}">${badge(p.id)} ${esc(p.name)}${p.note ? ` <small class="note">· ${esc(p.note)}</small>` : ''}${lowLv && LV[p.id] === lowLv ? ' <small class="tgt">trình thấp nhất đội</small>' : ''}</li>`;
     const m = ties.find((x) => oppOf(x) === opp);
     const s = m ? PB.tieScore(m) : null;
     const A = avg(ps), B = avg(mine);
     const nam = grp('nam'), nu = grp('nu');
     $('#opp-body').innerHTML = `<div class="card opp-card">
-      <div class="opp-head"><div><h3>${esc(tn(opp))}</h3><span class="muted">Vòng ${m ? m.round : '—'}${m && m.time ? ' · ' + esc(m.time) : ''}${m && m.court ? ' · Sân ' + esc(m.court) : ''}${s && s.done ? ` · Tỉ số ${s[m.a === ME() ? 'wa' : 'wb']}–${s[m.a === ME() ? 'wb' : 'wa']}` : ''}</span></div>
-        ${A && B ? `<div class="opp-cmp"><span>Trình TB</span><b>${esc(tn(ME()))} ${B.toFixed(2)}</b><i>vs</i><b>${A.toFixed(2)} ${esc(tn(opp))}</b></div>` : ''}</div>
+      <div class="opp-head"><div><h3>${esc(tn(opp))}</h3><span class="muted">Vòng ${m ? m.round : '—'}${s && s.done ? ` · Tỉ số ${s[m.a === ME() ? 'wa' : 'wb']}–${s[m.a === ME() ? 'wb' : 'wa']}` : ''}</span></div>
+        ${A && B ? `<div class="opp-cmp"><span>Trình TB <small>(số nhỏ = mạnh hơn)</small></span><b>${esc(tn(ME()))} ${B.toFixed(2)}</b><i>vs</i><b>${A.toFixed(2)} ${esc(tn(opp))}</b></div>` : ''}</div>
       ${ps.length ? `<div class="cols">
-        <div class="col"><h4>♂ Nam (${nam.length}) · thấp → cao</h4><ul class="roster opp-roster">${nam.map(li).join('')}</ul></div>
+        <div class="col"><h4>♂ Nam (${nam.length}) · trình cao → thấp</h4><ul class="roster opp-roster">${nam.map(li).join('')}</ul></div>
         <div class="col"><h4>♀ Nữ (${nu.length})</h4><ul class="roster opp-roster">${nu.map(li).join('')}</ul></div>
       </div>` : '<p class="muted">Đội này chưa có danh sách VĐV.</p>'}
       ${T.reserves ? `<p class="muted nb-note">VĐV dự bị toàn giải: ${esc(T.reserves)}</p>` : ''}
@@ -331,6 +331,7 @@
   function renderAll() {
     if (!T || !D) return;
     renderLive(); renderMine(); renderOpp();
+    document.dispatchEvent(new CustomEvent('nb:data', { detail: { T, LV, me: ME() } }));
     const st = $('#live-status');
     st.className = 'pill-status ' + (Store.enabled ? 'ok' : 'off');
     st.textContent = Store.enabled ? 'Trực tiếp' : 'Dữ liệu tĩnh';

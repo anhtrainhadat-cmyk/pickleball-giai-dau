@@ -152,7 +152,7 @@
   /* --- Đội & chấm trình --- */
   function teamsView() {
     const lv = (pid) => ratings[pid] || 0;
-    return `<p class="notice" style="margin-bottom:16px">📊 <b>Trình VĐV (6 nhóm: 1 – 2 – 3 – 4 – 5 – 6)</b> hiện trên <b>trang VĐV</b> (trang chính), <b>không hiện</b> trên trang khán giả <code>xem.html</code>. Bấm số là tự lưu; bấm lại vào mức đang chọn để bỏ chấm.</p>
+    return `<p class="notice" style="margin-bottom:16px">📊 <b>Trình VĐV (6 nhóm: 1 – 2 – 3 – 4 – 5 – 6, T1 là trình cao nhất)</b> hiện trên <b>trang VĐV</b> (trang chính), <b>không hiện</b> trên trang khán giả <code>xem.html</code>. Bấm số là tự lưu; bấm lại vào mức đang chọn để bỏ chấm.</p>
       <div class="team-admin">${T.teams.map((x, ti) => {
         const ps = Array.isArray(x.players) ? x.players : [];
         const rated = ps.filter((p) => lv(p.id));

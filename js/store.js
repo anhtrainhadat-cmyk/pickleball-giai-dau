@@ -5,9 +5,10 @@
  * Firestore:
  *   event/main        { teams[], status, predictionsOpen, subEvents }      — công khai đọc, BTC ghi
  *   matches/{id}      { round, order, a, b, court, time, subs{s0..s3} }    — công khai đọc, BTC ghi
- *   private/ratings   { levels: { playerId: 1|2|3 } }                       — CHỈ BTC đọc/ghi
+ *   private/ratings   { levels: { playerId: 1..6 } }                        — CHỈ BTC đọc/ghi
  *   predictions/{id}  { name, champion, second, third, createdAt }         — ai cũng gửi, BTC xoá
  *   admins/{email}    (tạo trong Firebase Console)                         — danh sách tài khoản BTC
+ *   cap/skills, cap/plan                                                   — CHỈ tài khoản Cap (kỹ năng VĐV, đấu pháp)
  */
 (function () {
   const C = window.SITE_CONFIG || {};
@@ -130,6 +131,7 @@
   Store.phoneToLogin = function (v) {
     v = String(v || '').trim();
     if (v.includes('@')) return v.toLowerCase();
+    if (/[a-z]/i.test(v)) return v.toLowerCase().replace(/\s+/g, '') + '@' + Store.PHONE_DOMAIN; // tên tài khoản, VD "Cap"
     let d = v.replace(/\D/g, '');
     if (d.startsWith('84') && d.length >= 11) d = '0' + d.slice(2);
     return d + '@' + Store.PHONE_DOMAIN;
@@ -184,6 +186,12 @@
     if (!Store.enabled) return cb({});
     db.doc('event/ratings').onSnapshot((s) => cb((s.exists && s.data().levels) || {}), onErr);
   };
+  /* ---------- Khu vực đội trưởng (cap/*) — chỉ tài khoản Cap đọc/ghi ---------- */
+  Store.CAP_EMAIL = 'cap@' + Store.PHONE_DOMAIN;
+  Store.onUser = async (cb) => { await Store.init(); if (!Store.enabled) return cb(null); auth.onAuthStateChanged(cb); };
+  Store.watchCap = (name, cb, onErr) => db.doc('cap/' + name).onSnapshot((s) => cb(s.exists ? s.data() : {}), onErr);
+  Store.setCap = (name, data) => db.doc('cap/' + name).set(data, { merge: true });
+  Store.del = () => firebase.firestore.FieldValue.delete();
   Store.deletePrediction = (id) => db.doc('predictions/' + id).delete();
 
   window.Store = Store;

@@ -1,6 +1,6 @@
 # Kích hoạt hệ thống BTC (Firebase — miễn phí)
 
-Firebase lưu: kết quả trận đấu (cập nhật trực tiếp cho khán giả), danh sách đội & VĐV, **trình VĐV 1–6 (chỉ BTC xem)**, dự đoán của khán giả và tài khoản đăng nhập BTC.
+Firebase lưu: kết quả trận đấu (cập nhật trực tiếp cho khán giả), danh sách đội & VĐV, **trình VĐV T1–T6 (T1 cao nhất)**, dự đoán của khán giả và tài khoản đăng nhập BTC.
 Dùng gói **Spark (miễn phí)**, không cần thẻ ngân hàng. Làm 1 lần, khoảng 10 phút.
 
 ## 1. Tạo dự án
@@ -50,3 +50,9 @@ Trong Firestore tab **Data**:
 ## Hạn mức miễn phí
 Gói Spark: 50.000 lượt đọc/ngày, 20.000 lượt ghi/ngày — đủ cho giải khoảng vài trăm người xem.
 Website đã bật bộ nhớ đệm và chỉ tải dự đoán khi người xem cuộn tới, để tiết kiệm lượt đọc.
+
+## Tài khoản đội trưởng "Cap" (trang nội bộ Team 2)
+Tab **Kỹ năng VĐV** và **Đấu pháp** trên trang nội bộ chỉ tài khoản Cap xem được (BTC cũng không xem được).
+1. **Authentication › Users › Add user**: Email `cap@dao97open.vn`, Password tuỳ chọn (≥ 6 ký tự) → **Add user**.
+2. **Firestore › Rules**: dán lại toàn bộ file [`firestore.rules`](firestore.rules) mới → **Publish** (có thêm phần `cap`).
+3. Trên trang nội bộ, mở tab Kỹ năng VĐV hoặc Đấu pháp → đăng nhập: tài khoản `Cap`, mật khẩu vừa đặt.
