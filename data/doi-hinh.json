@@ -1,5 +1,5 @@
 {
- "version": "2026-11-17",
+ "version": "2026-11-19",
  "reserves": "Mạnh Tùng, Thành Sơn, Mai Trang Dung",
  "teams": [
   {
@@ -131,7 +131,7 @@
     },
     {
      "id": "doi3-6",
-     "name": "Hải Lê",
+     "name": "Sơn Bờm",
      "gender": "nam"
     },
     {
@@ -232,7 +232,7 @@
     },
     {
      "id": "doi5-7",
-     "name": "Thuỷ Tiên",
+     "name": "LeNa",
      "gender": "nu"
     },
     {
