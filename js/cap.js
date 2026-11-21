@@ -345,7 +345,7 @@
   function renderTable() {
     const ties = myTies(), S = subs();
     const short = (l) => l.replace(/Đôi nam nữ/i, 'ĐNN').replace(/Đôi nam/i, 'ĐN').replace(/\s+/g, '');
-    const cell = (pid, side, key, i, opp) => `<td><button class="tcell ${side} ${pid && isF(pid) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
+    const cell = (pid, side, key, i, opp, fem) => `<td><button class="tcell ${side} ${fem || (pid && isF(pid)) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
     return `${bar('Đấu pháp', 'Bấm vào tên để chọn / đổi VĐV hoặc ghi chú')}${viewTabs()}
       ${ties.map((m) => {
         const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
@@ -356,7 +356,7 @@
             const sub = (m.subs || []).find((x) => x.key === s.key) || {}, r = PB.gameResult(sub.games);
             const res = r ? `<small class="${r.winner === (mine ? 'a' : 'b') ? 'up' : 'down'}">${mine ? r.pa : r.pb}–${mine ? r.pb : r.pa}</small>` : '';
             return [0, 1].map((k) => `<tr class="${k ? 'r2' : 'r1'}">${k ? '' : `<td rowspan="2" class="tn-c"><b>${i + 1}</b><small>${esc(short(s.label))}</small>${res}</td>`}
-              ${cell((P.us[s.key] || [])[k], 'us', s.key, k, opp)}${cell((P.them[s.key] || [])[k], 'them', s.key, k, opp)}</tr>`).join('');
+              ${cell((P.us[s.key] || [])[k], 'us', s.key, k, opp, s.mixed && k === 1)}${cell((P.them[s.key] || [])[k], 'them', s.key, k, opp, s.mixed && k === 1)}</tr>`).join('');
           }).join('')}</tbody></table></div>`;
       }).join('')}`;
   }
