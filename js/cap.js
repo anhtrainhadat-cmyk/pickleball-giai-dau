@@ -28,14 +28,14 @@
     [Store.BAU_EMAIL]: { label: 'BAU', team: 'doi3', plan: 'plan-bau', forcePw: true }
   };
   let user = null, T = null, LV = {}, ME = 'doi2', SKL = {}, PLAN = {}, unsub = [], skTeam = null, dpOpp = null, tab = null, err = '';
-  let mustPw = false, pwOpen = false, pop = null, NOTES = {}, sheet = null;
+  let mustPw = false, pwOpen = false, pop = null, NOTES = {}, COLORS = {}, sheet = null;
   let dpView = (() => { try { return localStorage.getItem('dao97_dpview'); } catch (e) { return null; } })() || 'bang';
 
   /* ---------- Dữ liệu từ trang nội bộ ---------- */
   document.addEventListener('nb:data', (e) => { ({ T, LV } = e.detail); render(); });
   document.addEventListener('nb:tab', (e) => { tab = e.detail; closePop(); closeSheet(); render(); });
   Store.onUser(async (u) => {
-    user = u; err = ''; mustPw = false; pwOpen = false; SKL = {}; PLAN = {}; NOTES = {};
+    user = u; err = ''; mustPw = false; pwOpen = false; SKL = {}; PLAN = {}; NOTES = {}; COLORS = {};
     unsub.forEach((f) => f()); unsub = [];
     const A = acct();
     if (A) {
@@ -43,7 +43,7 @@
       if (A.forcePw) { try { mustPw = !(await Store.getAcct(u.email)).pwChanged; } catch (er) { mustPw = true; } }
       const fail = (er) => { err = /permission/i.test(er.message) ? 'Firebase chưa cho phép tài khoản này đọc dữ liệu: cần dán lại luật bảo mật mới (firestore.rules).' : er.message; render(); };
       unsub.push(Store.watchCap('skills', (d) => { SKL = d.s || {}; render(); }, fail));
-      unsub.push(Store.watchCap(A.plan, (d) => { PLAN = d.r || {}; NOTES = d.n || {}; render(); if (sheet) drawSheet(); }, fail));
+      unsub.push(Store.watchCap(A.plan, (d) => { PLAN = d.r || {}; NOTES = d.n || {}; COLORS = d.c || {}; render(); if (sheet) drawSheet(); }, fail));
     }
     render();
   });
@@ -265,7 +265,7 @@
   // Nút VĐV: bấm mở cửa sổ ghi chú + đổi người
   const chip = (pid, side, key, i) => {
     const has = NOTES[pid] && NOTES[pid].trim();
-    return `<button class="pchip ${side} ${pid && isF(pid) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}">
+    return `<button class="pchip ${side} ${pid && isF(pid) ? 'f' : ''} ${pid && COLORS[pid] ? 'c-' + COLORS[pid] : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}">
       ${pid ? `${lvTag(pid)}<span class="pn">${esc(pName(pid))}</span>${has ? '<span class="pnote" title="Có ghi chú">📝</span>' : ''}` : '<span class="pn muted">＋ Chọn VĐV</span>'}</button>`;
   };
   function liveSub(m, s) {
@@ -345,7 +345,7 @@
   function renderTable() {
     const ties = myTies(), S = subs();
     const short = (l) => l.replace(/Đôi nam nữ/i, 'ĐNN').replace(/Đôi nam/i, 'ĐN').replace(/\s+/g, '');
-    const cell = (pid, side, key, i, opp, fem) => `<td><button class="tcell ${side} ${fem || (pid && isF(pid)) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
+    const cell = (pid, side, key, i, opp, fem) => `<td><button class="tcell ${side} ${fem || (pid && isF(pid)) ? 'f' : ''} ${pid && COLORS[pid] ? 'c-' + COLORS[pid] : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
     return `${bar('Đấu pháp', 'Bấm vào tên để chọn / đổi VĐV hoặc ghi chú')}${viewTabs()}
       ${ties.map((m) => {
         const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
@@ -389,6 +389,8 @@
       <div class="mdl-h"><div><small>${info ? esc(tn(info.team)) : ''}${side ? ' · ' + esc(subs().find((x) => x.key === key).label) : ''}</small>
         <h3>${p ? `${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)} ${lvTag(p.id)}` : 'Chọn VĐV'}</h3></div><button class="mdl-x" data-shx aria-label="Đóng">✕</button></div>
       ${p ? `<div class="sk-mini">${SK.map(([k, n]) => `<span class="sk-v" data-v="${sk(p.id, k) || ''}">${esc(n)}: ${sk(p.id, k) ? LVN[sk(p.id, k)] : '–'}</span>`).join('')}</div>
+        <div class="pp-h">🎨 Tô màu tên</div>
+        <div class="col-pick">${[['r', '🔴 Đỏ'], ['g', '🟢 Xanh lá'], ['', 'Bỏ màu']].map(([c, n]) => `<button class="cp ${c ? 'cp-' + c : ''} ${(COLORS[p.id] || '') === c ? 'on' : ''}" data-color="${c}" data-cpid="${esc(p.id)}">${n}</button>`).join('')}</div>
         <div class="pp-h">📝 Ghi chú về ${esc(p.name)}</div>
         <textarea class="note-in" rows="4" placeholder="VD: thuận tay trái, hay lốp khi bị ép, drive mạnh tay thuận…">${esc(keepNote != null ? keepNote : NOTES[p.id] || '')}</textarea>
         <div class="mdl-act"><button class="btn primary" data-note="${esc(p.id)}">💾 Lưu ghi chú</button></div>` : ''}
@@ -523,6 +525,13 @@
         NOTES = { ...NOTES, [pid]: v };
         Store.setCap(acct().plan, { n: { [pid]: v || Store.del() } }).then(() => toast('Đã lưu ghi chú')).catch((er) => toast('Chưa lưu được: ' + er.message));
         render(); return;
+      }
+      const cb = t.closest('[data-color]');
+      if (cb) {
+        const pid = cb.dataset.cpid, c = cb.dataset.color;
+        COLORS = { ...COLORS, [pid]: c || undefined };
+        Store.setCap(acct().plan, { c: { [pid]: c || Store.del() } }).catch((er) => toast('Chưa lưu được: ' + er.message));
+        render(); drawSheet(); return;
       }
       const pin = t.closest('.cap-sheet [data-pnote]'); if (pin) { sheet = { pid: pin.dataset.pnote }; drawSheet(); return; }
       if (t.closest('.cap-sheet')) return;

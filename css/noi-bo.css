@@ -409,3 +409,10 @@ table.vt-t { width: 100%; border-collapse: collapse; table-layout: fixed; backgr
 .th-team { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
 .vt-t th .th-team { color: var(--cyan); }
 .pp .fname { color: #fff200; font-weight: 800; }
+/* Tô màu tên VĐV (Đấu pháp) */
+.tcell.c-r, .tcell.c-r.f, .pchip.c-r .pn { color: #ff4d5e !important; font-weight: 800; text-shadow: none; }
+.tcell.c-g, .tcell.c-g.f, .pchip.c-g .pn { color: #3ee07a !important; font-weight: 800; text-shadow: none; }
+.col-pick { display: flex; gap: 6px; flex-wrap: wrap; }
+.cp { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-2); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; }
+.cp-r { color: #ff4d5e; } .cp-g { color: #3ee07a; }
+.cp.on { outline: 2px solid #fff; outline-offset: 1px; }
