@@ -351,7 +351,7 @@
         const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
         return `<div class="vt">
           <div class="vt-h"><b>Vòng ${m.round}</b><span>${esc(tn(ME))} – ${esc(tn(opp))}</span>${ts.done ? `<em class="${ts.complete ? (ts.winner === (mine ? 'a' : 'b') ? 'up' : 'down') : ''}">${ts.complete ? '🏁' : '🔴'} ${mine ? ts.wa : ts.wb}–${mine ? ts.wb : ts.wa}</em>` : ''}</div>
-          <table class="vt-t"><thead><tr><th>Trận</th><th>${esc(tn(ME))}</th><th>${esc(tn(opp))}</th></tr></thead>
+          <table class="vt-t"><thead><tr><th>Trận</th><th><button class="th-team" data-teaminfo="${esc(ME)}" data-opp="${esc(opp)}">${esc(tn(ME))} ▾</button></th><th><button class="th-team" data-teaminfo="${esc(opp)}" data-opp="${esc(opp)}">${esc(tn(opp))} ▾</button></th></tr></thead>
           <tbody>${S.map((s, i) => {
             const sub = (m.subs || []).find((x) => x.key === s.key) || {}, r = PB.gameResult(sub.games);
             const res = r ? `<small class="${r.winner === (mine ? 'a' : 'b') ? 'up' : 'down'}">${mine ? r.pa : r.pb}–${mine ? r.pb : r.pa}</small>` : '';
@@ -366,6 +366,7 @@
   function closeSheet() { sheet = null; const el = $('.cap-sheet'); if (el) el.remove(); document.body.style.overflow = ''; }
   function findPlayer(pid) { for (const t of T.teams) for (const p of t.players || []) if (p.id === pid) return { p, team: t.id }; return null; }
   function drawSheet() {
+    if (sheet.team) return drawTeamSheet();
     let el = $('.cap-sheet');
     const keepNote = el && $('textarea', el) ? $('textarea', el).value : null;
     if (!el) { el = document.createElement('div'); el.className = 'mdl-bg cap-sheet'; document.body.appendChild(el); document.body.style.overflow = 'hidden'; }
@@ -392,6 +393,27 @@
         <textarea class="note-in" rows="4" placeholder="VD: thuận tay trái, hay lốp khi bị ép, drive mạnh tay thuận…">${esc(keepNote != null ? keepNote : NOTES[p.id] || '')}</textarea>
         <div class="mdl-act"><button class="btn primary" data-note="${esc(p.id)}">💾 Lưu ghi chú</button></div>` : ''}
       ${swap}
+      <div class="mdl-act"><button class="btn ghost" data-shx>Đóng</button></div></div>`;
+  }
+  // Danh sách VĐV của một đội (bấm tên đội ở đầu bảng)
+  function drawTeamSheet() {
+    let el = $('.cap-sheet');
+    if (!el) { el = document.createElement('div'); el.className = 'mdl-bg cap-sheet'; document.body.appendChild(el); document.body.style.overflow = 'hidden'; }
+    const { team, opp } = sheet;
+    const m = myTies().find((x) => oppOf(x) === opp);
+    const P = planFor(opp), L = team === ME ? P.us : P.them;
+    const where = {}; Object.entries(L).forEach(([k, v]) => (v || []).forEach((x) => (where[x] = k)));
+    const ps = players(team).slice().sort(byLevel);
+    const tm = PB.team(T, team) || {};
+    const row = (p) => {
+      const k = where[p.id], lab = k ? subs().find((x) => x.key === k).label : '';
+      return `<button class="pp" data-pnote="${esc(p.id)}"><span class="${p.gender === 'nu' ? 'fname' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)} ${lvTag(p.id)}${NOTES[p.id] ? ' 📝' : ''}</span><small>${k ? esc(lab) : 'chưa xếp'}</small></button>`;
+    };
+    el.innerHTML = `<div class="mdl" role="dialog" aria-modal="true">
+      <div class="mdl-h"><div><small>Vòng ${m ? m.round : ''} · ${ps.length} VĐV${tm.captain ? ' · ĐT: ' + esc(tm.captain) : ''}</small><h3>${esc(tn(team))}</h3></div><button class="mdl-x" data-shx aria-label="Đóng">✕</button></div>
+      <div class="pp-h">Nam</div><div class="pp-list">${ps.filter(isMaleSlot).map(row).join('')}</div>
+      <div class="pp-h">Nữ</div><div class="pp-list">${ps.filter((p) => !isMaleSlot(p)).map(row).join('')}</div>
+      <p class="muted mdl-note">Bấm tên để xem kỹ năng và ghi chú. Cột phải là nội dung VĐV đang được xếp ở vòng này.</p>
       <div class="mdl-act"><button class="btn ghost" data-shx>Đóng</button></div></div>`;
   }
   function applySwap(np) {
@@ -502,8 +524,10 @@
         Store.setCap(acct().plan, { n: { [pid]: v || Store.del() } }).then(() => toast('Đã lưu ghi chú')).catch((er) => toast('Chưa lưu được: ' + er.message));
         render(); return;
       }
+      const pin = t.closest('.cap-sheet [data-pnote]'); if (pin) { sheet = { pid: pin.dataset.pnote }; drawSheet(); return; }
       if (t.closest('.cap-sheet')) return;
     }
+    const ti = t.closest('[data-teaminfo]'); if (ti) { openSheet({ team: ti.dataset.teaminfo, opp: ti.dataset.opp }); return; }
     const pc = t.closest('[data-ps]'); if (pc) { openSheet({ pid: pc.dataset.pid || null, side: pc.dataset.ps, key: pc.dataset.sub, i: +pc.dataset.i, opp: pc.dataset.opp || null }); return; }
     const vw = t.closest('[data-dpview]'); if (vw) { dpView = vw.dataset.dpview; try { localStorage.setItem('dao97_dpview', dpView); } catch (er) { /* bỏ qua */ } render(); return; }
     const pn = t.closest('[data-pnote]'); if (pn) { openSheet({ pid: pn.dataset.pnote }); return; }

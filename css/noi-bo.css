@@ -406,3 +406,6 @@ table.vt-t { width: 100%; border-collapse: collapse; table-layout: fixed; backgr
 /* Tên VĐV nữ: vàng sáng */
 .tcell.f, .tcell.us.f, .pchip.f .pn, .pname.f, .sk-table td.l .f, .roster .f, .opp-roster li.f, .pp-list .f { color: #ffe14d !important; }
 .vt-t .tcell.f { color: #fff200 !important; font-weight: 800; text-shadow: 0 0 10px rgba(255, 242, 0, .35); }
+.th-team { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.vt-t th .th-team { color: var(--cyan); }
+.pp .fname { color: #fff200; font-weight: 800; }
