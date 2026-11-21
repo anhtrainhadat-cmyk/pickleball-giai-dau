@@ -156,6 +156,7 @@
           <div class="actions">
             <button class="btn primary" data-fl="open">🔥 10 điều trước khi vào sân</button>
             <a class="btn ghost" href="#lich-doi">📋 Lịch đấu của đội</a>
+            <a class="btn ghost" href="index.html#vinh-danh" target="_blank" rel="noopener">🔴 Kết quả trực tiếp ↗</a>
             ${canEdit && !EDIT ? '<button class="btn neon" data-ed="start">✏️ Sửa cẩm nang</button>' : ''}
           </div>
           ${pending && !EDIT ? '' : ''}

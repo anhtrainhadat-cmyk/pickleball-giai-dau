@@ -418,3 +418,5 @@ table.vt-t { width: 100%; border-collapse: collapse; table-layout: fixed; backgr
 .cp.on { outline: 2px solid #fff; outline-offset: 1px; }
 .opt-all { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; font-size: .86rem; color: var(--muted); }
 .opt-all b { color: var(--gold); }
+.live-links { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
+.live-links .btn { padding: 6px 12px; font-size: .8rem; }

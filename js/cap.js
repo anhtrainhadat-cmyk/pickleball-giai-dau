@@ -234,6 +234,7 @@
   }
   const bar = (title, eyebrow) => `<div class="section-head"><div><div class="eyebrow">${eyebrow}</div><h2 class="display">${title}</h2></div>
     <span class="cap-who">🔓 ${esc(acct().label)} · <button class="linkbtn" data-cap="pw">🔑 Đổi mật khẩu</button> · <button class="linkbtn" data-cap="out">Đăng xuất</button></span></div>
+    <div class="live-links"><a class="btn sm neon" href="index.html#vinh-danh" target="_blank" rel="noopener">🔴 Kết quả trực tiếp ↗</a><a class="btn sm ghost" href="index.html#bxh" target="_blank" rel="noopener">📊 Bảng xếp hạng ↗</a><a class="btn sm ghost" href="index.html#lich" target="_blank" rel="noopener">🗓 Lịch & kết quả 7 vòng ↗</a></div>
     ${err ? `<p class="notice">⚠️ ${esc(err)}</p>` : ''}`;
 
   function teamOrder() {
