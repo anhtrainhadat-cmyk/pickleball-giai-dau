@@ -28,13 +28,13 @@
     [Store.BAU_EMAIL]: { label: 'BAU', team: 'doi3', plan: 'plan-bau', forcePw: true }
   };
   let user = null, T = null, LV = {}, ME = 'doi2', SKL = {}, PLAN = {}, unsub = [], skTeam = null, dpOpp = null, tab = null, err = '';
-  let mustPw = false, pwOpen = false, pop = null;
+  let mustPw = false, pwOpen = false, pop = null, NOTES = {}, sheet = null;
 
   /* ---------- Dữ liệu từ trang nội bộ ---------- */
   document.addEventListener('nb:data', (e) => { ({ T, LV } = e.detail); render(); });
-  document.addEventListener('nb:tab', (e) => { tab = e.detail; closePop(); render(); });
+  document.addEventListener('nb:tab', (e) => { tab = e.detail; closePop(); closeSheet(); render(); });
   Store.onUser(async (u) => {
-    user = u; err = ''; mustPw = false; pwOpen = false; SKL = {}; PLAN = {};
+    user = u; err = ''; mustPw = false; pwOpen = false; SKL = {}; PLAN = {}; NOTES = {};
     unsub.forEach((f) => f()); unsub = [];
     const A = acct();
     if (A) {
@@ -42,7 +42,7 @@
       if (A.forcePw) { try { mustPw = !(await Store.getAcct(u.email)).pwChanged; } catch (er) { mustPw = true; } }
       const fail = (er) => { err = /permission/i.test(er.message) ? 'Firebase chưa cho phép tài khoản này đọc dữ liệu: cần dán lại luật bảo mật mới (firestore.rules).' : er.message; render(); };
       unsub.push(Store.watchCap('skills', (d) => { SKL = d.s || {}; render(); }, fail));
-      unsub.push(Store.watchCap(A.plan, (d) => { PLAN = d.r || {}; render(); }, fail));
+      unsub.push(Store.watchCap(A.plan, (d) => { PLAN = d.r || {}; NOTES = d.n || {}; render(); if (sheet) drawSheet(); }, fail));
     }
     render();
   });
@@ -232,7 +232,7 @@
       <p class="muted sk-swipe">← Vuốt ngang bảng để xem đủ 7 kỹ năng →</p>
       <div class="table-wrap"><table class="sk-table">
         <thead><tr><th class="l">VĐV</th><th>Trình</th>${SK.map(([, n]) => `<th>${n}</th>`).join('')}</tr></thead>
-        <tbody>${ps.map((p) => `<tr><td class="l"><span class="${p.gender === 'nu' ? 'f' : ''}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}</span></td><td>${lvTag(p.id)}</td>
+        <tbody>${ps.map((p) => `<tr><td class="l"><button class="pname ${p.gender === 'nu' ? 'f' : ''}" data-pnote="${esc(p.id)}">${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)}${NOTES[p.id] ? ' 📝' : ''}</button></td><td>${lvTag(p.id)}</td>
           ${SK.map(([k]) => { const v = sk(p.id, k); return `<td><button class="sk-cell" data-v="${v || ''}" data-pid="${esc(p.id)}" data-k="${k}" aria-haspopup="menu" aria-label="${esc(SKN[k])} – ${esc(p.name)}: ${v ? LVN[v] : 'chưa chọn'}">${v ? LVN[v] : '＋'}</button></td>`; }).join('')}</tr>`).join('')}
         </tbody></table></div></div>`;
   }
@@ -260,6 +260,22 @@
     Object.values(L).flat().forEach((x) => { if (seen[x]) out.add(x); seen[x] = 1; });
     return [...out];
   }
+  // Nút VĐV: bấm mở cửa sổ ghi chú + đổi người
+  const chip = (pid, side, key, i) => {
+    const has = NOTES[pid] && NOTES[pid].trim();
+    return `<button class="pchip ${side}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}">
+      ${pid ? `${lvTag(pid)}<span class="pn">${esc(pName(pid))}</span>${has ? '<span class="pnote" title="Có ghi chú">📝</span>' : ''}` : '<span class="pn muted">＋ Chọn VĐV</span>'}</button>`;
+  };
+  function liveSub(m, s) {
+    const sub = (m.subs || []).find((x) => x.key === s.key); if (!sub) return '';
+    const mine = m.a === ME, r = PB.gameResult(sub.games);
+    const ours = mine ? sub.pa : sub.pb, theirs = mine ? sub.pb : sub.pa;
+    if (!r && !ours && !theirs) return '';
+    const sc = r ? (mine ? `${r.pa}–${r.pb}` : `${r.pb}–${r.pa}`) : '';
+    const won = r && r.winner === (mine ? 'a' : 'b');
+    return `<div class="dp-live ${r ? (won ? 'win' : 'lose') : ''}"><span class="lv-tag">${r ? (won ? '✅ Thực tế: Thắng' : '❌ Thực tế: Thua') : '🔴 Đang đấu'}</span>
+      <span>${esc(ours || '?')}</span><b>${sc || 'vs'}</b><span>${esc(theirs || '?')}</span></div>`;
+  }
   function renderPlan() {
     const ties = myTies();
     if (!dpOpp || !ties.some((m) => oppOf(m) === dpOpp)) { const n = ties.find((m) => !PB.tieScore(m).complete); dpOpp = oppOf(n || ties[0]); }
@@ -270,46 +286,103 @@
     const sumTeam = (id) => players(id).reduce((s, p) => s + str(p.id), 0);
     const diff = sumTeam(ME) - sumTeam(dpOpp);
     const miss = [ME, dpOpp].filter((id) => skCount(id) < players(id).length * SK.length);
-    return `${bar('Đấu pháp', 'Chỉ đội trưởng xem · tính theo trình + kỹ năng')}
+    const ts = PB.tieScore(m), mine = m.a === ME;
+    const tieLive = ts.done ? `<div class="dp-tie ${ts.complete ? (ts.winner === (mine ? 'a' : 'b') ? 'win' : 'lose') : ''}">
+        <span>${ts.complete ? '🏁 Kết quả lượt' : '🔴 Trực tiếp'} · ${ts.done}/4 nội dung</span>
+        <b>${esc(tn(ME))} ${mine ? ts.wa : ts.wb} – ${mine ? ts.wb : ts.wa} ${esc(tn(dpOpp))}</b></div>` : '';
+    return `${bar('Đấu pháp', 'Chỉ đội trưởng xem · bấm tên VĐV để ghi chú / đổi người')}
       <div class="chips cap-teams">${ties.map((x) => {
-        const Q = planFor(oppOf(x));
-        return `<button class="chip ${oppOf(x) === dpOpp ? 'active' : ''}" data-dpo="${esc(oppOf(x))}">V${x.round} · ${esc(tn(oppOf(x)))} <small>≈ ${exp(Q.us, Q.them).toFixed(1)}/4</small></button>`;
+        const Q = planFor(oppOf(x)), t2 = PB.tieScore(x), mi = x.a === ME;
+        return `<button class="chip ${oppOf(x) === dpOpp ? 'active' : ''}" data-dpo="${esc(oppOf(x))}">V${x.round} · ${esc(tn(oppOf(x)))} <small>${t2.done ? `${t2.complete ? '🏁' : '🔴'} ${mi ? t2.wa : t2.wb}–${mi ? t2.wb : t2.wa}` : `≈ ${exp(Q.us, Q.them).toFixed(1)}/4`}</small></button>`;
       }).join('')}</div>
-      ${miss.length ? `<p class="notice">📝 Chưa nhập đủ kỹ năng của ${miss.map((id) => `<button class="linkbtn" data-goskill="${esc(id)}">${esc(tn(id))}</button>`).join(', ')}: đấu pháp đang dựa nhiều vào trình. Nhập thêm ở tab <b>Kỹ năng VĐV</b> để chính xác hơn.</p>` : ''}
-      <div class="dp-grid">
-        <div class="card"><h3 class="card-h">🔎 Đặc điểm ${esc(tn(dpOpp))} <small class="muted">· Vòng ${m.round}</small></h3>
-          <ul class="dp-notes">${teamNotes(dpOpp).map((x) => `<li>${x}</li>`).join('')}</ul>
-          <p class="dp-cmp">Tương quan sức cả đội: <b class="${diff >= 0 ? 'up' : 'down'}">${tn(ME)} ${diff >= 0.5 ? 'nhỉnh hơn' : diff <= -0.5 ? 'yếu hơn' : 'ngang'}</b> (${diff >= 0 ? '+' : ''}${diff.toFixed(1)})</p></div>
-        <div class="card dp-sum"><h3 class="card-h">📈 Dự kiến lượt này</h3>
-          <div class="nb-stats"><div><b>${e.toFixed(1)}</b><small>nội dung thắng /4</small></div><div><b>${pct(d[3] + d[4])}</b><small>thắng lượt (≥3)</small></div>
-            <div><b>${pct(d[2])}</b><small>hoà 2–2</small></div><div><b>${pct(d[0] + d[1])}</b><small>thua lượt</small></div></div>
-          <p class="muted">Xếp hạng theo hiệu số nội dung, nên đội hình được tối ưu để thắng nhiều nội dung nhất (đôi khi chấp nhận 1 nội dung khó).</p></div>
-      </div>
-
+      ${tieLive}
       <div class="card dp-lineup">
         <div class="dp-tools">
-          <h3 class="card-h">⚔️ Kịch bản đưa quân</h3>
-          <label class="dp-scen">Đối thủ: <select data-scen>${Object.entries(SCEN).map(([k, n]) => `<option value="${k}" ${P.scen === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
-          ${P.editedThem ? '<span class="tag-ed">đối thủ: đã chỉnh tay</span>' : ''}
-          <span class="tag-ed ${P.editedUs ? '' : 'auto'}">${esc(tn(ME))}: ${P.editedUs ? 'đã chỉnh tay / cố định' : 'tự động tối ưu'}</span>
-          <button class="btn sm ghost" data-dp="reset-them">↺ Về kịch bản dự đoán</button>
+          <h3 class="card-h">⚔️ Vòng ${m.round}: ${esc(tn(ME))} gặp ${esc(tn(dpOpp))}</h3>
+          <label class="dp-scen">Đối thủ xếp: <select data-scen>${Object.entries(SCEN).map(([k, n]) => `<option value="${k}" ${P.scen === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        </div>
+        <div class="dp-tools2">
+          <span class="tag-ed ${P.editedThem ? '' : 'auto'}">${esc(tn(dpOpp))}: ${P.editedThem ? 'đã chỉnh tay' : 'dự đoán'}</span>
+          <span class="tag-ed ${P.editedUs ? '' : 'auto'}">${esc(tn(ME))}: ${P.editedUs ? 'đã chỉnh tay' : 'tự động tối ưu'}</span>
+          <button class="btn sm ghost" data-dp="reset-them">↺ Đối thủ về dự đoán</button>
           <button class="btn sm primary" data-dp="opt">⚡ Tối ưu ${esc(tn(ME))}</button>
         </div>
         ${dupT.length || dupU.length ? `<p class="notice danger">⚠️ ${[...dupT, ...dupU].map((x) => esc(pName(x))).join(', ')} đang được xếp 2 nội dung (điều lệ: mỗi VĐV tối đa 1 nội dung/vòng).</p>` : ''}
+        <div class="dp-head"><span>${esc(tn(ME))}</span><span></span><span>${esc(tn(dpOpp))}</span></div>
         <div class="dp-subs">${subs().map((s, i) => {
           const p = winP(P.us[s.key] || [], P.them[s.key] || []);
+          const tips = subTips(P.us[s.key] || [], P.them[s.key] || []);
           return `<div class="dp-sub">
-            <div class="dp-sh"><b>${i + 1} · ${esc(s.label)}</b><span class="dp-p ${p >= 0.55 ? 'up' : p <= 0.45 ? 'down' : ''}">Thắng ${pct(p)}</span></div>
+            <div class="dp-sh"><b>${i + 1} · ${esc(s.label)}</b>
+              <button class="lockbtn ${P.lock[s.key] ? 'on' : ''}" data-lockbtn="${s.key}" title="Đã báo cặp / giữ cố định khi tối ưu">${P.lock[s.key] ? '🔒 Đã chốt' : '🔓 Chốt cặp'}</button>
+              <span class="dp-p ${p >= 0.55 ? 'up' : p <= 0.45 ? 'down' : ''}">${pct(p)}</span></div>
             <div class="dp-bar"><i style="width:${p * 100}%"></i></div>
-            <div class="dp-vs">
-              <div class="dp-side them"><small>${esc(tn(dpOpp))}</small>${[0, 1].map((k) => sel(dpOpp, s, 'them', k, (P.them[s.key] || [])[k], P.them)).join('')}</div>
-              <div class="dp-side us"><small>${esc(tn(ME))} <label class="dp-lock" title="Đã báo cặp / giữ cố định khi tối ưu"><input type="checkbox" data-lock="${s.key}" ${P.lock[s.key] ? 'checked' : ''}> giữ</label></small>${[0, 1].map((k) => sel(ME, s, 'us', k, (P.us[s.key] || [])[k], P.us)).join('')}</div>
+            <div class="dp-vs2">
+              <div class="dp-col us">${[0, 1].map((k) => chip((P.us[s.key] || [])[k], 'us', s.key, k)).join('')}</div>
+              <div class="vs">VS</div>
+              <div class="dp-col them">${[0, 1].map((k) => chip((P.them[s.key] || [])[k], 'them', s.key, k)).join('')}</div>
             </div>
-            <ul class="dp-tips">${subTips(P.us[s.key] || [], P.them[s.key] || []).map((x) => `<li>${x}</li>`).join('')}</ul>
+            ${liveSub(m, s)}
+            ${tips.length ? `<details class="dp-tipbox"><summary>💡 Lưu ý đấu pháp (${tips.length})</summary><ul class="dp-tips">${tips.map((x) => `<li>${x}</li>`).join('')}</ul></details>` : ''}
           </div>`;
         }).join('')}</div>
-        <div class="callout rule-c">📜 <b>Báo cặp zic-zac:</b> ở nội dung mình được <b>báo sau</b>, chọn đúng cặp đối phương vừa báo trong ô bên trái, tích <b>“giữ”</b> các nội dung đã báo, rồi bấm <b>⚡ Tối ưu</b> để có cặp đối phó tốt nhất. Ở nội dung mình <b>báo trước</b>, nên giữ cặp chắc chắn, ít điểm yếu.</div>
-      </div>`;
+      </div>
+
+      <div class="dp-grid">
+        <div class="card dp-sum"><h3 class="card-h">📈 Dự kiến lượt này</h3>
+          <div class="nb-stats"><div><b>${e.toFixed(1)}</b><small>nội dung thắng /4</small></div><div><b>${pct(d[3] + d[4])}</b><small>thắng 3–1 / 4–0</small></div>
+            <div><b>${pct(d[2])}</b><small>2–2 (xét điểm)</small></div><div><b>${pct(d[0] + d[1])}</b><small>thua 1–3 / 0–4</small></div></div></div>
+        <div class="card"><h3 class="card-h">🔎 Đặc điểm ${esc(tn(dpOpp))}</h3>
+          <ul class="dp-notes">${teamNotes(dpOpp).map((x) => `<li>${x}</li>`).join('')}</ul>
+          <p class="dp-cmp">Tương quan sức cả đội: <b class="${diff >= 0 ? 'up' : 'down'}">${tn(ME)} ${diff >= 0.5 ? 'nhỉnh hơn' : diff <= -0.5 ? 'yếu hơn' : 'ngang'}</b> (${diff >= 0 ? '+' : ''}${diff.toFixed(1)})</p></div>
+      </div>
+      ${miss.length ? `<p class="notice">📝 Chưa nhập đủ kỹ năng của ${miss.map((id) => `<button class="linkbtn" data-goskill="${esc(id)}">${esc(tn(id))}</button>`).join(', ')}: đấu pháp đang dựa nhiều vào trình.</p>` : ''}
+      <div class="callout rule-c">📜 <b>Báo cặp zic-zac:</b> nội dung mình <b>báo sau</b>: bấm VĐV đội bạn để chọn đúng cặp họ vừa báo, bấm <b>🔓 Chốt cặp</b> ở các nội dung đã báo, rồi <b>⚡ Tối ưu</b>. Nội dung mình <b>báo trước</b>: giữ cặp chắc chắn, ít điểm yếu.</div>`;
+  }
+
+  /* ---------- Cửa sổ VĐV: ghi chú + kỹ năng + đổi người ---------- */
+  function openSheet(ctx) { sheet = ctx; drawSheet(); }
+  function closeSheet() { sheet = null; const el = $('.cap-sheet'); if (el) el.remove(); document.body.style.overflow = ''; }
+  function findPlayer(pid) { for (const t of T.teams) for (const p of t.players || []) if (p.id === pid) return { p, team: t.id }; return null; }
+  function drawSheet() {
+    let el = $('.cap-sheet');
+    const keepNote = el && $('textarea', el) ? $('textarea', el).value : null;
+    if (!el) { el = document.createElement('div'); el.className = 'mdl-bg cap-sheet'; document.body.appendChild(el); document.body.style.overflow = 'hidden'; }
+    const { pid, side, key, i } = sheet;
+    const info = pid ? findPlayer(pid) : null;
+    let swap = '';
+    if (side) {
+      const P = planFor(dpOpp), L = side === 'us' ? P.us : P.them, team = side === 'us' ? ME : dpOpp;
+      const s = subs().find((x) => x.key === key);
+      const where = {}; Object.entries(L).forEach(([k, v]) => (v || []).forEach((x, j) => (where[x] = [k, j])));
+      const ok = players(team).filter((p) => (s.mixed && i === 1 ? !isMaleSlot(p) : isMaleSlot(p))).sort(byLevel);
+      swap = `<div class="pp-h">Đổi VĐV ${esc(tn(team))} cho ${esc(s.label)}</div><div class="pp-list">${ok.map((p) => {
+        const w = where[p.id], cur = p.id === pid, lab = w ? subs().find((x) => x.key === w[0]).label : '';
+        return `<button class="pp ${cur ? 'on' : ''}" data-swap="${esc(p.id)}" ${cur ? 'disabled' : ''}><span>${lvTag(p.id)} ${esc(p.name)}${NOTES[p.id] ? ' 📝' : ''}</span><small>${cur ? 'đang chọn' : w ? `đang ở ${esc(lab)} → đổi chỗ` : 'chưa xếp'}</small></button>`;
+      }).join('')}</div>`;
+    }
+    const p = info && info.p;
+    el.innerHTML = `<div class="mdl" role="dialog" aria-modal="true">
+      <div class="mdl-h"><div><small>${info ? esc(tn(info.team)) : ''}${side ? ' · ' + esc(subs().find((x) => x.key === key).label) : ''}</small>
+        <h3>${p ? `${p.gender === 'nu' ? '♀' : '♂'} ${esc(p.name)} ${lvTag(p.id)}` : 'Chọn VĐV'}</h3></div><button class="mdl-x" data-shx aria-label="Đóng">✕</button></div>
+      ${p ? `<div class="sk-mini">${SK.map(([k, n]) => `<span class="sk-v" data-v="${sk(p.id, k) || ''}">${esc(n)}: ${sk(p.id, k) ? LVN[sk(p.id, k)] : '–'}</span>`).join('')}</div>
+        <div class="pp-h">📝 Ghi chú về ${esc(p.name)}</div>
+        <textarea class="note-in" rows="4" placeholder="VD: thuận tay trái, hay lốp khi bị ép, drive mạnh tay thuận…">${esc(keepNote != null ? keepNote : NOTES[p.id] || '')}</textarea>
+        <div class="mdl-act"><button class="btn primary" data-note="${esc(p.id)}">💾 Lưu ghi chú</button></div>` : ''}
+      ${swap}
+      <div class="mdl-act"><button class="btn ghost" data-shx>Đóng</button></div></div>`;
+  }
+  function applySwap(np) {
+    const { side, key, i } = sheet;
+    const P = planFor(dpOpp);
+    const L = JSON.parse(JSON.stringify(side === 'us' ? P.us : P.them));
+    const old = (L[key] || [])[i];
+    for (const [k, v] of Object.entries(L)) (v || []).forEach((x, j) => { if (x === np && !(k === key && j === i)) L[k][j] = old; });
+    L[key] = L[key] || []; L[key][i] = np;
+    const patch = side === 'us' ? { us: L } : { them: L };
+    PLAN = { ...PLAN, [dpOpp]: { ...(PLAN[dpOpp] || {}), ...patch } };
+    closeSheet(); render(); savePlan(dpOpp, patch);
+    toast('Đã đổi: ' + pName(np));
   }
 
   function pwForm(forced) {
@@ -330,6 +403,7 @@
     if (!pane) return;
     const a = document.activeElement;
     if (a && pane.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'SELECT')) return; // đang thao tác, chờ xong
+    if (!(tab === 'dau-phap' || tab === 'ky-nang')) closeSheet();
     const html = !isCap() ? `<section class="block"><div class="container">${gate()}</div></section>`
       : mustPw || pwOpen ? `<section class="block"><div class="container">${pwForm(mustPw)}</div></section>`
       : !T ? '<section class="block"><div class="container"><p class="muted">Đang tải dữ liệu giải…</p></div></section>'
@@ -361,7 +435,7 @@
     pop.el.remove(); if (pop.cell) pop.cell.classList.remove('open');
     pop = null;
   }
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closePop(); closeSheet(); } });
   window.addEventListener('resize', closePop);
 
   /* ---------- Thao tác ---------- */
@@ -396,6 +470,28 @@
     if (t.closest('[data-cap="out"]')) { Store.signOut(); return; }
     const st = t.closest('[data-skt]'); if (st) { skTeam = st.dataset.skt; render(); return; }
     const gs = t.closest('[data-goskill]'); if (gs) { skTeam = gs.dataset.goskill; $('.nb-tabs [data-tab="ky-nang"]').click(); return; }
+    if (sheet || $('.cap-sheet')) {
+      if (t.closest('[data-shx]') || t.classList.contains('cap-sheet')) { closeSheet(); return; }
+      const sw = t.closest('[data-swap]'); if (sw && !sw.disabled) { applySwap(sw.dataset.swap); return; }
+      const nb = t.closest('[data-note]');
+      if (nb) {
+        const v = $('.cap-sheet textarea').value.trim(), pid = nb.dataset.note;
+        NOTES = { ...NOTES, [pid]: v };
+        Store.setCap(acct().plan, { n: { [pid]: v || Store.del() } }).then(() => toast('Đã lưu ghi chú')).catch((er) => toast('Chưa lưu được: ' + er.message));
+        render(); return;
+      }
+      if (t.closest('.cap-sheet')) return;
+    }
+    const pc = t.closest('[data-ps]'); if (pc) { openSheet({ pid: pc.dataset.pid || null, side: pc.dataset.ps, key: pc.dataset.sub, i: +pc.dataset.i }); return; }
+    const pn = t.closest('[data-pnote]'); if (pn) { openSheet({ pid: pn.dataset.pnote }); return; }
+    const lb = t.closest('[data-lockbtn]');
+    if (lb) {
+      const P = planFor(dpOpp), k = lb.dataset.lockbtn;
+      const lock = { ...P.lock, [k]: !P.lock[k] };
+      PLAN = { ...PLAN, [dpOpp]: { ...(PLAN[dpOpp] || {}), lock, us: P.us } };
+      render(); savePlan(dpOpp, { lock, us: P.us });
+      return;
+    }
     if (t.closest('[data-cap="pw"]')) { pwOpen = true; render(); scrollTo({ top: 0 }); return; }
     if (t.closest('[data-cap="pw-cancel"]')) { pwOpen = false; render(); return; }
     const pick = t.closest('.sk-pop [data-pick]');
