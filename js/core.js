@@ -73,7 +73,8 @@
       if (r.winner === 'a') wa++; else wb++;
     }
     const total = (m.subs || []).length;
-    return { wa, wb, pa, pb, done, total, complete: total > 0 && done === total, winner: wa > wb ? 'a' : wb > wa ? 'b' : 'draw' };
+    // Không có kết quả hoà: 2–2 thì đội ghi nhiều điểm hơn trong lượt thắng (chỉ hoà nếu bằng cả điểm)
+    return { wa, wb, pa, pb, done, total, complete: total > 0 && done === total, winner: wa > wb ? 'a' : wb > wa ? 'b' : pa > pb ? 'a' : pb > pa ? 'b' : 'draw' };
   };
 
   // Kết quả trận (thường) hoặc lượt đấu đồng đội (khi đã đấu đủ nội dung)
@@ -448,15 +449,49 @@
     const done = PB.groupComplete(t, name);
     const sign = (n) => (n > 0 ? '+' + n : String(n));
     const medal = ['🥇', '🥈', '🥉'];
-    return `<div class="table-wrap"><table class="standings">
-      <thead><tr><th>#</th><th class="l">Đội</th><th title="Số lượt đã đấu">Tr</th><th title="Thắng">T</th><th title="Hoà">H</th><th title="Thua">B</th>
-      <th title="Nội dung thắng – thua">ND</th><th title="Hiệu số nội dung">HS ND</th><th title="Hiệu số điểm">HS điểm</th></tr></thead>
-      <tbody>${rows.map((r, i) => `<tr class="${done && i < 3 ? 'adv' : ''}">
-        <td>${done && i < 3 ? medal[i] : i + 1}</td><td class="l">${PB.teamCell(t, r.id, null, true)}</td>
-        <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.nw}–${r.nl}</td><td><b>${sign(r.nw - r.nl)}</b></td><td>${sign(r.pf - r.pa)}</td></tr>`).join('')}
+    const any = rows.some((r) => r.nw + r.nl > 0);
+    return `<div class="table-wrap"><table class="standings team-st">
+      <thead><tr><th>#</th><th class="l">Đội</th><th title="Lượt đấu thắng – thua (đã đấu xong)">T–B</th>
+      <th title="Nội dung thắng – thua">ND</th><th title="Hiệu số nội dung (tiêu chí 1)">HS ND</th><th title="Hiệu số điểm">HS điểm</th></tr></thead>
+      <tbody>${rows.map((r, i) => `<tr class="${any && i < 3 ? 'adv' : ''}">
+        <td>${any && i < 3 ? medal[i] : i + 1}</td><td class="l">${PB.teamCell(t, r.id, null, true)}</td>
+        <td>${r.w}–${r.l}</td><td>${r.nw}–${r.nl}</td><td><b>${sign(r.nw - r.nl)}</b></td><td>${sign(r.pf - r.pa)}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="hint">${done ? '✔ Đã hoàn tất vòng tròn.' : 'Cập nhật theo từng nội dung đã có kết quả.'} Xếp hạng: hiệu số nội dung → đối đầu → hiệu số điểm (Điều 9).</p>`;
+      <p class="hint">${done ? '✔ Đã hoàn tất vòng tròn.' : 'Cập nhật theo từng nội dung đã có kết quả.'} Xếp hạng: hiệu số nội dung → đối đầu → hiệu số điểm (Điều 9). Không có hoà: lượt 2–2 tính đội nhiều điểm hơn thắng.</p>`;
   }
+
+  /* ---------- Vinh danh: top 3 đội + VĐV nam, nữ xuất sắc (theo kết quả đã nhập) ---------- */
+  PB.splitPair = (v) => String(v || '').split(/\s*&\s*|\s*,\s*|\s+-\s+/).map((x) => x.trim()).filter(Boolean);
+  PB.honors = function (t) {
+    const g = (t.groups || [])[0];
+    const rows = g ? PB.standings(t, g.name) : [];
+    const started = rows.some((r) => r.nw + r.nl > 0);
+    const stats = new Map();
+    for (const m of t.matches || []) for (const sub of m.subs || []) {
+      const r = PB.gameResult(sub.games); if (!r) continue;
+      for (const side of ['a', 'b']) {
+        const tm = PB.team(t, m[side]) || {};
+        for (const n of PB.splitPair(side === 'a' ? sub.pa : sub.pb)) {
+          const p = (tm.players || []).find((x) => x.name === n);
+          if (!p) continue;
+          const k = p.id || tm.id + n;
+          const st = stats.get(k) || { id: p.id, name: p.name, gender: p.gender, team: tm.id, w: 0, l: 0, pf: 0, pa: 0 };
+          const my = side === 'a' ? r.pa : r.pb, op = side === 'a' ? r.pb : r.pa;
+          if (r.winner === side) st.w++; else st.l++;
+          st.pf += my; st.pa += op;
+          stats.set(k, st);
+        }
+      }
+    }
+    const rank = (list) => list.sort((x, y) => y.w - x.w || (y.w - y.l) - (x.w - x.l) || (y.pf - y.pa) - (x.pf - x.pa) || x.l - y.l);
+    const all = [...stats.values()];
+    return {
+      started, complete: !!(g && PB.groupComplete(t, g.name)),
+      teams: started ? rows.slice(0, 3) : [],
+      men: rank(all.filter((p) => p.gender !== 'nu')).slice(0, 3),
+      women: rank(all.filter((p) => p.gender === 'nu')).slice(0, 3)
+    };
+  };
 
   function renderTie(t, m, opts) {
     const s = PB.tieScore(m);

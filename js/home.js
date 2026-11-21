@@ -53,6 +53,31 @@
       <div class="bars">${f.rows.slice(0, 5).map((r) => `<div class="bar"><span class="nm">${esc(teamName(r.id))}</span><span class="tk"><i style="width:${Math.max(2, r.p1 * 100)}%"></i></span><span class="pc">${pct(r.p1)}</span></div>`).join('')}</div>`;
   }
 
+  /* ---------- Vinh danh (trực tiếp) ---------- */
+  function renderHonors() {
+    const h = PB.honors(T);
+    const st = $('#hon-status');
+    st.className = 'pill-status ' + (h.complete ? 'ok' : 'live');
+    st.textContent = h.complete ? '🏁 Chung cuộc' : h.started ? '🔴 Tạm thời · đang thi đấu' : 'Chờ kết quả';
+    const sign = (n) => (n > 0 ? '+' + n : String(n));
+    const lbl = [['🥇', 'Vô địch'], ['🥈', 'Giải Nhì'], ['🥉', 'Giải Ba']];
+    const teamCard = (i) => {
+      const r = h.teams[i];
+      return `<div class="hon-team r${i + 1}"><div class="hon-m">${lbl[i][0]}</div><div class="hon-l">${lbl[i][1]}</div>
+        ${r ? `<b class="hon-n">${esc(teamName(r.id))}</b><small>ND ${r.nw}–${r.nl} · HS ${sign(r.nw - r.nl)} · điểm ${sign(r.pf - r.pa)}</small>` : '<b class="hon-n muted">—</b><small>Chờ kết quả</small>'}</div>`;
+    };
+    const mvp = (title, ic, list) => {
+      const [p, ...rest] = list;
+      return `<div class="hon-mvp"><div class="hon-l">${ic} ${title}</div>
+        ${p ? `<b class="hon-n">${esc(p.name)}</b><small>${esc(teamName(p.team))} · ${p.w} thắng – ${p.l} thua · HS điểm ${sign(p.pf - p.pa)}</small>
+          ${rest.length ? `<ol class="hon-next" start="2">${rest.map((x) => `<li>${esc(x.name)} <small>(${esc(teamName(x.team))} · ${x.w}T–${x.l}B · ${sign(x.pf - x.pa)})</small></li>`).join('')}</ol>` : ''}`
+          : '<b class="hon-n muted">—</b><small>Cần nhập cặp VĐV và tỉ số các nội dung</small>'}</div>`;
+    };
+    $('#honors').innerHTML = `<div class="hon-teams">${teamCard(1)}${teamCard(0)}${teamCard(2)}</div>
+      <div class="hon-mvps">${mvp('VĐV nam xuất sắc', '♂', h.men)}${mvp('VĐV nữ xuất sắc', '♀', h.women)}</div>
+      <p class="hint">${h.complete ? 'Kết quả chung cuộc sau 7 vòng.' : 'Thứ hạng tạm thời, tự cập nhật mỗi khi BTC nhập kết quả.'} VĐV xuất sắc: nhiều trận thắng nhất → hiệu số thắng–thua → hiệu số điểm.</p>`;
+  }
+
   /* ---------- Bảng xếp hạng + vòng hiện tại ---------- */
   function currentRound() {
     const pend = T.matches.filter((m) => !PB.result(m));
@@ -177,7 +202,7 @@
 
   /* ---------- Tải dữ liệu ---------- */
   function renderAll() {
-    renderForecast(); renderStandings(); renderRounds(); renderTeams(); fillSelects(); formState(); renderPredictions();
+    renderForecast(); renderHonors(); renderStandings(); renderRounds(); renderTeams(); fillSelects(); formState(); renderPredictions();
     const st = $('#live-status');
     st.className = 'pill-status ' + (Store.enabled ? 'ok' : 'off');
     st.textContent = Store.enabled ? 'Trực tiếp' : 'Dữ liệu tĩnh';

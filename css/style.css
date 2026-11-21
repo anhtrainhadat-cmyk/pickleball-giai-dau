@@ -498,3 +498,33 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 .sc-preview span:only-child { grid-column: 1 / -1; }
 .sc-preview.ok { border: 2px solid var(--gold); color: var(--text); background: rgba(255, 204, 77, .1); }
 .sc-preview b { font-size: 1.6rem; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; }
+
+/* Vinh danh */
+.honors { padding-top: 48px; }
+.pill-status.live { color: #ff9bb0; }
+.hon-teams { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 12px; align-items: end; }
+.hon-team, .hon-mvp { text-align: center; padding: 18px 14px; border-radius: var(--radius); border: 1px solid var(--border); background: linear-gradient(180deg, rgba(42, 24, 98, .6), rgba(30, 17, 71, .9)); display: grid; gap: 4px; justify-items: center; }
+.hon-team.r1 { padding: 26px 14px; border: 2px solid var(--gold); box-shadow: var(--glow); background: radial-gradient(300px 160px at 50% 0%, rgba(255, 204, 77, .25), transparent 70%), var(--surface); }
+.hon-team.r2 { border-color: #c9d1e8; } .hon-team.r3 { border-color: #d9935a; }
+.hon-m { font-size: 2.4rem; line-height: 1; }
+.hon-team.r1 .hon-m { font-size: 3.2rem; }
+.hon-l { font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; color: var(--cyan); }
+.hon-n { font-size: 1.3rem; font-weight: 900; font-style: italic; }
+.hon-team.r1 .hon-n { font-size: 1.7rem; color: var(--gold); }
+.hon-team small, .hon-mvp small { color: var(--muted); font-size: .8rem; }
+.hon-mvps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.hon-mvp { border-color: rgba(227, 70, 207, .5); }
+.hon-mvp .hon-l { color: var(--magenta); }
+.hon-next { margin: 6px 0 0; padding-left: 20px; text-align: left; font-size: .86rem; justify-self: stretch; }
+@media (max-width: 640px) {
+  .hon-teams { grid-template-columns: 1fr 1fr; }
+  .hon-team.r1 { grid-column: 1 / -1; order: -1; }
+  .hon-mvps { grid-template-columns: 1fr; }
+  .hon-n { font-size: 1.1rem; }
+}
+/* Bảng xếp hạng gọn trên điện thoại */
+.team-st .l .tn { white-space: nowrap; font-weight: 700; }
+@media (max-width: 640px) {
+  .team-st th, .team-st td { padding: 9px 5px; font-size: .86rem; }
+  .team-st th { font-size: .66rem; }
+}
