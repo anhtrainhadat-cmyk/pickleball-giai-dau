@@ -402,3 +402,6 @@ table.vt-t { width: 100%; border-collapse: collapse; table-layout: fixed; backgr
 .tcell { width: 100%; padding: 7px 8px; background: none; border: 0; color: var(--text); font: inherit; text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tcell:active, .tcell:hover { background: rgba(255, 204, 77, .08); }
 .tcell.us { color: #ffd0da; }
+
+/* Tên VĐV nữ: vàng sáng */
+.tcell.f, .tcell.us.f, .pchip.f .pn, .pname.f, .sk-table td.l .f, .roster .f, .opp-roster li.f, .pp-list .f { color: #ffe14d !important; }

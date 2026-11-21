@@ -408,7 +408,7 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 
 /* Danh sách đội */
 .roster { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; font-size: .86rem; color: var(--muted); }
-.roster .f { color: #ff9be9; }
+.roster .f { color: #ffe14d; }
 .team-card .cap { color: var(--gold); font-size: .82rem; font-weight: 600; }
 
 /* BTC */

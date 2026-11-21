@@ -55,6 +55,7 @@
   const tn = (id) => PB.teamName(T, id);
   const pName = (pid) => { for (const t of T.teams) for (const p of t.players || []) if (p.id === pid) return p.name; return '?'; };
   const lvOf = (pid) => LV[pid] || 0;
+  const isF = (pid) => { for (const t of T.teams) for (const p of t.players || []) if (p.id === pid) return p.gender === 'nu'; return false; };
   const lvTag = (pid) => (LV[pid] ? `<span class="lv lv${LV[pid]}">T${LV[pid]}</span>` : '<span class="lv lv0">–</span>');
   const isMaleSlot = (p) => p.gender !== 'nu' || /vị trí nam/i.test(p.note || '');
   const byLevel = (a, b) => (lvOf(a.id) || 9) - (lvOf(b.id) || 9) || (a.gender === 'nu') - (b.gender === 'nu');
@@ -264,7 +265,7 @@
   // Nút VĐV: bấm mở cửa sổ ghi chú + đổi người
   const chip = (pid, side, key, i) => {
     const has = NOTES[pid] && NOTES[pid].trim();
-    return `<button class="pchip ${side}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}">
+    return `<button class="pchip ${side} ${pid && isF(pid) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}">
       ${pid ? `${lvTag(pid)}<span class="pn">${esc(pName(pid))}</span>${has ? '<span class="pnote" title="Có ghi chú">📝</span>' : ''}` : '<span class="pn muted">＋ Chọn VĐV</span>'}</button>`;
   };
   function liveSub(m, s) {
@@ -344,7 +345,7 @@
   function renderTable() {
     const ties = myTies(), S = subs();
     const short = (l) => l.replace(/Đôi nam nữ/i, 'ĐNN').replace(/Đôi nam/i, 'ĐN').replace(/\s+/g, '');
-    const cell = (pid, side, key, i, opp) => `<td><button class="tcell ${side}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
+    const cell = (pid, side, key, i, opp) => `<td><button class="tcell ${side} ${pid && isF(pid) ? 'f' : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
     return `${bar('Đấu pháp', 'Bấm vào tên để chọn / đổi VĐV hoặc ghi chú')}${viewTabs()}
       ${ties.map((m) => {
         const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
