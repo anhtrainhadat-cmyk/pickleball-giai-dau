@@ -338,3 +338,45 @@ body.editing ul.ticks li .ed { flex: 1; }
   .dp-live { grid-template-columns: 1fr auto 1fr; }
   .dp-live .lv-tag { grid-column: 1 / -1; }
 }
+
+/* Đấu pháp gọn (tối giản) */
+#pane-dau-phap .block { padding-top: 20px; }
+#pane-dau-phap .section-head { margin-bottom: 10px; }
+#pane-dau-phap .section-head h2 { font-size: 1.5rem; }
+#pane-dau-phap .cap-teams { gap: 5px; margin-bottom: 10px; }
+#pane-dau-phap .cap-teams .chip { padding: 5px 10px; font-size: .78rem; }
+.btn.xs { padding: 5px 11px; font-size: .78rem; }
+.dp-tie { padding: 8px 12px; margin-bottom: 10px; font-size: .82rem; }
+.dp-tie b { font-size: 1rem; }
+.dp-lineup { padding: 10px; }
+.dp-lineup .dp-tools { margin-bottom: 6px; gap: 6px; }
+.dp-lineup .card-h { font-size: .95rem; }
+.dp-scen select { padding: 4px 6px; font-size: .78rem; }
+.dp-tools2 { margin: 0 0 8px; gap: 5px; }
+.dp-tools2 .tag-ed { font-size: .68rem; }
+.dp-head { font-size: .7rem; margin-bottom: 4px; grid-template-columns: 1fr 46px 1fr; }
+.dp-subs { gap: 6px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
+.dp-sub { padding: 6px 8px 8px; gap: 5px; border-radius: 10px; }
+.dp-sh { gap: 6px; }
+.dp-sh b { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.lockbtn { padding: 1px 7px; font-size: .68rem; }
+.dp-vs2 { grid-template-columns: 1fr 46px 1fr; gap: 4px; }
+.dp-vs2 .vs { display: grid; justify-items: center; gap: 2px; font-style: normal; }
+.dp-vs2 .dp-p { font-size: .82rem; font-weight: 900; color: var(--text); }
+.dp-vs2 .dp-bar { width: 6px; height: 34px; display: flex; flex-direction: column-reverse; border-radius: 99px; background: rgba(255, 107, 138, .45); overflow: hidden; }
+.dp-vs2 .dp-bar i { width: 100%; background: var(--ball); display: block; }
+.dp-col { gap: 4px; }
+.pchip { min-height: 30px; padding: 4px 7px; border-radius: 8px; font-size: .78rem; font-weight: 600; gap: 4px; }
+.pchip .lv { font-size: .62rem; min-width: 20px; line-height: 15px; padding: 0 4px; }
+.pchip .pn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pnote { font-size: .7rem; }
+.dp-live { padding: 4px 7px; font-size: .7rem; gap: 4px; }
+.dp-live b { font-size: .82rem; }
+.dp-tipbox summary { font-size: .72rem; }
+.dp-tips { font-size: .78rem; }
+@media (max-width: 860px) { .dp-subs { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .dp-head, .dp-vs2 { grid-template-columns: 1fr 40px 1fr; }
+  .pchip { font-size: .76rem; }
+  .dp-live { grid-template-columns: 1fr auto 1fr; }
+}

@@ -20,7 +20,7 @@
   const EDGES = [['drive', 'luoi'], ['lop', 'bao'], ['ben', 'nong'], ['drop', 'drive']];
   const GOOD = { drive: 'drive tốt', luoi: 'đánh lưới tốt', drop: 'drop tốt', lop: 'lốp tốt', nong: 'kiểm soát nhịp tốt', bao: 'bao bóng tốt', ben: 'bền bóng' };
   const BAD = { drive: 'drive yếu', luoi: 'đánh lưới yếu', drop: 'drop yếu', lop: 'lốp yếu', nong: 'kiểm soát nhịp yếu (hay vội)', bao: 'bao bóng yếu', ben: 'bền bóng yếu' };
-  const SCEN = { A: 'Xếp mạnh trước (khả năng cao nhất)', B: 'Dàn đều sức các cặp' };
+  const SCEN = { A: 'Đội bạn: xếp mạnh trước', B: 'Đội bạn: dàn đều' };
 
   // Tài khoản được vào khu vực này: đội của mình (để lên đấu pháp) và nơi lưu đấu pháp riêng
   const ACC = {
@@ -298,14 +298,14 @@
       ${tieLive}
       <div class="card dp-lineup">
         <div class="dp-tools">
-          <h3 class="card-h">⚔️ Vòng ${m.round}: ${esc(tn(ME))} gặp ${esc(tn(dpOpp))}</h3>
-          <label class="dp-scen">Đối thủ xếp: <select data-scen>${Object.entries(SCEN).map(([k, n]) => `<option value="${k}" ${P.scen === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+          <h3 class="card-h">⚔️ V${m.round} · ${esc(tn(ME))} vs ${esc(tn(dpOpp))}</h3>
+          <label class="dp-scen"><select data-scen aria-label="Kịch bản đội bạn">${Object.entries(SCEN).map(([k, n]) => `<option value="${k}" ${P.scen === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
         </div>
         <div class="dp-tools2">
-          <span class="tag-ed ${P.editedThem ? '' : 'auto'}">${esc(tn(dpOpp))}: ${P.editedThem ? 'đã chỉnh tay' : 'dự đoán'}</span>
-          <span class="tag-ed ${P.editedUs ? '' : 'auto'}">${esc(tn(ME))}: ${P.editedUs ? 'đã chỉnh tay' : 'tự động tối ưu'}</span>
-          <button class="btn sm ghost" data-dp="reset-them">↺ Đối thủ về dự đoán</button>
-          <button class="btn sm primary" data-dp="opt">⚡ Tối ưu ${esc(tn(ME))}</button>
+          <span class="tag-ed ${P.editedUs ? '' : 'auto'}">${esc(tn(ME))}: ${P.editedUs ? 'tay' : 'tự động'}</span>
+          <span class="tag-ed ${P.editedThem ? '' : 'auto'}">${esc(tn(dpOpp))}: ${P.editedThem ? 'tay' : 'dự đoán'}</span>
+          <button class="btn xs ghost" data-dp="reset-them">↺ Đội bạn</button>
+          <button class="btn xs primary" data-dp="opt">⚡ Tối ưu</button>
         </div>
         ${dupT.length || dupU.length ? `<p class="notice danger">⚠️ ${[...dupT, ...dupU].map((x) => esc(pName(x))).join(', ')} đang được xếp 2 nội dung (điều lệ: mỗi VĐV tối đa 1 nội dung/vòng).</p>` : ''}
         <div class="dp-head"><span>${esc(tn(ME))}</span><span></span><span>${esc(tn(dpOpp))}</span></div>
@@ -313,17 +313,15 @@
           const p = winP(P.us[s.key] || [], P.them[s.key] || []);
           const tips = subTips(P.us[s.key] || [], P.them[s.key] || []);
           return `<div class="dp-sub">
-            <div class="dp-sh"><b>${i + 1} · ${esc(s.label)}</b>
-              <button class="lockbtn ${P.lock[s.key] ? 'on' : ''}" data-lockbtn="${s.key}" title="Đã báo cặp / giữ cố định khi tối ưu">${P.lock[s.key] ? '🔒 Đã chốt' : '🔓 Chốt cặp'}</button>
-              <span class="dp-p ${p >= 0.55 ? 'up' : p <= 0.45 ? 'down' : ''}">${pct(p)}</span></div>
-            <div class="dp-bar"><i style="width:${p * 100}%"></i></div>
+            <div class="dp-sh"><b>${esc(s.label)}</b>
+              <button class="lockbtn ${P.lock[s.key] ? 'on' : ''}" data-lockbtn="${s.key}" title="Chốt cặp (đã báo) – giữ nguyên khi tối ưu">${P.lock[s.key] ? '🔒 Chốt' : '🔓'}</button></div>
             <div class="dp-vs2">
               <div class="dp-col us">${[0, 1].map((k) => chip((P.us[s.key] || [])[k], 'us', s.key, k)).join('')}</div>
-              <div class="vs">VS</div>
+              <div class="vs"><b class="dp-p ${p >= 0.55 ? 'up' : p <= 0.45 ? 'down' : ''}">${pct(p)}</b><i class="dp-bar"><i style="height:${p * 100}%"></i></i></div>
               <div class="dp-col them">${[0, 1].map((k) => chip((P.them[s.key] || [])[k], 'them', s.key, k)).join('')}</div>
             </div>
             ${liveSub(m, s)}
-            ${tips.length ? `<details class="dp-tipbox"><summary>💡 Lưu ý đấu pháp (${tips.length})</summary><ul class="dp-tips">${tips.map((x) => `<li>${x}</li>`).join('')}</ul></details>` : ''}
+            ${tips.length ? `<details class="dp-tipbox"><summary>💡 Lưu ý (${tips.length})</summary><ul class="dp-tips">${tips.map((x) => `<li>${x}</li>`).join('')}</ul></details>` : ''}
           </div>`;
         }).join('')}</div>
       </div>
