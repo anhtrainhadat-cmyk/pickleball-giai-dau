@@ -1,5 +1,5 @@
 {
- "version": "2026-11-21",
+ "version": "2026-11-21b",
  "reserves": "Mạnh Tùng, Thành Sơn, Mai Trang Dung",
  "teams": [
   {
@@ -250,8 +250,8 @@
     {
      "id": "doi6-1",
      "name": "Loan Nguyễn",
-     "gender": "nu",
-     "note": "Đội trưởng · VĐV nữ thi đấu vị trí nam"
+     "gender": "nam",
+     "note": "Đội trưởng"
     },
     {
      "id": "doi6-2",
