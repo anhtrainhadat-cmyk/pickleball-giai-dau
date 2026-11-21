@@ -474,6 +474,7 @@
           <button type="button" class="pick-p ${sub.pa ? 'set' : ''}" data-pick="p" data-mid="${m.id}" data-sub="${i}" data-side="a">${sub.pa ? PB.esc(sub.pa) : '👥 Chọn 2 VĐV'}</button>
           <button type="button" class="pick-s ${r ? 'set' : ''}" data-pick="s" data-mid="${m.id}" data-sub="${i}">${r ? PB.esc(PB.formatGames(sub.games)) : 'Nhập tỉ số'}</button>
           <button type="button" class="pick-p ${sub.pb ? 'set' : ''}" data-pick="p" data-mid="${m.id}" data-sub="${i}" data-side="b">${sub.pb ? PB.esc(sub.pb) : '👥 Chọn 2 VĐV'}</button>
+          ${r ? `<div class="sub-act"><span>✅ Đã công bố</span><button type="button" data-pick="s" data-mid="${m.id}" data-sub="${i}">✏️ Sửa</button><button type="button" data-delsc="${i}" data-mid="${m.id}">🗑 Xoá</button></div>` : ''}
         </div>` : ''}
       </div>`;
     }).join('');
@@ -485,6 +486,7 @@
         <div class="tt b ${cls('b')}">${PB.teamCell(t, m.b)}</div>
       </div>
       <div class="subs">${subs}</div>
+      ${opts.editable && s.done ? `<div class="tie-act"><button type="button" class="btn sm ghost danger" data-deltie="${m.id}">🗑 Xoá kết quả cả lượt (${s.done} nội dung)</button></div>` : ''}
       ${opts.editable ? `<div class="m-edit"><input class="in-sm" data-mid="${m.id}" data-f="court" value="${PB.esc(m.court || '')}" placeholder="Sân" aria-label="Sân"><input class="in-sm" data-mid="${m.id}" data-f="time" value="${PB.esc(m.time || '')}" placeholder="Giờ" aria-label="Giờ"></div>` : ''}
     </div>`;
   }

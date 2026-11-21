@@ -131,7 +131,7 @@
     const done = T.matches.filter((m) => PB.result(m)).length;
     return `<div class="card" style="margin-bottom:16px">
         <div class="toolbar" style="justify-content:space-between"><b>${done}/${T.matches.length} lượt đấu đã xong</b><span class="saving">Lưu tự động · khán giả thấy ngay</span></div>
-        <p class="hint">Mỗi nội dung: bấm <b>👥 Chọn 2 VĐV</b> ở hai bên để chọn cặp thi đấu (mỗi VĐV chỉ đánh 1 nội dung/vòng; Đôi nam nữ = 1 nam + 1 nữ), rồi bấm <b>Nhập tỉ số</b> → chọn đội thắng (15 điểm) → chọn điểm đội thua (0–14). Xử thua do vi phạm: chọn đội thua <b>0</b> điểm.</p>
+        <p class="hint">Mỗi nội dung: bấm <b>👥 Chọn 2 VĐV</b> ở hai bên để chọn cặp thi đấu (mỗi VĐV chỉ đánh 1 nội dung/vòng; Đôi nam nữ = 1 nam + 1 nữ), rồi bấm <b>Nhập tỉ số</b> → chọn đội thắng (15 điểm) → chọn điểm đội thua (0–14) → bấm <b>✅ Xác nhận</b> mới lưu và hiện ra các trang. Kết quả đã lưu có nút <b>✏️ Sửa</b> / <b>🗑 Xoá</b>. Xử thua do vi phạm: chọn đội thua <b>0</b> điểm.</p>
       </div>
       <div class="chips" style="margin-bottom:14px">${rounds.map((r) => {
         const ok = T.matches.filter((m) => m.round === r).every((m) => PB.result(m));
@@ -206,24 +206,25 @@
   function pickScore(m, si) {
     const sub = m.subs[si], A = PB.teamName(T, m.a), B = PB.teamName(T, m.b);
     const r = PB.gameResult(sub.games);
-    let win = r ? r.winner : null;
+    let win = r ? r.winner : null, lose = r ? Math.min(r.pa, r.pb) : null;
     const draw = () => {
-      const lose = r && r.winner === win ? Math.min(r.pa, r.pb) : null;
-      openModal(`<div class="mdl-h"><div><small>Vòng ${m.round} · ${esc(sub.label)}</small><h3>Nhập tỉ số</h3></div><button class="mdl-x" data-x aria-label="Đóng">✕</button></div>
+      const sc = win && lose !== null ? (win === 'a' ? [15, lose] : [lose, 15]) : null;
+      openModal(`<div class="mdl-h"><div><small>Vòng ${m.round} · ${esc(sub.label)}</small><h3>${r ? 'Sửa tỉ số' : 'Nhập tỉ số'}</h3></div><button class="mdl-x" data-x aria-label="Đóng">✕</button></div>
         ${!sub.pa || !sub.pb ? '<p class="notice warn mdl-note">⚠️ Chưa chọn đủ cặp VĐV hai bên. Nên chọn VĐV trước khi nhập tỉ số.</p>' : ''}
+        ${r ? `<p class="muted mdl-note">Kết quả hiện tại: <b>${esc(A)} ${r.pa} – ${r.pb} ${esc(B)}</b></p>` : ''}
         <div class="pp-h">1 · Đội thắng (chạm 15 điểm)</div>
         <div class="win-pick">${[['a', A, sub.pa], ['b', B, sub.pb]].map(([k, n, ps]) => `<button class="pp ${win === k ? 'on' : ''}" data-win="${k}"><span><b>${esc(n)}</b></span><small>${esc(ps || 'chưa chọn VĐV')}</small></button>`).join('')}</div>
         ${win ? `<div class="pp-h">2 · Điểm của ${esc(win === 'a' ? B : A)} (đội thua)</div>
-          <div class="sc-grid">${Array.from({ length: 15 }, (_, i) => `<button class="sc ${lose === i ? 'on' : ''}" data-lose="${i}">${i}</button>`).join('')}</div>
-          <p class="muted mdl-note">Bấm số là lưu ngay: ${esc(A)} <b>${win === 'a' ? '15' : '?'}</b> – <b>${win === 'b' ? '15' : '?'}</b> ${esc(B)}. Xử thua do vi phạm: chọn 0.</p>` : '<p class="muted mdl-note">Chọn đội thắng trước.</p>'}
-        <div class="mdl-act">${r ? '<button class="btn ghost danger" data-clear>Xoá kết quả</button>' : ''}<button class="btn ghost" data-x>Đóng</button></div>`, async (e) => {
-        const w = e.target.closest('[data-win]'); if (w) { win = w.dataset.win; return draw(); }
-        const l = e.target.closest('[data-lose]');
-        if (l) {
-          const x = +l.dataset.lose, sc = win === 'a' ? `15-${x}` : `${x}-15`;
-          closeModal(); await save(m, sub, 'sc', sc); toast(`Đã lưu ${sub.label}: ${A} ${sc} ${B}`); return;
+          <div class="sc-grid">${Array.from({ length: 15 }, (_, i) => `<button class="sc ${lose === i ? 'on' : ''}" data-lose="${i}">${i}</button>`).join('')}</div>` : '<p class="muted mdl-note">Chọn đội thắng trước.</p>'}
+        <div class="sc-preview ${sc ? 'ok' : ''}">${sc ? `<span>${esc(A)}</span><b>${sc[0]} – ${sc[1]}</b><span>${esc(B)}</span>` : '<span>Chưa đủ thông tin tỉ số</span>'}</div>
+        <div class="mdl-act"><button class="btn ghost" data-x>Huỷ</button><button class="btn primary" data-ok ${sc ? '' : 'disabled'}>✅ Xác nhận${r ? ' sửa' : ''} kết quả</button></div>
+        <p class="muted mdl-note">Chỉ khi bấm <b>Xác nhận</b> kết quả mới được lưu và hiện ra trang VĐV, trang khán giả.</p>`, async (e) => {
+        const w = e.target.closest('[data-win]'); if (w) { if (win !== w.dataset.win) lose = null; win = w.dataset.win; return draw(); }
+        const l = e.target.closest('[data-lose]'); if (l) { lose = +l.dataset.lose; return draw(); }
+        if (e.target.closest('[data-ok]') && sc) {
+          const v = `${sc[0]}-${sc[1]}`;
+          closeModal(); await save(m, sub, 'sc', v); toast(`✅ Đã lưu ${sub.label}: ${A} ${sc[0]}–${sc[1]} ${B}`);
         }
-        if (e.target.closest('[data-clear]') && confirm('Xoá kết quả nội dung này?')) { closeModal(); await save(m, sub, 'sc', ''); }
       });
     };
     draw();
@@ -231,7 +232,21 @@
   async function save(m, sub, f, v) {
     try { await Store.saveSub(m.id, sub.key, f, v); } catch (er) { toast('Không lưu được: ' + er.message); }
   }
-  app.addEventListener('click', (e) => {
+  app.addEventListener('click', async (e) => {
+    const ds = e.target.closest('[data-delsc]');
+    if (ds) {
+      const m = T.matches.find((x) => x.id === ds.dataset.mid), sub = m && m.subs[+ds.dataset.delsc]; if (!sub) return;
+      const r = PB.gameResult(sub.games);
+      if (confirm(`Xoá kết quả ${sub.label} (${PB.teamName(T, m.a)} ${r.pa}–${r.pb} ${PB.teamName(T, m.b)})?\nKết quả sẽ biến mất khỏi mọi trang.`)) { await save(m, sub, 'sc', ''); toast('Đã xoá kết quả ' + sub.label); }
+      return;
+    }
+    const dt = e.target.closest('[data-deltie]');
+    if (dt) {
+      const m = T.matches.find((x) => x.id === dt.dataset.deltie); if (!m) return;
+      if (!confirm(`Xoá toàn bộ kết quả lượt Vòng ${m.round}: ${PB.teamName(T, m.a)} – ${PB.teamName(T, m.b)}?\nCặp VĐV đã chọn được giữ nguyên.`)) return;
+      try { await Store.clearScores(m.id, m.subs.map((x) => x.key)); toast('Đã xoá kết quả cả lượt'); } catch (er) { toast('Không xoá được: ' + er.message); }
+      return;
+    }
     const b = e.target.closest('[data-pick]'); if (!b) return;
     const m = T.matches.find((x) => x.id === b.dataset.mid); if (!m) return;
     if (b.dataset.pick === 'p') pickPlayers(m, +b.dataset.sub, b.dataset.side); else pickScore(m, +b.dataset.sub);

@@ -489,3 +489,12 @@ code { background: var(--bg-2); padding: 1px 6px; border-radius: 6px; font-size:
 .mdl-sel { font-size: .9rem; }
 .mdl-act { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .btn.danger { color: var(--danger); }
+.sub-act { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; margin-top: 4px; font-size: .76rem; }
+.sub-act span { margin-right: auto; color: var(--ball); font-weight: 600; }
+.sub-act button { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.sub-act button[data-delsc] { color: var(--danger); }
+.tie-act { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+.sc-preview { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 12px; border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--muted); }
+.sc-preview span:only-child { grid-column: 1 / -1; }
+.sc-preview.ok { border: 2px solid var(--gold); color: var(--text); background: rgba(255, 204, 77, .1); }
+.sc-preview b { font-size: 1.6rem; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; }

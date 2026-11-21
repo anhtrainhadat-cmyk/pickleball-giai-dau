@@ -166,6 +166,7 @@
   };
   Store.saveEvent = (patch) => db.doc('event/main').update(patch);
   Store.saveSub = (mid, key, field, value) => db.doc('matches/' + mid).update(`subs.${key}.${field}`, value);
+  Store.clearScores = (mid, keys) => db.doc('matches/' + mid).update(Object.fromEntries(keys.map((k) => [`subs.${k}.sc`, ''])));
   Store.saveMatch = (mid, field, value) => db.doc('matches/' + mid).update(field, value);
   Store.watchRatings = (cb, onErr) => db.doc('private/ratings').onSnapshot((s) => cb((s.exists && s.data().levels) || {}), onErr);
   // Lưu trình vào vùng BTC (private/ratings) và chép bản công khai (event/ratings) để trang VĐV hiển thị
