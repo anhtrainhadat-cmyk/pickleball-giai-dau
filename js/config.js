@@ -31,5 +31,10 @@ window.SITE_CONFIG = {
     storageBucket: 'dao97-open.firebasestorage.app',
     messagingSenderId: '223298716515',
     appId: '1:223298716515:web:0aba4931b80d3fa0394956'
+  },
+  // Sửa danh sách VĐV ngay trên web (áp dụng cho mọi trang, kể cả khi dữ liệu Firebase chưa cập nhật)
+  rosterFix: {
+    'doi6-1': { gender: 'nam', note: 'Đội trưởng' }, // Loan Nguyễn là VĐV nam
+    'doi8-2': { name: 'Cường Cá' }                   // Team 8: Lê Đức Cảnh → Cường Cá
   }
 };

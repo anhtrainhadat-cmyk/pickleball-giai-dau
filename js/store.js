@@ -48,7 +48,8 @@
   /* ---------- Chuyển đổi dữ liệu ---------- */
   const subKey = (i) => 's' + i;
   function build(ev, matchDocs) {
-    const teams = ev.teams || [];
+    const fix = C.rosterFix || {};
+    const teams = (ev.teams || []).map((t) => ({ ...t, players: (t.players || []).map((p) => (p && fix[p.id] ? { ...p, ...fix[p.id] } : p)) }));
     return {
       id: 'dao97-open-2026', name: C.name, format: 'team-rr',
       status: ev.status || 'sap-dien-ra',
