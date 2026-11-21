@@ -416,3 +416,5 @@ table.vt-t { width: 100%; border-collapse: collapse; table-layout: fixed; backgr
 .cp { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-2); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; }
 .cp-r { color: #ff4d5e; } .cp-g { color: #3ee07a; }
 .cp.on { outline: 2px solid #fff; outline-offset: 1px; }
+.opt-all { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; font-size: .86rem; color: var(--muted); }
+.opt-all b { color: var(--gold); }

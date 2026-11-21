@@ -20,7 +20,7 @@
   const EDGES = [['drive', 'luoi'], ['lop', 'bao'], ['ben', 'nong'], ['drop', 'drive']];
   const GOOD = { drive: 'drive tốt', luoi: 'đánh lưới tốt', drop: 'drop tốt', lop: 'lốp tốt', nong: 'kiểm soát nhịp tốt', bao: 'bao bóng tốt', ben: 'bền bóng' };
   const BAD = { drive: 'drive yếu', luoi: 'đánh lưới yếu', drop: 'drop yếu', lop: 'lốp yếu', nong: 'kiểm soát nhịp yếu (hay vội)', bao: 'bao bóng yếu', ben: 'bền bóng yếu' };
-  const SCEN = { A: 'Đội bạn: xếp mạnh trước', B: 'Đội bạn: dàn đều' };
+  const SCEN = { A: 'Đội bạn: xếp mạnh trước', B: 'Đội bạn: dàn đều', C: 'Đội bạn: xếp tối ưu nhất' };
 
   // Tài khoản được vào khu vực này: đội của mình (để lên đấu pháp) và nơi lưu đấu pháp riêng
   const ACC = {
@@ -61,7 +61,8 @@
   const byLevel = (a, b) => (lvOf(a.id) || 9) - (lvOf(b.id) || 9) || (a.gender === 'nu') - (b.gender === 'nu');
   const sk = (pid, k) => (SKL[pid] || {})[k];
   const skCount = (id) => players(id).reduce((n, p) => n + SK.filter(([k]) => sk(p.id, k)).length, 0);
-  const str = (pid) => (lvOf(pid) ? 7 - lvOf(pid) : 3.5) + SK.reduce((s, [k]) => s + W[k] * (VAL[sk(pid, k)] || 0), 0);
+  const COLOR_W = { g: 0.8, r: -0.8 }; // Xanh = đội trưởng đánh giá mạnh/phong độ tốt, Đỏ = yếu/phong độ kém
+  const str = (pid) => (lvOf(pid) ? 7 - lvOf(pid) : 3.5) + SK.reduce((s, [k]) => s + W[k] * (VAL[sk(pid, k)] || 0), 0) + (COLOR_W[COLORS[pid]] || 0);
   const subs = () => (T.subEvents || PB.DEFAULT_SUBS).map((label, i) => ({ key: 's' + i, label, mixed: /nữ/i.test(label) }));
   const myTies = () => T.matches.filter((m) => m.a === ME || m.b === ME).sort((x, y) => x.round - y.round);
   const oppOf = (m) => (m.a === ME ? m.b : m.a);
@@ -105,11 +106,29 @@
     for (const L of lineups(ME, fixed)) { const v = exp(L, them); if (v > bv + 1e-9) { bv = v; best = L; } }
     return best || {};
   }
+  // Đội bạn xếp TỐT NHẤT cho họ = đội hình khiến Team 2 (dù đối phó tốt nhất) thắng ít nội dung nhất
+  function minimax(opp) {
+    const cache = new Map();
+    const wp = (u, t) => { const k = u.join() + '|' + t.join(); let v = cache.get(k); if (v === undefined) { v = winP(u, t); cache.set(k, v); } return v; };
+    const S = subs(), ours = lineups(ME), theirs = lineups(opp);
+    let bestT = null, bestV = Infinity, bestU = null;
+    for (const L of theirs) {
+      let mv = -1, mu = null;
+      for (const U of ours) {
+        let v = 0; for (const x of S) v += wp(U[x.key], L[x.key]);
+        if (v > mv) { mv = v; mu = U; }
+        if (mv >= bestV) break; // không tốt hơn cho đội bạn → bỏ qua
+      }
+      if (mv < bestV) { bestV = mv; bestT = L; bestU = mu; }
+    }
+    return { them: bestT, us: bestU, v: bestV };
+  }
   function predictThem(id, scen) {
     const ps = players(id);
     const men = ps.filter(isMaleSlot).map((p) => p.id).sort((a, b) => str(b) - str(a));
     const wom = ps.filter((p) => !isMaleSlot(p)).map((p) => p.id).sort((a, b) => str(b) - str(a));
     const S = subs();
+    if (scen === 'C') return minimax(id).them;
     if (scen !== 'B') {
       // Xếp mạnh trước: cặp nam mạnh nhất vào Đôi nam 1, nam mạnh kế + nữ mạnh nhất vào Nam nữ 1, …
       const L = {}; let mi = 0, wi = 0;
@@ -346,7 +365,10 @@
     const ties = myTies(), S = subs();
     const short = (l) => l.replace(/Đôi nam nữ/i, 'ĐNN').replace(/Đôi nam/i, 'ĐN').replace(/\s+/g, '');
     const cell = (pid, side, key, i, opp, fem) => `<td><button class="tcell ${side} ${fem || (pid && isF(pid)) ? 'f' : ''} ${pid && COLORS[pid] ? 'c-' + COLORS[pid] : ''}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
+    const tot = ties.reduce((a, m) => { const Q = planFor(oppOf(m)); return a + exp(Q.us, Q.them); }, 0);
     return `${bar('Đấu pháp', 'Bấm vào tên để chọn / đổi VĐV hoặc ghi chú')}${viewTabs()}
+      <div class="opt-all"><button class="btn sm primary" data-dp="opt-all">🧠 Lên đội hình tối ưu 7 vòng</button>
+        <span>Dự kiến Team 2 thắng <b>≈ ${tot.toFixed(1)}/28</b> nội dung</span></div>
       ${ties.map((m) => {
         const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
         return `<div class="vt">
@@ -566,6 +588,21 @@
     const a = t.closest('[data-dp]');
     if (a) {
       const P = planFor(dpOpp);
+      if (a.dataset.dp === 'opt-all') {
+        if (!confirm('Tính đội hình cho cả 7 vòng?\n• Đội bạn: xếp TỐT NHẤT cho họ\n• Team 2: cặp đối phó tốt nhất\nDựa trên trình, kỹ năng và màu (xanh = mạnh, đỏ = yếu). Các cặp đã chỉnh tay và chốt sẽ được thay.')) return;
+        a.disabled = true; a.textContent = '⏳ Đang tính…';
+        setTimeout(() => {
+          const r = {};
+          for (const m of myTies()) {
+            const o = oppOf(m), x = minimax(o);
+            r[o] = { scen: 'C', them: x.them, us: x.us, lock: {} };
+          }
+          PLAN = { ...PLAN, ...r };
+          Store.setCap(acct().plan, { r }).catch((er) => toast('Chưa lưu được: ' + er.message));
+          render(); toast('✅ Đã lên đội hình tối ưu cho 7 vòng');
+        }, 30);
+        return;
+      }
       if (a.dataset.dp === 'reset-them') {
         PLAN = { ...PLAN, [dpOpp]: { ...(PLAN[dpOpp] || {}), them: null } };
         savePlan(dpOpp, { them: Store.del() }); render();
