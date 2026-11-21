@@ -29,6 +29,7 @@
   };
   let user = null, T = null, LV = {}, ME = 'doi2', SKL = {}, PLAN = {}, unsub = [], skTeam = null, dpOpp = null, tab = null, err = '';
   let mustPw = false, pwOpen = false, pop = null, NOTES = {}, sheet = null;
+  let dpView = (() => { try { return localStorage.getItem('dao97_dpview'); } catch (e) { return null; } })() || 'bang';
 
   /* ---------- Dữ liệu từ trang nội bộ ---------- */
   document.addEventListener('nb:data', (e) => { ({ T, LV } = e.detail); render(); });
@@ -290,7 +291,7 @@
     const tieLive = ts.done ? `<div class="dp-tie ${ts.complete ? (ts.winner === (mine ? 'a' : 'b') ? 'win' : 'lose') : ''}">
         <span>${ts.complete ? '🏁 Kết quả lượt' : '🔴 Trực tiếp'} · ${ts.done}/4 nội dung</span>
         <b>${esc(tn(ME))} ${mine ? ts.wa : ts.wb} – ${mine ? ts.wb : ts.wa} ${esc(tn(dpOpp))}</b></div>` : '';
-    return `${bar('Đấu pháp', 'Chỉ đội trưởng xem · bấm tên VĐV để ghi chú / đổi người')}
+    return `${bar('Đấu pháp', 'Chỉ đội trưởng xem · bấm tên VĐV để ghi chú / đổi người')}${viewTabs()}
       <div class="chips cap-teams">${ties.map((x) => {
         const Q = planFor(oppOf(x)), t2 = PB.tieScore(x), mi = x.a === ME;
         return `<button class="chip ${oppOf(x) === dpOpp ? 'active' : ''}" data-dpo="${esc(oppOf(x))}">V${x.round} · ${esc(tn(oppOf(x)))} <small>${t2.done ? `${t2.complete ? '🏁' : '🔴'} ${mi ? t2.wa : t2.wb}–${mi ? t2.wb : t2.wa}` : `≈ ${exp(Q.us, Q.them).toFixed(1)}/4`}</small></button>`;
@@ -338,6 +339,27 @@
       <div class="callout rule-c">📜 <b>Báo cặp zic-zac:</b> nội dung mình <b>báo sau</b>: bấm VĐV đội bạn để chọn đúng cặp họ vừa báo, bấm <b>🔓 Chốt cặp</b> ở các nội dung đã báo, rồi <b>⚡ Tối ưu</b>. Nội dung mình <b>báo trước</b>: giữ cặp chắc chắn, ít điểm yếu.</div>`;
   }
 
+  const viewTabs = () => `<div class="dp-views"><button class="${dpView === 'bang' ? 'on' : ''}" data-dpview="bang">📋 Bảng 7 vòng</button><button class="${dpView !== 'bang' ? 'on' : ''}" data-dpview="chi-tiet">🔎 Chi tiết từng vòng</button></div>`;
+  // Bảng đơn giản: mỗi vòng một bảng, cột Trận | Team mình | Team bạn; mỗi trận 2 dòng (2 VĐV)
+  function renderTable() {
+    const ties = myTies(), S = subs();
+    const short = (l) => l.replace(/Đôi nam nữ/i, 'ĐNN').replace(/Đôi nam/i, 'ĐN').replace(/\s+/g, '');
+    const cell = (pid, side, key, i, opp) => `<td><button class="tcell ${side}" data-ps="${side}" data-sub="${key}" data-i="${i}" data-pid="${esc(pid || '')}" data-opp="${esc(opp)}">${pid ? esc(pName(pid)) + (NOTES[pid] ? ' <span class="pnote">📝</span>' : '') : '<span class="muted">＋ chọn</span>'}</button></td>`;
+    return `${bar('Đấu pháp', 'Bấm vào tên để chọn / đổi VĐV hoặc ghi chú')}${viewTabs()}
+      ${ties.map((m) => {
+        const opp = oppOf(m), P = planFor(opp), ts = PB.tieScore(m), mine = m.a === ME;
+        return `<div class="vt">
+          <div class="vt-h"><b>Vòng ${m.round}</b><span>${esc(tn(ME))} – ${esc(tn(opp))}</span>${ts.done ? `<em class="${ts.complete ? (ts.winner === (mine ? 'a' : 'b') ? 'up' : 'down') : ''}">${ts.complete ? '🏁' : '🔴'} ${mine ? ts.wa : ts.wb}–${mine ? ts.wb : ts.wa}</em>` : ''}</div>
+          <table class="vt-t"><thead><tr><th>Trận</th><th>${esc(tn(ME))}</th><th>${esc(tn(opp))}</th></tr></thead>
+          <tbody>${S.map((s, i) => {
+            const sub = (m.subs || []).find((x) => x.key === s.key) || {}, r = PB.gameResult(sub.games);
+            const res = r ? `<small class="${r.winner === (mine ? 'a' : 'b') ? 'up' : 'down'}">${mine ? r.pa : r.pb}–${mine ? r.pb : r.pa}</small>` : '';
+            return [0, 1].map((k) => `<tr class="${k ? 'r2' : 'r1'}">${k ? '' : `<td rowspan="2" class="tn-c"><b>${i + 1}</b><small>${esc(short(s.label))}</small>${res}</td>`}
+              ${cell((P.us[s.key] || [])[k], 'us', s.key, k, opp)}${cell((P.them[s.key] || [])[k], 'them', s.key, k, opp)}</tr>`).join('');
+          }).join('')}</tbody></table></div>`;
+      }).join('')}`;
+  }
+
   /* ---------- Cửa sổ VĐV: ghi chú + kỹ năng + đổi người ---------- */
   function openSheet(ctx) { sheet = ctx; drawSheet(); }
   function closeSheet() { sheet = null; const el = $('.cap-sheet'); if (el) el.remove(); document.body.style.overflow = ''; }
@@ -349,12 +371,13 @@
     const { pid, side, key, i } = sheet;
     const info = pid ? findPlayer(pid) : null;
     let swap = '';
+    const OPs = sheet.opp || dpOpp;
     if (side) {
-      const P = planFor(dpOpp), L = side === 'us' ? P.us : P.them, team = side === 'us' ? ME : dpOpp;
+      const OP = sheet.opp || dpOpp, P = planFor(OP), L = side === 'us' ? P.us : P.them, team = side === 'us' ? ME : OP;
       const s = subs().find((x) => x.key === key);
       const where = {}; Object.entries(L).forEach(([k, v]) => (v || []).forEach((x, j) => (where[x] = [k, j])));
       const ok = players(team).filter((p) => (s.mixed && i === 1 ? !isMaleSlot(p) : isMaleSlot(p))).sort(byLevel);
-      swap = `<div class="pp-h">Đổi VĐV ${esc(tn(team))} cho ${esc(s.label)}</div><div class="pp-list">${ok.map((p) => {
+      swap = `<div class="pp-h">Đổi VĐV ${esc(tn(team))} cho ${esc(s.label)}${sheet.opp ? ' · Vòng ' + (myTies().find((x) => oppOf(x) === OPs) || {}).round : ''}</div><div class="pp-list">${ok.map((p) => {
         const w = where[p.id], cur = p.id === pid, lab = w ? subs().find((x) => x.key === w[0]).label : '';
         return `<button class="pp ${cur ? 'on' : ''}" data-swap="${esc(p.id)}" ${cur ? 'disabled' : ''}><span>${lvTag(p.id)} ${esc(p.name)}${NOTES[p.id] ? ' 📝' : ''}</span><small>${cur ? 'đang chọn' : w ? `đang ở ${esc(lab)} → đổi chỗ` : 'chưa xếp'}</small></button>`;
       }).join('')}</div>`;
@@ -372,14 +395,14 @@
   }
   function applySwap(np) {
     const { side, key, i } = sheet;
-    const P = planFor(dpOpp);
+    const OP = sheet.opp || dpOpp, P = planFor(OP);
     const L = JSON.parse(JSON.stringify(side === 'us' ? P.us : P.them));
     const old = (L[key] || [])[i];
     for (const [k, v] of Object.entries(L)) (v || []).forEach((x, j) => { if (x === np && !(k === key && j === i)) L[k][j] = old; });
     L[key] = L[key] || []; L[key][i] = np;
     const patch = side === 'us' ? { us: L } : { them: L };
-    PLAN = { ...PLAN, [dpOpp]: { ...(PLAN[dpOpp] || {}), ...patch } };
-    closeSheet(); render(); savePlan(dpOpp, patch);
+    PLAN = { ...PLAN, [OP]: { ...(PLAN[OP] || {}), ...patch } };
+    closeSheet(); render(); savePlan(OP, patch);
     toast('Đã đổi: ' + pName(np));
   }
 
@@ -405,7 +428,7 @@
     const html = !isCap() ? `<section class="block"><div class="container">${gate()}</div></section>`
       : mustPw || pwOpen ? `<section class="block"><div class="container">${pwForm(mustPw)}</div></section>`
       : !T ? '<section class="block"><div class="container"><p class="muted">Đang tải dữ liệu giải…</p></div></section>'
-      : `<section class="block"><div class="container">${tab === 'ky-nang' ? renderSkills() : renderPlan()}</div></section>`;
+      : `<section class="block"><div class="container">${tab === 'ky-nang' ? renderSkills() : dpView === 'bang' ? renderTable() : renderPlan()}</div></section>`;
     pane.innerHTML = html;
   }
 
@@ -480,7 +503,8 @@
       }
       if (t.closest('.cap-sheet')) return;
     }
-    const pc = t.closest('[data-ps]'); if (pc) { openSheet({ pid: pc.dataset.pid || null, side: pc.dataset.ps, key: pc.dataset.sub, i: +pc.dataset.i }); return; }
+    const pc = t.closest('[data-ps]'); if (pc) { openSheet({ pid: pc.dataset.pid || null, side: pc.dataset.ps, key: pc.dataset.sub, i: +pc.dataset.i, opp: pc.dataset.opp || null }); return; }
+    const vw = t.closest('[data-dpview]'); if (vw) { dpView = vw.dataset.dpview; try { localStorage.setItem('dao97_dpview', dpView); } catch (er) { /* bỏ qua */ } render(); return; }
     const pn = t.closest('[data-pnote]'); if (pn) { openSheet({ pid: pn.dataset.pnote }); return; }
     const lb = t.closest('[data-lockbtn]');
     if (lb) {
