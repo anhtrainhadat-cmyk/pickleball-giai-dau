@@ -467,13 +467,13 @@
       const sc = r ? PB.formatGames(sub.games) : '–';
       return `<div class="sub ${r ? 'done' : ''}">
         <span class="sl">${PB.esc(sub.label)}</span>
-        <span class="sp a ${r && r.winner === 'a' ? 'w' : ''}">${PB.esc(sub.pa || '')}</span>
+        ${opts.editable ? '' : `<span class="sp a ${r && r.winner === 'a' ? 'w' : ''}">${PB.esc(sub.pa || '')}</span>
         <span class="ss">${PB.esc(sc)}</span>
-        <span class="sp b ${r && r.winner === 'b' ? 'w' : ''}">${PB.esc(sub.pb || '')}</span>
+        <span class="sp b ${r && r.winner === 'b' ? 'w' : ''}">${PB.esc(sub.pb || '')}</span>`}
         ${opts.editable ? `<div class="sub-edit">
-          <input data-mid="${m.id}" data-sub="${i}" data-f="pa" value="${PB.esc(sub.pa || '')}" placeholder="VĐV đội trái" aria-label="VĐV đội trái">
-          <input class="in-score" data-mid="${m.id}" data-sub="${i}" data-f="games" value="${PB.esc(PB.formatGames(sub.games))}" placeholder="15-12" aria-label="Tỉ số ${PB.esc(sub.label)}">
-          <input data-mid="${m.id}" data-sub="${i}" data-f="pb" value="${PB.esc(sub.pb || '')}" placeholder="VĐV đội phải" aria-label="VĐV đội phải">
+          <button type="button" class="pick-p ${sub.pa ? 'set' : ''}" data-pick="p" data-mid="${m.id}" data-sub="${i}" data-side="a">${sub.pa ? PB.esc(sub.pa) : '👥 Chọn 2 VĐV'}</button>
+          <button type="button" class="pick-s ${r ? 'set' : ''}" data-pick="s" data-mid="${m.id}" data-sub="${i}">${r ? PB.esc(PB.formatGames(sub.games)) : 'Nhập tỉ số'}</button>
+          <button type="button" class="pick-p ${sub.pb ? 'set' : ''}" data-pick="p" data-mid="${m.id}" data-sub="${i}" data-side="b">${sub.pb ? PB.esc(sub.pb) : '👥 Chọn 2 VĐV'}</button>
         </div>` : ''}
       </div>`;
     }).join('');

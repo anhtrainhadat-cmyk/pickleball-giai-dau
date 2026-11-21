@@ -102,7 +102,6 @@
     const views = { 'ket-qua': resultsView, doi: teamsView, 'du-doan': predsView, 'cai-dat': settingsView };
     app.innerHTML = rosterBanner() + levelBanner() + `<nav class="tabs" style="margin-top:0">${TABS.map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? 'active' : ''}">${v}</button>`).join('')}</nav>
       <div id="pane">${views[tab]()}</div>`;
-    if (tab === 'ket-qua') attachDatalists();
     scrollTo(0, y);
   }
 
@@ -132,22 +131,111 @@
     const done = T.matches.filter((m) => PB.result(m)).length;
     return `<div class="card" style="margin-bottom:16px">
         <div class="toolbar" style="justify-content:space-between"><b>${done}/${T.matches.length} lượt đấu đã xong</b><span class="saving">Lưu tự động · khán giả thấy ngay</span></div>
-        <p class="hint">Nhập tỉ số mỗi nội dung theo thứ tự <b>đội trái – đội phải</b>, VD <code>15-12</code>. Xử thua do vi phạm: <code>0-15</code> hoặc <code>15-0</code>. Ô hai bên để ghi cặp VĐV (gợi ý theo danh sách đội). Xoá trắng ô tỉ số để huỷ kết quả.</p>
+        <p class="hint">Mỗi nội dung: bấm <b>👥 Chọn 2 VĐV</b> ở hai bên để chọn cặp thi đấu (mỗi VĐV chỉ đánh 1 nội dung/vòng; Đôi nam nữ = 1 nam + 1 nữ), rồi bấm <b>Nhập tỉ số</b> → chọn đội thắng (15 điểm) → chọn điểm đội thua (0–14). Xử thua do vi phạm: chọn đội thua <b>0</b> điểm.</p>
       </div>
       <div class="chips" style="margin-bottom:14px">${rounds.map((r) => {
         const ok = T.matches.filter((m) => m.round === r).every((m) => PB.result(m));
         return `<button class="chip ${r === round ? 'active' : ''}" data-round="${r}">Vòng ${r}${ok ? ' ✓' : ''}</button>`;
       }).join('')}</div>
       <div class="match-list ties">${T.matches.filter((m) => m.round === round).map((m) => PB.renderMatch(T, m, { editable: true })).join('')}</div>
-      <h2 class="stage-title">Bảng xếp hạng</h2><div class="card">${PB.renderStandings(T, 'A')}</div>
-      ${T.teams.map((x) => `<datalist id="dl-${esc(x.id)}">${(x.players || []).filter((p) => p.name).map((p) => `<option value="${esc(p.name)}">`).join('')}</datalist>`).join('')}`;
+      <h2 class="stage-title">Bảng xếp hạng</h2><div class="card">${PB.renderStandings(T, 'A')}</div>`;
   }
-  function attachDatalists() {
-    app.querySelectorAll('.sub-edit input[data-f="pa"], .sub-edit input[data-f="pb"]').forEach((inp) => {
-      const m = T.matches.find((x) => x.id === inp.dataset.mid);
-      if (m) inp.setAttribute('list', 'dl-' + (inp.dataset.f === 'pa' ? m.a : m.b));
-    });
+
+  /* --- Cửa sổ chọn VĐV / nhập tỉ số --- */
+  const SEP = ' & ';
+  const splitPair = (v) => String(v || '').split(/\s*&\s*|\s*,\s*|\s+-\s+/).map((x) => x.trim()).filter(Boolean);
+  const maleSlot = (p) => p.gender !== 'nu' || /vị trí nam/i.test(p.note || '');
+  let modal = null;
+  function closeModal() { if (modal) { modal.remove(); modal = null; document.body.style.overflow = ''; } }
+  function openModal(html, onClick) {
+    closeModal();
+    modal = document.createElement('div');
+    modal.className = 'mdl-bg';
+    modal.innerHTML = `<div class="mdl" role="dialog" aria-modal="true">${html}</div>`;
+    modal.addEventListener('click', (e) => { if (e.target === modal || e.target.closest('[data-x]')) return closeModal(); onClick(e); });
+    document.body.appendChild(modal); document.body.style.overflow = 'hidden';
   }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  function pickPlayers(m, si, side) {
+    const sub = m.subs[si], tid = side === 'a' ? m.a : m.b, key = side === 'a' ? 'pa' : 'pb';
+    const mixed = /nữ/i.test(sub.label);
+    const ps = ((PB.team(T, tid) || {}).players || []).filter((p) => p && p.name);
+    // VĐV đã được xếp ở nội dung khác của cùng lượt đấu
+    const usedIn = {};
+    m.subs.forEach((x, j) => { if (j !== si) splitPair(x[key]).forEach((n) => (usedIn[n] = x.label)); });
+    let sel = splitPair(sub[key]).filter((n) => ps.some((p) => p.name === n));
+    const ok = () => {
+      if (sel.length !== 2) return false;
+      if (!mixed) return true;
+      const g = sel.map((n) => maleSlot(ps.find((p) => p.name === n)));
+      return g.includes(true) && g.includes(false);
+    };
+    const row = (p) => {
+      const used = usedIn[p.name], on = sel.includes(p.name);
+      const lv = ratings[p.id] ? `<span class="lv lv${ratings[p.id]}">T${ratings[p.id]}</span>` : '';
+      return `<button class="pp ${on ? 'on' : ''}" data-pp="${esc(p.name)}" ${used ? 'disabled' : ''}>
+        <span>${maleSlot(p) ? '♂' : '♀'} ${esc(p.name)} ${lv}</span>${used ? `<small>đã đánh ${esc(used)}</small>` : on ? '<small>✓ đã chọn</small>' : ''}</button>`;
+    };
+    const draw = () => {
+      const men = ps.filter(maleSlot), wom = ps.filter((p) => !maleSlot(p));
+      openModal(`<div class="mdl-h"><div><small>Vòng ${m.round} · ${esc(sub.label)}</small><h3>${esc(PB.teamName(T, tid))}</h3></div><button class="mdl-x" data-x aria-label="Đóng">✕</button></div>
+        <p class="muted mdl-note">${mixed ? 'Chọn <b>1 nam + 1 nữ</b>.' : 'Chọn <b>2 VĐV nam</b>.'} VĐV đã đánh nội dung khác trong lượt này sẽ bị khoá.</p>
+        ${mixed ? `<div class="pp-h">Nam</div><div class="pp-list">${men.map(row).join('')}</div><div class="pp-h">Nữ</div><div class="pp-list">${wom.map(row).join('')}</div>`
+          : `<div class="pp-list">${men.map(row).join('')}</div>`}
+        <div class="mdl-sel">Đã chọn: <b>${sel.length ? esc(sel.join(SEP)) : '—'}</b> (${sel.length}/2)</div>
+        <div class="mdl-act">${sub[key] ? '<button class="btn ghost danger" data-clear>Xoá cặp</button>' : ''}<button class="btn ghost" data-x>Huỷ</button><button class="btn primary" data-save ${ok() ? '' : 'disabled'}>Lưu cặp</button></div>`, async (e) => {
+        const b = e.target.closest('[data-pp]');
+        if (b && !b.disabled) {
+          const n = b.dataset.pp, p = ps.find((x) => x.name === n);
+          if (sel.includes(n)) sel = sel.filter((x) => x !== n);
+          else if (mixed) { sel = sel.filter((x) => maleSlot(ps.find((y) => y.name === x)) !== maleSlot(p)); sel.push(n); }
+          else { if (sel.length >= 2) sel.shift(); sel.push(n); }
+          return draw();
+        }
+        if (e.target.closest('[data-clear]')) { closeModal(); await save(m, sub, key, ''); return; }
+        if (e.target.closest('[data-save]') && ok()) {
+          const order = sel.slice().sort((x, y) => maleSlot(ps.find((p) => p.name === y)) - maleSlot(ps.find((p) => p.name === x)));
+          closeModal(); await save(m, sub, key, order.join(SEP));
+        }
+      });
+    };
+    draw();
+  }
+
+  function pickScore(m, si) {
+    const sub = m.subs[si], A = PB.teamName(T, m.a), B = PB.teamName(T, m.b);
+    const r = PB.gameResult(sub.games);
+    let win = r ? r.winner : null;
+    const draw = () => {
+      const lose = r && r.winner === win ? Math.min(r.pa, r.pb) : null;
+      openModal(`<div class="mdl-h"><div><small>Vòng ${m.round} · ${esc(sub.label)}</small><h3>Nhập tỉ số</h3></div><button class="mdl-x" data-x aria-label="Đóng">✕</button></div>
+        ${!sub.pa || !sub.pb ? '<p class="notice warn mdl-note">⚠️ Chưa chọn đủ cặp VĐV hai bên. Nên chọn VĐV trước khi nhập tỉ số.</p>' : ''}
+        <div class="pp-h">1 · Đội thắng (chạm 15 điểm)</div>
+        <div class="win-pick">${[['a', A, sub.pa], ['b', B, sub.pb]].map(([k, n, ps]) => `<button class="pp ${win === k ? 'on' : ''}" data-win="${k}"><span><b>${esc(n)}</b></span><small>${esc(ps || 'chưa chọn VĐV')}</small></button>`).join('')}</div>
+        ${win ? `<div class="pp-h">2 · Điểm của ${esc(win === 'a' ? B : A)} (đội thua)</div>
+          <div class="sc-grid">${Array.from({ length: 15 }, (_, i) => `<button class="sc ${lose === i ? 'on' : ''}" data-lose="${i}">${i}</button>`).join('')}</div>
+          <p class="muted mdl-note">Bấm số là lưu ngay: ${esc(A)} <b>${win === 'a' ? '15' : '?'}</b> – <b>${win === 'b' ? '15' : '?'}</b> ${esc(B)}. Xử thua do vi phạm: chọn 0.</p>` : '<p class="muted mdl-note">Chọn đội thắng trước.</p>'}
+        <div class="mdl-act">${r ? '<button class="btn ghost danger" data-clear>Xoá kết quả</button>' : ''}<button class="btn ghost" data-x>Đóng</button></div>`, async (e) => {
+        const w = e.target.closest('[data-win]'); if (w) { win = w.dataset.win; return draw(); }
+        const l = e.target.closest('[data-lose]');
+        if (l) {
+          const x = +l.dataset.lose, sc = win === 'a' ? `15-${x}` : `${x}-15`;
+          closeModal(); await save(m, sub, 'sc', sc); toast(`Đã lưu ${sub.label}: ${A} ${sc} ${B}`); return;
+        }
+        if (e.target.closest('[data-clear]') && confirm('Xoá kết quả nội dung này?')) { closeModal(); await save(m, sub, 'sc', ''); }
+      });
+    };
+    draw();
+  }
+  async function save(m, sub, f, v) {
+    try { await Store.saveSub(m.id, sub.key, f, v); } catch (er) { toast('Không lưu được: ' + er.message); }
+  }
+  app.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]'); if (!b) return;
+    const m = T.matches.find((x) => x.id === b.dataset.mid); if (!m) return;
+    if (b.dataset.pick === 'p') pickPlayers(m, +b.dataset.sub, b.dataset.side); else pickScore(m, +b.dataset.sub);
+  });
 
   /* --- Đội & chấm trình --- */
   function teamsView() {
